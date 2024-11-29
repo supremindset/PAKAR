@@ -5,7 +5,7 @@ self.addEventListener('install', function(event) {
     caches.open(CACHE_NAME).then(function(cache) {
       return cache.addAll([
         './',
-        './PAKAR.html',
+        './index.html',
         './manifest.json',
         './styles.css', // Add your CSS file
         './script.js', // Add your JavaScript file
