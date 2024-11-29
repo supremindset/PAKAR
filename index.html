@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="manifest.json">
-  <script async id="weppstore-install-script" src="https://cdn.jsdelivr.net/gh/ryxxn/pwa-install-prompt@main/index.js"></script>
-</head>
   <title>Bayang-Bayang Qiblat</title>
+  <link rel="canonical" href="https://supremindset.github.io/PAKAR/" />
+  <link rel="manifest" href="/PAKAR/manifest.webmanifest">
   <style>
    body {
       display: flex;
@@ -286,7 +284,6 @@
   </style>
 </head>
 <body>
-  <button id="install-button" style="display: visible;">Install App</button>
   <h2 id="distanceToKaabah" placeholder="Distance to Kaaba"></h2>
   <div id="status">Checking network status...</div>
   <br/><br/>
@@ -335,8 +332,15 @@
 
     <div id="map"></div>
   </div>
-<script async id="weppstore-install-script" src="https://cdn.jsdelivr.net/gh/ryxxn/pwa-install-prompt@main/index.js"></script>
+
   <script>
+  if (navigator.serviceWorker) {
+        navigator.serviceWorker.register (
+          '/PAKAR/sw.js',
+          {scope: '/PAKAR/'}
+        )
+      }
+      
 function isOnline() {
   return navigator.onLine;
 }
@@ -593,33 +597,6 @@ const QIBLAT_METHODS = {
   BANGUNAN: 'bangunan',
   BAYANG: 'bayang',
 };
-
-// Installation prompt handling
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('beforeinstallprompt event fired');
-    e.preventDefault();
-    deferredPrompt = e;
-    const installButton = document.getElementById('install-button');
-    installButton.style.display = 'block'; // Show the install button
-});
-
-const installButton = document.getElementById('install-button');
-installButton.addEventListener('click', () => {
-    installButton.style.display = 'none'; // Hide the button when clicked
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the A2HS prompt');
-            } else {
-                console.log('User dismissed the A2HS prompt');
-            }
-            deferredPrompt = null;
-        });
-    }
-});
 
 function toRadians(degrees) {
   return degrees * Math.PI / 180;
