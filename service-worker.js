@@ -3,10 +3,8 @@ self.addEventListener('install', function(event) {
     caches.open('static-cache').then(function(cache) {
       return cache.addAll([
         './',
-        './index.html',
+        './PAKAR.html',
         './manifest.json',
-        './style.css',
-        './script.js',
         // Add other assets you need to cache
       ]);
     })
