@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bayang-Bayang Qiblat</title>
   <link rel="manifest" href="/manifest.json">
+  <link rel="icon" sizes="192x192" href="./icon.png">
   <style>
    body {
       display: flex;
@@ -729,16 +730,59 @@
         console.warn("Offline mode: updateBearingAndLines cannot be executed.");
       };
     }
+
+if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    } else {
+      alert('ServiceWorker unavailable');
+    }
     
-    if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-        console.log('Service Worker registered with scope:', registration.scope);
-      }).catch((error) => {
-        console.error('Service Worker registration failed:', error);
-      });
-    });
+    function output(text) {
+  document.body.appendChild(new Text(text));
+  document.body.appendChild(document.createElement('br'));
+}
+
+let cookie = document.cookie.split('; ').filter(value => value.startsWith('time='))[0];
+if (!cookie) {
+  cookie = `time=${Date.now()}`;
+  document.cookie = `${cookie}; max-age=864000`;
+}
+
+let strage = localStorage.getItem('time');
+if (!strage) localStorage.setItem('time', strage = Date.now());
+
+output(`cookie = ${cookie.split('=')[1]}`);
+output(`localStorage = ${strage}`);
+
+// Link to GitHub
+{
+  const link = document.createElement('a');
+  link.href = 'https://github.com/supremindset/pakar';
+  link.text = 'A Tag Link';
+  document.body.appendChild(link);
+  document.body.appendChild(document.createElement('br'));
+}
+
+{
+  const link = document.createElement('a');
+  link.href = 'javascript:void(0)';
+  link.onclick = () => {
+    location.href = 'https://github.com/supremindset/pakar';
   }
+  link.text = 'JavaScript Link';
+  document.body.appendChild(link);
+  document.body.appendChild(document.createElement('br'));
+}
+
+{
+  const link = document.createElement('a');
+  link.href = 'https://github.com/supremindset/pakar';
+  link.target = '_blank';
+  link.text = 'New Window Link';
+  document.body.appendChild(link);
+  document.body.appendChild(document.createElement('br'));
+}
+
   </script>
 </body>
 </html>
