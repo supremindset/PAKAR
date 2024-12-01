@@ -1,11 +1,13 @@
 {
-  "name": "Standard PWA",
-  "short_name": "Standard",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#546e7a",
-  "theme_color": "#29434e",
-  "icons": [
+    "name":"Text-To-Speech-Converter",
+    "short_name":"Text-To-speech APP",
+    "start_url":"index.html",
+    "display":"standalone",
+    "background_color":"#fafa05",
+    "theme_color":"black",
+    "scope": ".",
+    "description":"This App Converts Text Into Speech",
+    "icons": [
     {
       "src": "./icon256.png",
       "type": "image/png",
