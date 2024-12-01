@@ -7,46 +7,50 @@ var URLS = [
   `${GHPATH}/css/styles.css`,
   `${GHPATH}/img/icon.png`,
   `${GHPATH}/js/app.js`
-]
+];
 
-var CACHE_NAME = APP_PREFIX + VERSION
-self.addEventListener('fetch', function (e) {
+var CACHE_NAME = APP_PREFIX + VERSION;
+
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Installing cache : ' + CACHE_NAME);
+      return cache.addAll(URLS);
+    }).catch((error) => {
+      console.error('Failed to cache resources during install:', error);
+    })
+  );
+});
+
+self.addEventListener('fetch', (e) => {
   console.log('Fetch request : ' + e.request.url);
   e.respondWith(
-    caches.match(e.request).then(function (request) {
-      if (request) { 
+    caches.match(e.request).then((cachedResponse) => {
+      if (cachedResponse) {
         console.log('Responding with cache : ' + e.request.url);
-        return request
-      } else {       
+        return cachedResponse;
+      } else {
         console.log('File is not cached, fetching : ' + e.request.url);
-        return fetch(e.request)
+        return fetch(e.request).catch((error) => {
+          console.error('Fetch failed:', error);
+          throw error;
+        });
       }
     })
-  )
-})
+  );
+});
 
-self.addEventListener('install', function (e) {
+self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(function (cache) {
-      console.log('Installing cache : ' + CACHE_NAME);
-      return cache.addAll(URLS)
-    })
-  )
-})
-
-self.addEventListener('activate', function (e) {
-  e.waitUntil(
-    caches.keys().then(function (keyList) {
-      var cacheWhitelist = keyList.filter(function (key) {
-        return key.indexOf(APP_PREFIX)
-      })
+    caches.keys().then((keyList) => {
+      let cacheWhitelist = keyList.filter((key) => key.indexOf(APP_PREFIX) !== -1);
       cacheWhitelist.push(CACHE_NAME);
-      return Promise.all(keyList.map(function (key, i) {
+      return Promise.all(keyList.map((key, i) => {
         if (cacheWhitelist.indexOf(key) === -1) {
-          console.log('Deleting cache : ' + keyList[i] );
-          return caches.delete(keyList[i])
+          console.log('Deleting cache : ' + keyList[i]);
+          return caches.delete(keyList[i]);
         }
-      }))
+      }));
     })
-  )
-})
+  );
+});
