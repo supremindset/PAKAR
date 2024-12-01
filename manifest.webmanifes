@@ -9,9 +9,9 @@
   "display": "standalone", 
   "icons": [
       {
-        "src": "/github-page-pwa/img/icon.png",
-        "type": "image/png",
-        "sizes": "700x700"
+        "src": "/PAKAR/Papirus-Team-Papirus-Apps-NoMachine-icon.256.png",
+        "type": "png",
+        "sizes": "256x256"
       }
   ]
 }
