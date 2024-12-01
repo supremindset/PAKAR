@@ -3,7 +3,7 @@
   "short_name": "GPPWA",
   "description": "Github Page as a Progressive Web App",
   "scope": "/PAKAR/",
-  "start_url": "/PAKAR/",
+  "start_url": "./PAKAR/",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "display": "standalone", 
