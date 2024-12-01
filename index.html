@@ -6,14 +6,6 @@
   <title>Bayang-Bayang Qiblat</title>
   <link rel="canonical" href="https://supremindset.github.io/PAKAR/" />
   <link rel="manifest" href="/PAKAR/manifest.webmanifest">
-  <script>
-      if (navigator.serviceWorker) {
-        navigator.serviceWorker.register (
-          '/PAKAR/sw.js',
-          {scope: '/PAKAR/'}
-        )
-      }
-  </script>
   <style>
    body {
       display: flex;
@@ -750,6 +742,14 @@
         console.warn("Offline mode: updateBearingAndLines cannot be executed.");
       };
     }
+  </script>
+  <script>
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.register (
+          '/PAKAR/sw.js',
+          {scope: '/PAKAR/'}
+        )
+      }
   </script>
 </body>
 </html>
