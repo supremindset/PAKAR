@@ -472,7 +472,7 @@
             const userLng = position.coords.longitude;
             
             // Set map view to user's current location
-            map.setView([userLat, userLng], 22); // Zoom level can be adjusted
+            map.setView([userLat, userLng], 18); // Zoom level can be adjusted
             firstPin.setLatLng([userLat, userLng]); // Move the first pin to user's location
           },
           function() {
