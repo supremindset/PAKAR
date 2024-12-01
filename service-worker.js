@@ -5,7 +5,7 @@ self.addEventListener('install', (event) => {
         '/',
         '/index.html',
         '/styles.css', // Add your stylesheet if any
-        '/icon.png', // Add your icon
+        '/icon.svg', // Add your icon
       ]);
     })
   );
