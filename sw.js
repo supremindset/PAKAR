@@ -5,7 +5,7 @@ var URLS = [
   `${GHPATH}/`,
   `${GHPATH}/index.html`,
   `${GHPATH}/css/styles.css`,
-  `${GHPATH}/img/icon.png`,
+  `${GHPATH}/Papirus-Team-Papirus-Apps-NoMachine-icon.256.png`,
   `${GHPATH}/js/app.js`
 ];
 
