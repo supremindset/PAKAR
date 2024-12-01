@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bayang-Bayang Qiblat</title>
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" sizes="256x256" href="./icon256.png">
+  <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech Converter</title>
+    <link rel="manifest" href="manifest.json">
   <style>
    body {
       display: flex;
@@ -367,7 +369,6 @@
       }
     }
 
-    
     function checkNetworkStatus() {
       if (navigator.onLine) {
         document.getElementById('map').style.display = 'block';
@@ -478,7 +479,7 @@
           
           const sunAzimuth = updateSunAzimuth(firstLatLng);
 
-          const shadowEndpoint = calculateShadowEndpoint(firstLatLng, sunAzimuth + 180, 10000000);
+          const shadowEndpoint = calculateShadowEndpoint(firstLatLng, 10); // Using 10 meters as object height
           if (shadowLine) {
             shadowLine.setLatLngs([firstLatLng, shadowEndpoint]);
           } else {
@@ -503,7 +504,7 @@
 
           updateCompassDisplay();
         }
-      };
+      }
 
       function updateSunAzimuth(position) {
         const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
@@ -519,18 +520,31 @@
       });
     }
 
-    function calculateShadowEndpoint(startLatLng, azimuth, distance) {
+    function calculateShadowEndpoint(startLatLng, objectHeight) {
+      const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+      const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
+
+      const azimuth = position.azimuth; // In radians
+      const altitude = position.altitude; // In radians
+
+      // Calculate shadow length based on object height and sun altitude
+      const shadowLength = objectHeight / Math.tan(altitude);
+
+      // Earth's radius in meters
       const earthRadius = 6371000;
-      const bearing = toRadians(azimuth);
-      
+
+      // Calculate the end point of the shadow using the Haversine formula
+      const angularDistance = shadowLength / earthRadius;
+      const bearing = azimuth;
+
       const lat1 = toRadians(startLatLng.lat);
       const lon1 = toRadians(startLatLng.lng);
-      
-      const lat2 = Math.asin(Math.sin(lat1) * Math.cos(distance / earthRadius) +
-                    Math.cos(lat1) * Math.sin(distance / earthRadius) * Math.cos(bearing));
-      const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(distance / earthRadius) * Math.cos(lat1),
-                                    Math.cos(distance / earthRadius) - Math.sin(lat1) * Math.sin(lat2));
-      
+
+      const lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularDistance) +
+                             Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing));
+      const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
+                                     Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2));
+
       return L.latLng(toDegrees(lat2), toDegrees(lon2));
     }
 
@@ -730,59 +744,6 @@
         console.warn("Offline mode: updateBearingAndLines cannot be executed.");
       };
     }
-
-if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
-    } else {
-      alert('ServiceWorker unavailable');
-    }
-    
-    function output(text) {
-  document.body.appendChild(new Text(text));
-  document.body.appendChild(document.createElement('br'));
-}
-
-let cookie = document.cookie.split('; ').filter(value => value.startsWith('time='))[0];
-if (!cookie) {
-  cookie = `time=${Date.now()}`;
-  document.cookie = `${cookie}; max-age=864000`;
-}
-
-let strage = localStorage.getItem('time');
-if (!strage) localStorage.setItem('time', strage = Date.now());
-
-output(`cookie = ${cookie.split('=')[1]}`);
-output(`localStorage = ${strage}`);
-
-// Link to GitHub
-{
-  const link = document.createElement('a');
-  link.href = 'https://github.com/supremindset/pakar';
-  link.text = 'A Tag Link';
-  document.body.appendChild(link);
-  document.body.appendChild(document.createElement('br'));
-}
-
-{
-  const link = document.createElement('a');
-  link.href = 'javascript:void(0)';
-  link.onclick = () => {
-    location.href = 'https://github.com/supremindset/pakar';
-  }
-  link.text = 'JavaScript Link';
-  document.body.appendChild(link);
-  document.body.appendChild(document.createElement('br'));
-}
-
-{
-  const link = document.createElement('a');
-  link.href = 'https://github.com/supremindset/pakar';
-  link.target = '_blank';
-  link.text = 'New Window Link';
-  document.body.appendChild(link);
-  document.body.appendChild(document.createElement('br'));
-}
-
   </script>
 </body>
 </html>
