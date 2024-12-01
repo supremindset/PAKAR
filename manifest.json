@@ -2,7 +2,7 @@
   "name": "PAKAR",
   "short_name": "PAKAR",
   "description": "Your description here",
-  "start_url": "/",
+  "start_url": "/https://supremindset.github.io/PAKAR",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
