@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://supremindset.github.io/PAKAR/" />
   <link rel="manifest" href="/PAKAR/manifest.webmanifest">
   <style>
-    body {
+   body {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -23,36 +23,6 @@
       margin-bottom: 20px;
     }
 
-    .tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .tab-button {
-      background-color: #2980b9;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .tab-button.active {
-      background-color: #3498db;
-    }
-
-    .tab-content {
-      display: none;
-      width: 100%;
-      height: 100vh;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Existing CSS styles */
     .tooltip {
       position: relative;
       display: inline-block;
@@ -264,6 +234,8 @@
       transition: transform 0.5s ease;
     }
 
+    
+    
     .custom-select {
       width: 300px;
       height: 41px;
@@ -298,88 +270,64 @@
     }
 
     #map {
-      position: relative;
-      width: 100%;
-      height: 50vh; /* Fullscreen height */
-      margin-top: 0; /* Remove margin */
-      border: none; /* Remove border if necessary */
-    }
+  width: 100%;
+  height: 100vh; /* Fullscreen height */
+  margin-top: 0; /* Remove margin */
+  border: none; /* Remove border if necessary */
+}
+
   </style>
 </head>
 <body>
-  <div class="tabs">
-    <button class="tab-button active" onclick="openTab(event, 'compassDataInput')">Compass & Data Input</button>
-    <button class="tab-button" onclick="openTab(event, 'maps')">Maps</button>
-  </div>
-
-  <div id="compassDataInput" class="tab-content active">
-    <div class="container">
-      <div class="circle-container">
-        <div class="circle" id="circle">
-          <div class="center-dot"></div>
-          <div class="center-line" id="centerLine"></div>
-          <div class="arrow-line" id="arrowLine">
-            <div class="arrow-head" id="arrowHead"></div>
-          </div>
-          <div class="black-arrow-line" id="blackArrowLine">
-            <div class="black-arrow-head" id="blackArrowHead"></div>
-          </div>
-          <div class="short-horizontal-line" id="shortHorizontalLine">
-            <div class="label-north">N</div>
-            <div class="label-south">S</div>
-          </div>
-          <div class="vertical-line" id="verticalLine">
-            <div class="label-east">E</div>
-            <div class="label-west">W</div>
-          </div>
+  <br/><br/>
+  <div class="container">
+    <div class="circle-container">
+      <div class="circle" id="circle">
+        <div class="center-dot"></div>
+        <div class="center-line" id="centerLine"></div>
+        <div class="arrow-line" id="arrowLine">
+          <div class="arrow-head" id="arrowHead"></div>
         </div>
-      </div>
-
-      <div class="data-inputs">
-        <select class="custom-select" id="kaedahQiblat">
-          <option value="bangunan" selected>Bangunan</option>
-          <option value="bayang">Bayang-Bayang</option>
-        </select>
-        <div class="tooltip">
-          <input class="custom-select" type="number" id="degreeInput" placeholder="Bearing" min="0" max="360" step="0.1">
-          <span id="degreeTooltip" class="tooltiptext">The angle measured clockwise from true north to a specific point or direction. It helps determine the direction you need to travel or face to reach a location.</span>
+        <div class="black-arrow-line" id="blackArrowLine">
+          <div class="black-arrow-head" id="blackArrowHead"></div>
         </div>
-
-        <div class="tooltip">
-          <input class="custom-select" type="number" id="qiblatInput" placeholder="True North Qiblat" min="0" max="360" step="0.1">
-          <span id="qiblatTooltip" class="tooltiptext">The fixed angle that indicates the direction towards the Kaaba in Mecca measure from true north, which Muslims face during prayer. This direction remains constant, allowing people to know where to turn for their prayers no matter where they are.</span>
+        <div class="short-horizontal-line" id="shortHorizontalLine">
+          <div class="label-north">N</div>
+          <div class="label-south">S</div>
         </div>
-        <div class="tooltip">
-          <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
-          <span id="dateTimeTooltip" class="tooltiptext">Select a specific date and time to calculate the sun's position.</span>
+        <div class="vertical-line" id="verticalLine">
+          <div class="label-east">E</div>
+          <div class="label-west">W</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="maps" class="tab-content">
-    <div id="map" >
-      <button id="updateLocationButton" style="position: absolute; top: 10px; left: 100px; z-index: 1000; background-color: white; border: 1px solid #ccc; padding: 5px; border-radius: 4px; cursor: pointer;">Update Location</button>
+    <div class="data-inputs">
+      <select class="custom-select" id="kaedahQiblat">
+        <option value="bangunan" selected>Bangunan</option>
+        <option value="bayang">Bayang-Bayang</option>
+      </select>
+      <div class="tooltip">
+        <input class="custom-select" type="number" id="degreeInput" placeholder="Bearing" min="0" max="360" step="0.1">
+        <span id="degreeTooltip" class="tooltiptext">The angle measured clockwise from true north to a specific point or direction. It helps determine the direction you need to travel or face to reach a location.</span>
+      </div>
+
+      <div class="tooltip">
+        <input class="custom-select" type="number" id="qiblatInput" placeholder="True North Qiblat" min="0" max="360" step="0.1">
+        <span id="qiblatTooltip" class="tooltiptext">The fixed angle that indicates the direction towards the Kaaba in Mecca measure from true north, which Muslims face during prayer. This direction remains constant, allowing people to know where to turn for their prayers no matter where they are.</span>
+      </div>
+      <div class="tooltip">
+        <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
+        <span id="dateTimeTooltip" class="tooltiptext">Select a specific date and time to calculate the sun's position.</span>
+      </div>
     </div>
+    <div id="map" style="position: relative; height: 100vH;">
+    <button id="updateLocationButton" style="position: absolute; top: 10px; left: 100px; z-index: 1000; background-color: white; border: 1px solid #ccc; padding: 5px; border-radius: 4px; cursor: pointer;">Update Location</button>
+</div>
   </div>
 
 <script>
-  function openTab(evt, tabName) {
-    const tabContents = document.getElementsByClassName("tab-content");
-    for (let i = 0; i < tabContents.length; i++) {
-      tabContents[i].style.display = "none";
-    }
-
-    const tabButtons = document.getElementsByClassName("tab-button");
-    for (let i = 0; i < tabButtons.length; i++) {
-      tabButtons[i].className = tabButtons[i].className.replace(" active", "");
-    }
-
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
-  }
-
-  function isOnline() {
+    function isOnline() {
     return navigator.onLine;
   }
   
@@ -862,6 +810,6 @@
       {scope: '/PAKAR/'}
     )
   }
-</script>
+  </script>
 </body>
 </html>
