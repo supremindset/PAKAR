@@ -275,6 +275,18 @@
   margin-top: 0; /* Remove margin */
   border: none; /* Remove border if necessary */
 }
+
+#updateLocationButton {
+    position: absolute;
+    top: 10px; /* Adjust the top position as needed */
+    left: 10px; /* Adjust the left position as needed */
+    z-index: 1000; /* Ensure it appears above the map */
+    background-color: white; /* Button background color */
+    border: 1px solid #ccc; /* Button border */
+    padding: 8px 12px; /* Padding inside the button */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Cursor changes to pointer on hover */
+}
     
     #status {
       color: #2980b9;
@@ -326,8 +338,8 @@
         <span id="dateTimeTooltip" class="tooltiptext">Select a specific date and time to calculate the sun's position.</span>
       </div>
     </div>
-<button id="updateLocationButton" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">Update Location</button>
-    <div id="map"></div>
+<div id="map" style="position: relative; height: 100vH;">
+</div>
   </div>
 
 <script>
@@ -470,8 +482,20 @@
       })
       .addTo(map);
       
-      // Geolocation to zoom to user's current location
-      const updateLocationButton = document.getElementById('updateLocationButton');
+      // Create the Update Location button and position it below the search control
+      const updateLocationButton = document.createElement('button');
+      updateLocationButton.id = 'updateLocationButton';
+      updateLocationButton.textContent = 'Update Location';
+      updateLocationButton.style.position = 'absolute';
+      updateLocationButton.style.top = '90px'; // Adjust based on the height of the search control
+      updateLocationButton.style.left = '10px';
+      updateLocationButton.style.zIndex = '1000';
+      updateLocationButton.style.backgroundColor = 'white';
+      updateLocationButton.style.border = '1px solid #ccc';
+      updateLocationButton.style.padding = '5px';
+      updateLocationButton.style.borderRadius = '4px';
+      document.getElementById('map').appendChild(updateLocationButton);
+
       updateLocationButton.addEventListener('click', function() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
