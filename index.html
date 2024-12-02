@@ -326,7 +326,7 @@
         <span id="dateTimeTooltip" class="tooltiptext">Select a specific date and time to calculate the sun's position.</span>
       </div>
     </div>
-<button id="updateLocationButton" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">Update Location</button>
+
     <div id="map"></div>
   </div>
 
@@ -466,9 +466,8 @@
       
       // Geolocation to zoom to user's current location
       const updateLocationButton = document.getElementById('updateLocationButton');
-
-updateLocationButton.addEventListener('click', function() {
-      if (navigator.geolocation) {
+      updateLocationButton.addEventListener('click', function() {
+  if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       function(position) {
         const userLat = position.coords.latitude;
@@ -477,12 +476,18 @@ updateLocationButton.addEventListener('click', function() {
         // Set map view to user's current location immediately
         map.setView([userLat, userLng], 13); // Zoom level can be adjusted
         firstPin.setLatLng([userLat, userLng]); // Move the first pin to user's location
+        
+        // Update bearing and lines based on the new location
+        updateBearingAndLines();
       },
       function() {
         console.error('Geolocation permission denied or unavailable. Defaulting to Banting, Selangor.');
         alert('Unable to retrieve your location. Please enable location services.');
         map.setView(defaultLocation, 13);
         firstPin.setLatLng(defaultLocation);
+        
+        // Update bearing and lines to default location
+        updateBearingAndLines();
       },
       {
         enableHighAccuracy: true, // Use high accuracy
@@ -490,11 +495,14 @@ updateLocationButton.addEventListener('click', function() {
         maximumAge: 0 // Do not use cached position
       }
     );
-} else {
+  } else {
     console.error('Geolocation is not supported by this browser. Defaulting to Banting, Selangor.');
     map.setView(defaultLocation, 13);
     firstPin.setLatLng(defaultLocation);
-}
+    
+    // Update bearing and lines to default location
+    updateBearingAndLines();
+  }
 });
 
       function updateBearingAndLines() {
