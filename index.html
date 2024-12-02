@@ -466,26 +466,31 @@
       
       // Geolocation to zoom to user's current location
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          function(position) {
-            const userLat = position.coords.latitude;
-            const userLng = position.coords.longitude;
-            
-            // Set map view to user's current location
-            map.setView([userLat, userLng], 18); // Zoom level can be adjusted
-            firstPin.setLatLng([userLat, userLng]); // Move the first pin to user's location
-          },
-          function() {
-            console.error('Geolocation permission denied or unavailable. Defaulting to Banting, Selangor.');
-            map.setView(defaultLocation, 13);
-            firstPin.setLatLng(defaultLocation);
-          }
-        );
-      } else {
-        console.error('Geolocation is not supported by this browser. Defaulting to Banting, Selangor.');
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        // Set map view to user's current location immediately
+        map.setView([userLat, userLng], 13); // Zoom level can be adjusted
+        firstPin.setLatLng([userLat, userLng]); // Move the first pin to user's location
+      },
+      function() {
+        console.error('Geolocation permission denied or unavailable. Defaulting to Banting, Selangor.');
         map.setView(defaultLocation, 13);
         firstPin.setLatLng(defaultLocation);
+      },
+      {
+        enableHighAccuracy: true, // Use high accuracy
+        timeout: 5000, // Set a timeout for the geolocation request
+        maximumAge: 0 // Do not use cached position
       }
+    );
+} else {
+    console.error('Geolocation is not supported by this browser. Defaulting to Banting, Selangor.');
+    map.setView(defaultLocation, 13);
+    firstPin.setLatLng(defaultLocation);
+}
 
       function updateBearingAndLines() {
         if (firstPin && secondPin) {
