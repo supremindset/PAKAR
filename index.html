@@ -446,7 +446,13 @@
         secondPin.setLatLng(e.latlng);
         updateBearingAndLines();
       });
-
+      
+      // Allow long click (context menu) to move the first pin
+  map.on('contextmenu', function (e) {
+    firstPin.setLatLng(e.latlng);
+    updateBearingAndLines();
+  });
+      
       L.Control.geocoder({
         defaultMarkGeocode: false
       })
