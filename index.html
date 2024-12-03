@@ -400,10 +400,18 @@ appearance: none;
             return;
         }
 
-        const customIcon = L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
+        const redIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg', // Replace with actual URL
+            iconSize: [100, 100], // Size of the icon
+            iconAnchor: [30, 100], // Point of the icon which will correspond to marker's location
+            popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
+            tooltipAnchor: [16, -28] // Point from which the tooltip should open relative to the iconAnchor
+        });
+
+        const yellowIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/yellowPin.svg', // Replace with actual URL
+            iconSize: [100, 100],
+            iconAnchor: [30, 100],
             popupAnchor: [1, -34],
             tooltipAnchor: [16, -28]
         });
@@ -444,10 +452,10 @@ appearance: none;
         L.control.layers(baseMaps).addTo(map);
 
         const kaabahLatLng = [21.4225, 39.8262];
-        const firstPin = L.marker(defaultLocation, {icon: customIcon, draggable: true}).addTo(map)
+        const firstPin = L.marker(defaultLocation, {icon: redIcon, draggable: true}).addTo(map)
             .bindTooltip('', {permanent: true, direction: 'right'}).openTooltip();
 
-        const secondPin = L.marker([3.1390, 101.6869], {icon: customIcon, draggable: true}).addTo(map)
+        const secondPin = L.marker([3.1390, 101.6869], {icon: yellowIcon, draggable: true}).addTo(map)
             .bindTooltip('', {permanent: true, direction: 'right'}).openTooltip();
 
         map.on('zoomend', function() {
