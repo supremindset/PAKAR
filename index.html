@@ -103,8 +103,9 @@
       border: 2px solid #2980b9;
       transition: transform 0.5s ease;
       background-color: #ffffff;
+      z-index: 1; /* Base z-index for the circle */
     }
-
+    
     .degree-number {
       position: absolute;
       transform-origin: center;
@@ -115,21 +116,29 @@
 
     .center-dot {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 30px;
+  height: 30px;
   background-color: #2980b9;
   border-radius: 50%;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  cursor: pointer; /* Add cursor pointer to indicate it's clickable */
-  border: none; /* Remove default button border if using a button element */
-  outline: none; /* Remove outline */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  z-index: 3; /* Higher z-index to place it on top of lines */
 }
 
 .center-dot:hover {
-  background-color: #3498db; /* Change color on hover */
+  background-color: #3498db;
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.center-dot:active {
+  background-color: #1e6a8d;
+  transform: translate(-50%, -50%) scale(0.95);
 }
 
     .center-line {
@@ -142,6 +151,7 @@
       transform-origin: center;
       transform: translateY(-50%);
       transition: transform 0.5s ease;
+      z-index: 2; /* Ensure lines are behind the center-dot */
     }
 
     .arrow-line {
@@ -154,6 +164,7 @@
       transform-origin: center;
       transform: translateY(-50%) rotate(0deg);
       transition: transform 0.5s ease;
+      z-index: 2; /* Ensure lines are behind the center-dot */
     }
 
     .short-horizontal-line {
@@ -227,6 +238,7 @@
       left: 100%;
       transform: translate(-100%, -50%);
       transition: transform 0.5s ease;
+      z-index: 2; /* Ensure heads are behind the center-dot */
     }
 
     .black-arrow-line {
@@ -239,6 +251,7 @@
       transform-origin: center;
       transform: translateY(-50%);
       transition: transform 0.5s ease;
+      z-index: 2; /* Ensure lines are behind the center-dot */
     }
 
     .black-arrow-head {
@@ -251,6 +264,7 @@
       left: 100%;
       transform: translate(-100%, -50%);
       transition: transform 0.5s ease;
+      z-index: 2; /* Ensure heads are behind the center-dot */
     }
 
     
