@@ -123,7 +123,6 @@
       left: 50%;
       transform: translate(-50%, -50%);
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-      cursor: pointer; /* Make it clear that this is clickable */
     }
 
     .center-line {
@@ -355,7 +354,6 @@ appearance: none;
     <div class="circle-container">
       <div class="circle" id="circle">
         <div class="center-dot"></div>
-        <div id="centerDot" class="center-dot"></div>
         <div class="center-line" id="centerLine"></div>
         <div class="arrow-line" id="arrowLine">
        <div class="arrow-head" id="arrowHead"></div>
@@ -581,7 +579,8 @@ appearance: none;
         })
         .addTo(map);
 
-        const updateLocation = () => {
+        const updateLocationButton = document.getElementById('updateLocationButton');
+        updateLocationButton.addEventListener('click', function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
@@ -610,15 +609,7 @@ appearance: none;
                 firstPin.setLatLng(defaultLocation);
                 updateBearingAndLines('firstPin');
             }
-        };
-
-        // Update location on button click
-        const updateLocationButton = document.getElementById('updateLocationButton');
-        updateLocationButton.addEventListener('click', updateLocation);
-
-        // Update location on center-dot click
-        const centerDot = document.getElementById('centerDot');
-        centerDot.addEventListener('click', updateLocation);
+        });
 
         updateBearingAndLines = function(changedPin) {
             if (firstPin && secondPin) {
