@@ -62,10 +62,12 @@
     }
 
     .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+      height: 100vh; /* Set a fixed height for the container */
+    overflow-y: scroll; /* Enable vertical scrolling */
+    width: 100%;
+    position: relative;
+    padding-top: 30px;
+}
 
     .circle-container {
       position: relative;
@@ -76,6 +78,16 @@
       border-radius: 50%;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
+    
+    .sticky-wrapper {
+   position: sticky; /* Make the wrapper sticky */
+   top: 0; /* Stick to the top of the container or viewport */
+   z-index: 1000; /* Ensure it stays on top of other elements */
+   width: 100%; /* Ensure it spans the full width */
+   display: flex;
+   justify-content: center; /* Center the circle-container horizontally */
+   background-color: #f7f9fc; /* Match the background color to blend in */
+}
 
     .data-inputs {
       display: flex;
@@ -272,26 +284,81 @@ appearance: none;
     select::-ms-expand {
       display: none;
     }
-
-    #map {
+    
+.all-fieldset {
+  border: 2px solid #2980b9;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 20px 0;
   width: 100%;
-  height: 100vh; /* Fullscreen height */
-  margin-top: 0; /* Remove margin */
-  border: none; /* Remove border if necessary */
+  box-sizing: border-box;
 }
+
+    
+    .data-inputs-fieldset {
+  border: 2px solid #2980b9;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.location-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.location-btn:hover {
+  background-color: #3498db;
+}
+
+.map-fieldset {
+  border: 2px solid #2980b9;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 20px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.map-fieldset legend {
+  font-size: 1.2em;
+  color: #2980b9;
+  font-weight: bold;
+  padding: 0 10px;
+}
+
+    
+
+.angle-label {
+    position: absolute;
+    top: 60%; /* Move it further down below the red line */
+    left: 90%; /* Center it horizontally relative to the line */
+    transform: translate(-50%, 0); /* Adjust vertical positioning */
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
 
   </style>
 </head>
 <body>
-  <br/><br/>
   <div class="container">
+    <div class="sticky-wrapper">
     <div class="circle-container">
       <div class="circle" id="circle">
         <div class="center-dot"></div>
         <div class="center-line" id="centerLine"></div>
         <div class="arrow-line" id="arrowLine">
-          <div class="arrow-head" id="arrowHead"></div>
-        </div>
+       <div class="arrow-head" id="arrowHead"></div>
+       <div class="angle-label" id="angleLabel"></div>
+   </div>
         <div class="black-arrow-line" id="blackArrowLine">
           <div class="black-arrow-head" id="blackArrowHead"></div>
         </div>
@@ -305,30 +372,41 @@ appearance: none;
         </div>
       </div>
     </div>
-
-    <div class="data-inputs">
-      <select class="custom-select" id="kaedahQiblat">
-        <option value="bangunan" selected>Bangunan</option>
-        <option value="bayang">Bayang-Bayang</option>
-      </select>
-      <div class="tooltip">
-        <input class="custom-select" type="number" id="degreeInput" placeholder="Bearing" min="0" max="360" step="0.1">
-        <span id="degreeTooltip" class="tooltiptext">The angle measured clockwise from true north to a specific point or direction. It helps determine the direction you need to travel or face to reach a location.</span>
-      </div>
-
-      <div class="tooltip">
-        <input class="custom-select" type="number" id="qiblatInput" placeholder="True North Qiblat" min="0" max="360" step="0.1">
-        <span id="qiblatTooltip" class="tooltiptext">The fixed angle that indicates the direction towards the Kaaba in Mecca measure from true north, which Muslims face during prayer. This direction remains constant, allowing people to know where to turn for their prayers no matter where they are.</span>
-      </div>
-      <div class="tooltip">
-        <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
-        <span id="dateTimeTooltip" class="tooltiptext">Select a specific date and time to calculate the sun's position.</span>
-      </div>
     </div>
-    <div id="map" style="position: relative; height: 100vH;">
-    <button id="updateLocationButton" style="position: absolute; top: 10px; left: 100px; z-index: 1000; background-color: white; border: 1px solid #ccc; padding: 5px; border-radius: 4px; cursor: pointer;">Update Location</button>
-</div>
+    
+
+<fieldset class="data-inputs-fieldset">
+    <legend>Qiblat Settings</legend>
+    <div class="data-inputs">
+  
+    <select class="custom-select" id="kaedahQiblat">
+      <option value="bangunan" selected>Bangunan</option>
+      <option value="bayang">Bayang-Bayang</option>
+    </select>
+    <div class="tooltip">
+      <input class="custom-select" type="number" id="degreeInput" placeholder="Bearing" min="0" max="360" step="0.1">
+      <span id="degreeTooltip" class="tooltiptext">The angle measured clockwise from true north to a specific point or direction.</span>
+    </div>
+    <div class="tooltip">
+      <input class="custom-select" type="number" id="qiblatInput" placeholder="True North Qiblat" min="0" max="360" step="0.1">
+      <span id="qiblatTooltip" class="tooltiptext">The fixed angle that indicates the direction towards the Kaaba in Mecca measured from true north.</span>
+    </div>
+    <div class="tooltip">
+      <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
+      <span id="dateTimeTooltip" class="tooltiptext">Select a specific date and time to calculate the sun's position.</span>
+    </div>
+    </div>
+  </fieldset>
+  
+
+
+<fieldset class="map-fieldset">
+  <legend><button id="updateLocationButton" class="location-btn">Update Location</button></legend>
+  <div id="map" style="position: relative; height: 50vh; width: 100%; margin-top:  0; border: none;">
   </div>
+</fieldset>
+  </div>
+  
 
 <script>
     function isOnline() {
@@ -401,22 +479,21 @@ appearance: none;
         }
 
         const redIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg', // Replace with actual URL
-            iconSize: [100, 100], // Size of the icon
-            iconAnchor: [30, 100], // Point of the icon which will correspond to marker's location
-            popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
-            tooltipAnchor: [16, -28] // Point from which the tooltip should open relative to the iconAnchor
-        });
-
-        const yellowIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/yellowPin.svg', // Replace with actual URL
+            iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg',
             iconSize: [100, 100],
             iconAnchor: [30, 100],
             popupAnchor: [1, -34],
             tooltipAnchor: [16, -28]
         });
 
-        // Default to Banting, Selangor
+        const yellowIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/yellowPin.svg',
+            iconSize: [100, 100],
+            iconAnchor: [30, 100],
+            popupAnchor: [1, -34],
+            tooltipAnchor: [16, -28]
+        });
+
         const defaultLocation = [2.8126, 101.5018];
         const map = L.map('map').setView(defaultLocation, 10);
 
@@ -480,7 +557,6 @@ appearance: none;
             updateBearingAndLines('secondPin');
         });
 
-        // Allow long click (context menu) to move the first pin
         map.on('contextmenu', function(e) {
             firstPin.setLatLng(e.latlng);
             updateBearingAndLines('firstPin');
@@ -503,7 +579,6 @@ appearance: none;
         })
         .addTo(map);
 
-        // Geolocation to zoom to user's current location
         const updateLocationButton = document.getElementById('updateLocationButton');
         updateLocationButton.addEventListener('click', function() {
             if (navigator.geolocation) {
@@ -511,12 +586,8 @@ appearance: none;
                     function(position) {
                         const userLat = position.coords.latitude;
                         const userLng = position.coords.longitude;
-
-                        // Set map view to user's current location immediately
-                        map.setView([userLat, userLng], 13); // Zoom level can be adjusted
-                        firstPin.setLatLng([userLat, userLng]); // Move the first pin to user's location
-
-                        // Update bearing and lines based on the new location
+                        map.setView([userLat, userLng], 13);
+                        firstPin.setLatLng([userLat, userLng]);
                         updateBearingAndLines('firstPin');
                     },
                     function() {
@@ -524,27 +595,23 @@ appearance: none;
                         alert('Unable to retrieve your location. Please enable location services.');
                         map.setView(defaultLocation, 13);
                         firstPin.setLatLng(defaultLocation);
-
-                        // Update bearing and lines to default location
                         updateBearingAndLines('firstPin');
                     },
                     {
-                        enableHighAccuracy: true, // Use high accuracy
-                        timeout: 5000, // Set a timeout for the geolocation request
-                        maximumAge: 0 // Do not use cached position
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
                     }
                 );
             } else {
                 console.error('Geolocation is not supported by this browser. Defaulting to Banting, Selangor.');
                 map.setView(defaultLocation, 13);
                 firstPin.setLatLng(defaultLocation);
-
-                // Update bearing and lines to default location
                 updateBearingAndLines('firstPin');
             }
         });
 
-        function updateBearingAndLines(changedPin) {
+        updateBearingAndLines = function(changedPin) {
             if (firstPin && secondPin) {
                 const firstLatLng = firstPin.getLatLng();
                 const secondLatLng = secondPin.getLatLng();
@@ -564,7 +631,7 @@ appearance: none;
                     sunAzimuth = parseFloat(ELEMENTS.degreeInput.value) || 0;
                 }
 
-                const shadowEndpoint = calculateShadowEndpoint(firstLatLng, 1000000); // Using 1000000 meters as object height
+                const shadowEndpoint = calculateShadowEndpoint(firstLatLng, 1000000);
                 if (shadowLine) {
                     shadowLine.setLatLngs([firstLatLng, shadowEndpoint]);
                 } else {
@@ -589,7 +656,7 @@ appearance: none;
 
                 updateCompassDisplay();
             }
-        }
+        };
 
         function updateSunAzimuth(position) {
             const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
@@ -603,22 +670,37 @@ appearance: none;
                 updateBearingAndLines('firstPin');
             }
         });
+
+        ELEMENTS.kaedahQiblat.addEventListener('change', () => {
+            updateDirectionLabels();
+            toggleDateTimeInputVisibility();
+            updateBearingAndLines('firstPin');
+            if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+                ELEMENTS.degreeInput.placeholder = "Bearing";
+                ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
+                ELEMENTS.degreeTooltip.textContent = "The angle measured clockwise from true north to a specific point or direction.";
+                ELEMENTS.qiblatTooltip.textContent = "The fixed angle that indicates the direction towards the Kaaba in Mecca measure from true north.";
+            } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+                ELEMENTS.degreeInput.placeholder = "Azimuth Matahari";
+                ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
+                ELEMENTS.degreeTooltip.textContent = "The angle that shows the sun's position in the sky at a specific time, measured from true north.";
+                ELEMENTS.qiblatTooltip.textContent = "The fixed angle that indicates the direction towards the Kaaba in Mecca measure from true north.";
+            }
+            updateCompassDisplay();
+        });
     }
 
     function calculateShadowEndpoint(startLatLng, objectHeight) {
         const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
         const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
 
-        const azimuth = position.azimuth; // In radians
-        const altitude = position.altitude; // In radians
+        const azimuth = position.azimuth;
+        const altitude = position.altitude;
 
-        // Calculate shadow length based on object height and sun altitude
         const shadowLength = objectHeight / Math.tan(altitude);
 
-        // Earth's radius in meters
         const earthRadius = 6371000;
 
-        // Calculate the end point of the shadow using the Haversine formula
         const angularDistance = shadowLength / earthRadius;
         const bearing = azimuth;
 
@@ -753,7 +835,18 @@ appearance: none;
         updateArrow(ELEMENTS.blackArrowHead, degree);
         updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
         updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
+
+        const angleBetweenLines = calculateAngleBetweenLines(degree, finalQiblatDegree);
+        ELEMENTS.angleLabel.textContent = `${angleBetweenLines.toFixed(2)}°`;
     };
+
+    function calculateAngleBetweenLines(degree1, degree2) {
+        let angle = Math.abs(degree2 - degree1);
+        if (angle > 180) {
+            angle = 360 - angle;
+        }
+        return angle;
+    }
 
     ELEMENTS.degreeInput.addEventListener('focus', () => {
         showTooltip(ELEMENTS.degreeTooltip);
@@ -783,23 +876,6 @@ appearance: none;
 
     ELEMENTS.degreeInput.addEventListener('input', updateCompassDisplay);
 
-    ELEMENTS.kaedahQiblat.addEventListener('change', () => {
-        updateDirectionLabels();
-        toggleDateTimeInputVisibility();
-        if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-            ELEMENTS.degreeInput.placeholder = "Bearing";
-            ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
-            ELEMENTS.degreeTooltip.textContent = "The angle measured clockwise from true north to a specific point or direction. It helps determine the direction you need to travel or face to reach a location.";
-            ELEMENTS.qiblatTooltip.textContent = "The fixed angle that indicates the direction towards the Kaaba in Mecca measure from true north, which Muslims face during prayer. This direction remains constant, allowing people to know where to turn for their prayers no matter where they are.";
-        } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-            ELEMENTS.degreeInput.placeholder = "Azimuth Matahari";
-            ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
-            ELEMENTS.degreeTooltip.textContent = "The angle that shows the sun's position in the sky at a specific time, measured from true north. It helps you know where to look for the sun as it moves from east to west throughout the day.";
-            ELEMENTS.qiblatTooltip.textContent = "The fixed angle that indicates the direction towards the Kaaba in Mecca measure from true north, which Muslims face during prayer. This direction remains constant, allowing people to know where to turn for their prayers no matter where they are.";
-        }
-        updateCompassDisplay();
-    });
-
     const populateDegreeNumbers = () => {
         const radius = ELEMENTS.circle.offsetWidth / 2;
         const offset = 20;
@@ -820,9 +896,17 @@ appearance: none;
         }
     };
 
+    function createAngleLabel() {
+        const angleLabel = document.createElement('div');
+        angleLabel.className = 'angle-label';
+        ELEMENTS.arrowLine.appendChild(angleLabel);
+        ELEMENTS.angleLabel = angleLabel;
+    }
+
     populateDegreeNumbers();
     updateDirectionLabels();
     toggleDateTimeInputVisibility();
+    createAngleLabel();
 
     if (!isOnline()) {
         updateBearingAndLines = function() {
