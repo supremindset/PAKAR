@@ -114,16 +114,23 @@
     }
 
     .center-dot {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background-color: #2980b9;
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    }
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #2980b9;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+  border: none; /* Remove default button border if using a button element */
+  outline: none; /* Remove outline */
+}
+
+.center-dot:hover {
+  background-color: #3498db; /* Change color on hover */
+}
 
     .center-line {
       position: absolute;
@@ -353,8 +360,8 @@ appearance: none;
     <div class="sticky-wrapper">
     <div class="circle-container">
       <div class="circle" id="circle">
-        <div class="center-dot"></div>
-        <div class="center-line" id="centerLine"></div>
+  <button class="center-dot" id="centerDotButton"></button>
+  <div class="center-line" id="centerLine"></div>
         <div class="arrow-line" id="arrowLine">
        <div class="arrow-head" id="arrowHead"></div>
        <div class="angle-label" id="angleLabel"></div>
@@ -579,8 +586,7 @@ appearance: none;
         })
         .addTo(map);
 
-        const updateLocationButton = document.getElementById('updateLocationButton');
-        updateLocationButton.addEventListener('click', function() {
+        function updateLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
@@ -609,7 +615,13 @@ appearance: none;
                 firstPin.setLatLng(defaultLocation);
                 updateBearingAndLines('firstPin');
             }
-        });
+        }
+
+        const updateLocationButton = document.getElementById('updateLocationButton');
+        updateLocationButton.addEventListener('click', updateLocation);
+
+        const centerDotButton = document.getElementById('centerDotButton');
+        centerDotButton.addEventListener('click', updateLocation);
 
         updateBearingAndLines = function(changedPin) {
             if (firstPin && secondPin) {
