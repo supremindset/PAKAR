@@ -453,7 +453,6 @@
     let updateBearingAndLines;
     let shadowLine;
     let mapInitialized = false;
-    let activityTimeout; // Variable to store the timeout ID
 
     window.onload = function() {
         if (isOnline()) {
@@ -912,23 +911,9 @@
 
     ELEMENTS.qiblatInput.addEventListener('input', () => {
         updateCompassDisplay();
-        resetActivityTimer();
     });
 
-    ELEMENTS.degreeInput.addEventListener('input', () => {
-        updateCompassDisplay();
-        resetActivityTimer();
-    });
-
-    // Reset the activity timer and make the circle non-sticky
-    function resetActivityTimer() {
-        clearTimeout(activityTimeout);
-        const circleWrapper = document.querySelector('.sticky-wrapper');
-        circleWrapper.classList.add('non-sticky');
-        activityTimeout = setTimeout(() => {
-            circleWrapper.classList.remove('non-sticky');
-        }, 2000);
-    }
+    ELEMENTS.degreeInput.addEventListener('input', updateCompassDisplay);
 
     const populateDegreeNumbers = () => {
         const radius = ELEMENTS.circle.offsetWidth / 2;
@@ -968,7 +953,6 @@
 
         inputElement.addEventListener('blur', () => {
             circleWrapper.classList.remove('non-sticky');
-            resetActivityTimer(); // Ensure the timer is reset on blur
         });
     }
 
