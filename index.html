@@ -453,6 +453,7 @@
     let updateBearingAndLines;
     let shadowLine;
     let mapInitialized = false;
+    let activityTimeout; // Variable to store the timeout ID
 
     window.onload = function() {
         if (isOnline()) {
@@ -619,7 +620,7 @@
                     function(position) {
                         const userLat = position.coords.latitude;
                         const userLng = position.coords.longitude;
-                        map.setView([userLat, userLng], 13);
+                        map.setView([userLat, userLng], 19);
                         firstPin.setLatLng([userLat, userLng]);
                         updateBearingAndLines('firstPin');
                     },
@@ -911,9 +912,23 @@
 
     ELEMENTS.qiblatInput.addEventListener('input', () => {
         updateCompassDisplay();
+        resetActivityTimer();
     });
 
-    ELEMENTS.degreeInput.addEventListener('input', updateCompassDisplay);
+    ELEMENTS.degreeInput.addEventListener('input', () => {
+        updateCompassDisplay();
+        resetActivityTimer();
+    });
+
+    // Reset the activity timer and make the circle non-sticky
+    function resetActivityTimer() {
+        clearTimeout(activityTimeout);
+        const circleWrapper = document.querySelector('.sticky-wrapper');
+        circleWrapper.classList.add('non-sticky');
+        activityTimeout = setTimeout(() => {
+            circleWrapper.classList.remove('non-sticky');
+        }, 2000);
+    }
 
     const populateDegreeNumbers = () => {
         const radius = ELEMENTS.circle.offsetWidth / 2;
@@ -953,6 +968,7 @@
 
         inputElement.addEventListener('blur', () => {
             circleWrapper.classList.remove('non-sticky');
+            resetActivityTimer(); // Ensure the timer is reset on blur
         });
     }
 
