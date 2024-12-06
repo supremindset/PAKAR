@@ -61,39 +61,49 @@
       opacity: 1;
     }
 
-    .container {
-      height: 100vh; /* Set a fixed height for the container */
-    overflow-y: scroll; /* Enable vertical scrolling */
+    
+.container {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto; /* Ensure the container can scroll */
     width: 100%;
     position: relative;
     padding-top: 30px;
 }
 
     .circle-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin-bottom: 50px;
-      background-color: #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin-bottom: 50px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
     
     .sticky-wrapper {
-   position: sticky; /* Make the wrapper sticky */
-   top: 0; /* Stick to the top of the container or viewport */
-   z-index: 1000; /* Ensure it stays on top of other elements */
-   width: 100%; /* Ensure it spans the full width */
-   display: flex;
-   justify-content: center; /* Center the circle-container horizontally */
-   background-color: #f7f9fc; /* Match the background color to blend in */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #f7f9fc;
 }
 
+.non-sticky {
+    position: static; /* Changes from sticky to static */
+}
+
+
+    
     .data-inputs {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px; /* Add some margin to prevent overlap with other elements */
+}
 
     .circle {
       position: absolute;
@@ -270,22 +280,20 @@
     
     
     .custom-select {
-      box-sizing: border-box;
-    	-webkit-appearance: none;
--moz-appearance: none;
-appearance: none;
-      width: 300px;
-      height: 41px;
-      padding: 10px;
-      font-size: 12px;
-      text-align: center;
-      margin: 3px 0;
-      border: 2px solid #2980b9;
-      border-radius: 5px;
-      outline: none;
-      transition: border-color 0.3s;
-      appearance: none;
-    }
+    box-sizing: border-box;
+    width: 300px;
+    height: 41px;
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+    margin: 5px 0; /* Slightly larger margin for better spacing */
+    border: 2px solid #2980b9;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+    background-color: #ffffff;
+    cursor: pointer;
+}
 
     select {
       background-color: #ffffff;
@@ -452,6 +460,11 @@ appearance: none;
         } else {
             document.getElementById('map').style.display = 'none';
         }
+
+        // Ensure the circle can toggle stickiness based on input focus
+        const circleWrapper = document.querySelector('.sticky-wrapper');
+        toggleStickyOnFocus(ELEMENTS.degreeInput, circleWrapper);
+        toggleStickyOnFocus(ELEMENTS.qiblatInput, circleWrapper);
     };
 
     function initializeMapIfOnline() {
@@ -516,7 +529,7 @@ appearance: none;
         });
 
         const defaultLocation = [2.8126, 101.5018];
-        const map = L.map('map').setView(defaultLocation, 10);
+        const map = L.map('map').setView(defaultLocation, 19);
 
         const esriLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>',
@@ -613,7 +626,7 @@ appearance: none;
                     function() {
                         console.error('Geolocation permission denied or unavailable. Defaulting to Banting, Selangor.');
                         alert('Unable to retrieve your location. Please enable location services.');
-                        map.setView(defaultLocation, 13);
+                        map.setView(defaultLocation, 19);
                         firstPin.setLatLng(defaultLocation);
                         updateBearingAndLines('firstPin');
                     },
@@ -625,7 +638,7 @@ appearance: none;
                 );
             } else {
                 console.error('Geolocation is not supported by this browser. Defaulting to Banting, Selangor.');
-                map.setView(defaultLocation, 13);
+                map.setView(defaultLocation, 19);
                 firstPin.setLatLng(defaultLocation);
                 updateBearingAndLines('firstPin');
             }
@@ -927,6 +940,20 @@ appearance: none;
         angleLabel.className = 'angle-label';
         ELEMENTS.arrowLine.appendChild(angleLabel);
         ELEMENTS.angleLabel = angleLabel;
+    }
+
+    // Function to toggle sticky class on the circle
+    function toggleStickyOnFocus(inputElement, circleWrapper) {
+        inputElement.addEventListener('focus', () => {
+            circleWrapper.classList.add('non-sticky');
+            setTimeout(() => {
+                inputElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }, 300);
+        });
+
+        inputElement.addEventListener('blur', () => {
+            circleWrapper.classList.remove('non-sticky');
+        });
     }
 
     populateDegreeNumbers();
