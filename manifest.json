@@ -1,7 +1,7 @@
 {
-  "name": "Github Page PWA",
-  "short_name": "GPPWA",
-  "description": "Github Page as a Progressive Web App",
+  "name": "PAKAR Qiblat",
+  "short_name": "PAKAR",
+  "description": "Persatuan Falak",
   "scope": "/PAKAR/",
   "start_url": "/PAKAR/index.html",
   "background_color": "#ffffff",
@@ -10,9 +10,44 @@
   "prefer_related_applications": "false",
   "icons": [
       {
-        "src": "/PAKAR/icon256.png",
-        "type": "image/png",
-        "sizes": "256x256"
-      }
+	"src": "/PAKAR/Kaabab(48 x 48 px).svg",
+	"type": "image/svg+xml",
+	"sizes": "48x48"
+},
+{
+	"src": "/PAKAR/Kaabab(72 x 72 px).svg",
+	"type": "image/svg+xml",
+	"sizes": "72x72"
+},
+{
+	"src": "/PAKAR/Kaabah(96 x 96 px).svg",
+	"type": "image/svg+xml",
+	"sizes": "96x96"
+},
+{
+	"src": "/PAKAR/Kaabah(128 x 128 px).svg",
+	"type": "image/svg+xml",
+	"sizes": "128x128"
+},
+{
+	"src": "/PAKAR/Kaabab(144 x 144 px).svg",
+	"type": "image/svg+xml",
+	"sizes": "144x144"
+},
+{
+	"src": "/PAKAR/Kaabah(192 x 192 px).svg",
+	"type": "image/svg+xml",
+	"sizes": "192x192"
+},
+{
+	"src": "/PAKAR/Kaabah(256 x 256 px).svg",
+	"type": "image/svg+xml",
+	"sizes": "256x256"
+},
+{
+	"src": "/PAKAR/Kaabah(512 x 512 px).svg",
+	"type": "image/svg+xml",
+	"sizes": "512x512"
+}
   ]
 }
