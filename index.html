@@ -671,69 +671,71 @@ function initializeMap() {
   const markerTooltipText1Element = document.getElementById('markerTooltipText1');
   const markerTooltipText2Element = document.getElementById('markerTooltipText2');
 
-  function updateBearingAndLines(changedPin) {
-  if (firstPin && secondPin) {
-    const firstLatLng = firstPin.getLatLng();
-    const secondLatLng = secondPin.getLatLng();
+  updateBearingAndLines = function(changedPin) {
+    if (firstPin && secondPin) {
+      const firstLatLng = firstPin.getLatLng();
+      const secondLatLng = secondPin.getLatLng();
 
-    const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
-    lineToKaabah.setLatLngs(pathToKaabah);
+      const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
+      lineToKaabah.setLatLngs(pathToKaabah);
 
-    lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
+      lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
 
-    const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
-    const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
-
-    let sunAzimuth;
-    if (changedPin === 'firstPin') {
-      sunAzimuth = updateSunAzimuth(firstLatLng);
-    } else {
-      sunAzimuth = parseFloat(ELEMENTS.degreeInput.value) || 0;
-    }
-
-    const shadowEndpoint = calculateShadowEndpoint(firstLatLng, 1000000);
-    const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
-
-    if (isBetweenSunriseSunset(currentDate, firstLatLng.lat, firstLatLng.lng)) {
-      if (!shadowLine) {
-        shadowLine = L.polyline([firstLatLng, shadowEndpoint], { color: 'green' }).addTo(map);
+      const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
+      const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
+      
+      let sunAzimuth;
+      if (changedPin === 'firstPin') {
+        sunAzimuth = updateSunAzimuth(firstLatLng);
       } else {
-        shadowLine.setLatLngs([firstLatLng, shadowEndpoint]);
-        shadowLine.setStyle({ color: 'green' }); // Set the color to green when visible
+        sunAzimuth = parseFloat(ELEMENTS.degreeInput.value) || 0;
       }
-    } else {
-      if (shadowLine) {
-        map.removeLayer(shadowLine); // Remove the shadow line from the map
-        shadowLine = null; // Reset the shadowLine variable
-      }
-    }
 
-    // Update the new tooltip container
-    markerTooltipText1Element.innerHTML = `
-      Red Pin - Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>
-      Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>
-    `;
+      const shadowEndpoint = calculateShadowEndpoint(firstLatLng, 1000000);
+      const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
 
-    markerTooltipText2Element.innerHTML = `
-      Yellow Pin - Bearing: ${bearingToSecondPin.toFixed(2)}°
-    `;
-
-    if (!ELEMENTS.dateTimeInput.value) {
-      ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
-    }
-
-    if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-      ELEMENTS.degreeInput.value = bearingToSecondPin.toFixed(2);
-    } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-      ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
-    }
-
-    updateArrow(ELEMENTS.blackArrowLine, sunAzimuth);
-    updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
-
-    updateCompassDisplay();
+      if (isBetweenSunriseSunset(currentDate, firstLatLng.lat, firstLatLng.lng)) {
+  const shadowEndpoint = calculateShadowEndpoint(firstLatLng, 1000000);
+  if (shadowLine) {
+    shadowLine.setLatLngs([firstLatLng, shadowEndpoint]);
+    shadowLine.setStyle({ color: 'green' }); // Set the color to green when visible
+  } else {
+    shadowLine = L.polyline([firstLatLng, shadowEndpoint], { color: 'green' }).addTo(map);
+  }
+} else {
+  if (shadowLine) {
+    map.removeLayer(shadowLine); // Remove the shadow line from the map
+    shadowLine = null; // Reset the shadowLine variable
   }
 }
+
+      // Update the new tooltip container
+          markerTooltipText1Element.innerHTML = `
+            Red Pin - Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>
+            Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>
+          `;
+          
+          markerTooltipText2Element.innerHTML = `
+            Yellow Pin - Bearing: ${bearingToSecondPin.toFixed(2)}°
+          `;
+          
+
+          if (!ELEMENTS.dateTimeInput.value) {
+            ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
+          }
+
+          if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+            ELEMENTS.degreeInput.value = bearingToSecondPin.toFixed(2);
+          } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+            ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
+          }
+
+          updateArrow(ELEMENTS.blackArrowLine, sunAzimuth);
+          updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
+
+          updateCompassDisplay();
+        }
+      };
 
   function isBetweenSunriseSunset(date, latitude, longitude) {
     const sunTimes = SunCalc.getTimes(date, latitude, longitude);
