@@ -743,16 +743,12 @@ function initializeMap() {
     return azimuth;
   }
 
-  function updateShadowLine(latLng, azimuth) {
+  function updateShadowLine(latLng, objectHeight) {
     const isNight = isSunDown(new Date(ELEMENTS.dateTimeInput.value || Date.now()), latLng.lat, latLng.lng);
 
     if (!isNight) {
-      const shadowStartLat = latLng.lat;
-      const shadowStartLng = latLng.lng;
-      const shadowEndLat = latLng.lat + 100000 * Math.cos(toRadians(azimuth));
-      const shadowEndLng = latLng.lng + 100000 * Math.sin(toRadians(azimuth));
-
-      shadowLine.setLatLngs([[shadowStartLat, shadowStartLng], [shadowEndLat, shadowEndLng]]);
+      const shadowEndpoint = calculateShadowEndpoint(latLng, objectHeight);
+      shadowLine.setLatLngs([[latLng.lat, latLng.lng], [shadowEndpoint.lat, shadowEndpoint.lng]]);
       shadowLine.setStyle({
         color: 'green',
         weight: 10,
@@ -764,6 +760,31 @@ function initializeMap() {
     } else {
       shadowLine.setLatLngs([[0, 0], [0, 0]]);
     }
+  }
+  
+  function calculateShadowEndpoint(startLatLng, objectHeight) {
+    const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+    const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
+
+    const azimuth = position.azimuth;
+    const altitude = position.altitude;
+
+    const shadowLength = objectHeight / Math.tan(altitude);
+
+    const earthRadius = 6371000;
+
+    const angularDistance = shadowLength / earthRadius;
+    const bearing = azimuth;
+
+    const lat1 = toRadians(startLatLng.lat);
+    const lon1 = toRadians(startLatLng.lng);
+
+    const lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularDistance) +
+        Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing));
+    const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
+        Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2));
+
+    return L.latLng(toDegrees(lat2), toDegrees(lon2));
   }
 
   ELEMENTS.dateTimeInput.addEventListener('change', function() {
