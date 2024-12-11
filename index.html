@@ -710,7 +710,7 @@ function initializeMap() {
 
       // Update the new tooltip container
           markerTooltipText1Element.innerHTML = `
-            Red Pin - Qibla: ${bearingToKaabah.toFixed(2)}°<br/>
+            Red Pin - Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>
             Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>
           `;
           
@@ -739,7 +739,13 @@ function initializeMap() {
   function isBetweenSunriseSunset(date, latitude, longitude) {
     const sunTimes = SunCalc.getTimes(date, latitude, longitude);
     const currentTime = date.getTime();
-    return currentTime >= sunTimes.sunrise.getTime() && currentTime <= sunTimes.sunset.getTime();
+    const sunAltitude = SunCalc.getPosition(date, latitude, longitude).altitude;
+
+    return (
+      currentTime >= sunTimes.sunrise.getTime() &&
+      currentTime <= sunTimes.sunset.getTime() &&
+      sunAltitude > 0
+    );
   }
 
   function updateSunAzimuth(position) {
@@ -771,265 +777,265 @@ function initializeMap() {
  }
 
   function calculateShadowEndpoint(startLatLng, objectHeight) {
-    const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
-    const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
+  const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+  const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
 
-    const azimuth = position.azimuth;
-    const altitude = position.altitude;
+  const azimuth = position.azimuth;
+  const altitude = position.altitude;
 
-    const shadowLength = objectHeight / Math.tan(altitude);
+  const shadowLength = objectHeight / Math.tan(altitude);
 
-    const earthRadius = 6371000;
+  const earthRadius = 6371000;
 
-    const angularDistance = shadowLength / earthRadius;
-    const bearing = azimuth;
+  const angularDistance = shadowLength / earthRadius;
+  const bearing = azimuth;
 
-    const lat1 = toRadians(startLatLng.lat);
-    const lon1 = toRadians(startLatLng.lng);
+  const lat1 = toRadians(startLatLng.lat);
+  const lon1 = toRadians(startLatLng.lng);
 
-    const lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularDistance) +
-        Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing));
-    const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
-        Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2));
+  const lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularDistance) +
+      Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing));
+  const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
+      Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2));
 
-    return L.latLng(toDegrees(lat2), toDegrees(lon2));
-  }
+  return L.latLng(toDegrees(lat2), toDegrees(lon2));
+}
 
-  const ELEMENTS = {
-      circle: document.getElementById('circle'),
-      centerLine: document.getElementById('centerLine'),
-      arrowLine: document.getElementById('arrowLine'),
-      arrowHead: document.getElementById('arrowHead'),
-      blackArrowLine: document.getElementById('blackArrowLine'),
-      blackArrowHead: document.getElementById('blackArrowHead'),
-      kaedahQiblat: document.getElementById('kaedahQiblat'),
-      degreeInput: document.getElementById('degreeInput'),
-      degreeTooltip: document.getElementById('degreeTooltip'),
-      qiblatInput: document.getElementById('qiblatInput'),
-      qiblatTooltip: document.getElementById('qiblatTooltip'),
-      distanceToKaabah: document.getElementById('distanceToKaabah'),
-      dateTimeInput: document.getElementById('dateTimeInput'),
-      status: document.getElementById('status')
-    };
-    
+const ELEMENTS = {
+    circle: document.getElementById('circle'),
+    centerLine: document.getElementById('centerLine'),
+    arrowLine: document.getElementById('arrowLine'),
+    arrowHead: document.getElementById('arrowHead'),
+    blackArrowLine: document.getElementById('blackArrowLine'),
+    blackArrowHead: document.getElementById('blackArrowHead'),
+    kaedahQiblat: document.getElementById('kaedahQiblat'),
+    degreeInput: document.getElementById('degreeInput'),
+    degreeTooltip: document.getElementById('degreeTooltip'),
+    qiblatInput: document.getElementById('qiblatInput'),
+    qiblatTooltip: document.getElementById('qiblatTooltip'),
+    distanceToKaabah: document.getElementById('distanceToKaabah'),
+    dateTimeInput: document.getElementById('dateTimeInput'),
+    status: document.getElementById('status')
+  };
+  
 const DISPLAY = {
-  BLOCK: 'block',
-  NONE: 'none',
+BLOCK: 'block',
+NONE: 'none',
 };
 
 const QIBLAT_METHODS = {
-  BANGUNAN: 'bangunan',
-  BAYANG: 'bayang',
+BANGUNAN: 'bangunan',
+BAYANG: 'bayang',
 };
 
 function toRadians(degrees) {
-  return degrees * Math.PI / 180;
+return degrees * Math.PI / 180;
 }
 
 function toDegrees(radians) {
-  return radians * 180 / Math.PI;
+return radians * 180 / Math.PI;
 }
 
 function calculateBearing(lat1, lon1, lat2, lon2) {
-  var lat1Rad = toRadians(lat1);
-  var lat2Rad = toRadians(lat2);
-  var deltaLonRad = toRadians(lon2 - lon1);
+var lat1Rad = toRadians(lat1);
+var lat2Rad = toRadians(lat2);
+var deltaLonRad = toRadians(lon2 - lon1);
 
-  var y = Math.sin(deltaLonRad) * Math.cos(lat2Rad);
-  var x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLonRad);
+var y = Math.sin(deltaLonRad) * Math.cos(lat2Rad);
+var x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLonRad);
 
-  var bearing = Math.atan2(y, x);
-  return (toDegrees(bearing) + 360) % 360;
+var bearing = Math.atan2(y, x);
+return (toDegrees(bearing) + 360) % 360;
 }
 
 function interpolateGreatCircle(lat1, lon1, lat2, lon2, steps) {
-  var points = [];
-  var startLat = toRadians(lat1);
-  var startLon = toRadians(lon1);
-  var endLat = toRadians(lat2);
-  var endLon = toRadians(lon2);
+var points = [];
+var startLat = toRadians(lat1);
+var startLon = toRadians(lon1);
+var endLat = toRadians(lat2);
+var endLon = toRadians(lon2);
 
-  var d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((endLat - startLat) / 2), 2) +
-      Math.cos(startLat) * Math.cos(endLat) * Math.pow(Math.sin((endLon - startLon) / 2), 2)));
+var d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((endLat - startLat) / 2), 2) +
+    Math.cos(startLat) * Math.cos(endLat) * Math.pow(Math.sin((endLon - startLon) / 2), 2)));
 
-  for (var i = 0; i <= steps; i++) {
-    var f = i / steps;
-    var A = Math.sin((1 - f) * d) / Math.sin(d);
-    var B = Math.sin(f * d) / Math.sin(d);
+for (var i = 0; i <= steps; i++) {
+  var f = i / steps;
+  var A = Math.sin((1 - f) * d) / Math.sin(d);
+  var B = Math.sin(f * d) / Math.sin(d);
 
-    var x = A * Math.cos(startLat) * Math.cos(startLon) + B * Math.cos(endLat) * Math.cos(endLon);
-    var y = A * Math.cos(startLat) * Math.sin(startLon) + B * Math.cos(endLat) * Math.sin(endLon);
-    var z = A * Math.sin(startLat) + B * Math.sin(endLat);
+  var x = A * Math.cos(startLat) * Math.cos(startLon) + B * Math.cos(endLat) * Math.cos(endLon);
+  var y = A * Math.cos(startLat) * Math.sin(startLon) + B * Math.cos(endLat) * Math.sin(endLon);
+  var z = A * Math.sin(startLat) + B * Math.sin(endLat);
 
-    var newLat = Math.atan2(z, Math.sqrt(x * x + y * y));
-    var newLon = Math.atan2(y, x);
+  var newLat = Math.atan2(z, Math.sqrt(x * x + y * y));
+  var newLon = Math.atan2(y, x);
 
-    points.push([toDegrees(newLat), toDegrees(newLon)]);
-  }
+  points.push([toDegrees(newLat), toDegrees(newLon)]);
+}
 
-  return points;
+return points;
 }
 
 const showTooltip = (tooltipElement) => {
-  tooltipElement.style.visibility = 'visible';
-  tooltipElement.style.opacity = '1';
+tooltipElement.style.visibility = 'visible';
+tooltipElement.style.opacity = '1';
 };
 
 const hideTooltip = (tooltipElement) => {
-  tooltipElement.style.visibility = 'hidden';
-  tooltipElement.style.opacity = '0';
+tooltipElement.style.visibility = 'hidden';
+tooltipElement.style.opacity = '0';
 };
 
 const updateArrow = (element, degree) => {
-  element.style.transform = `translateY(-50%) rotate(${degree}deg)`;
+element.style.transform = `translateY(-50%) rotate(${degree}deg)`;
 };
 
 const updateDirectionLabels = () => {
-  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-    document.querySelector('.label-north').textContent = 'S';
-    document.querySelector('.label-south').textContent = 'N';
-    document.querySelector('.label-east').textContent = 'W';
-    document.querySelector('.label-west').textContent = 'E';
-  } else {
-    document.querySelector('.label-north').textContent = 'N';
-    document.querySelector('.label-south').textContent = 'S';
-    document.querySelector('.label-east').textContent = 'E';
-    document.querySelector('.label-west').textContent = 'W';
-  }
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+  document.querySelector('.label-north').textContent = 'S';
+  document.querySelector('.label-south').textContent = 'N';
+  document.querySelector('.label-east').textContent = 'W';
+  document.querySelector('.label-west').textContent = 'E';
+} else {
+  document.querySelector('.label-north').textContent = 'N';
+  document.querySelector('.label-south').textContent = 'S';
+  document.querySelector('.label-east').textContent = 'E';
+  document.querySelector('.label-west').textContent = 'W';
+}
 };
 
 const updateCompassDisplay = () => {
-  const degree = parseFloat(ELEMENTS.degreeInput.value) || 0;
-  const inputQiblaDegree = parseFloat(ELEMENTS.qiblatInput.value) || 0;
+const degree = parseFloat(ELEMENTS.degreeInput.value) || 0;
+const inputQiblaDegree = parseFloat(ELEMENTS.qiblatInput.value) || 0;
 
-  let finalQiblatDegree = inputQiblaDegree;
+let finalQiblatDegree = inputQiblaDegree;
 
-  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-    finalQiblatDegree = (finalQiblatDegree + 180) % 360;
-  }
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+  finalQiblatDegree = (finalQiblatDegree + 180) % 360;
+}
 
-  ELEMENTS.centerLine.style.transform = `translateY(-50%) rotate(${degree}deg)`;
-  ELEMENTS.circle.style.transform = `rotate(${90 - degree}deg)`;
+ELEMENTS.centerLine.style.transform = `translateY(-50%) rotate(${degree}deg)`;
+ELEMENTS.circle.style.transform = `rotate(${90 - degree}deg)`;
 
-  updateArrow(ELEMENTS.blackArrowLine, degree);
-  updateArrow(ELEMENTS.blackArrowHead, degree);
-  updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
-  updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
+updateArrow(ELEMENTS.blackArrowLine, degree);
+updateArrow(ELEMENTS.blackArrowHead, degree);
+updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
+updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
 
-  const angleBetweenLines = calculateAngleBetweenLines(degree, finalQiblatDegree);
-  ELEMENTS.angleLabel.textContent = `${angleBetweenLines.toFixed(2)}°`;
+const angleBetweenLines = calculateAngleBetweenLines(degree, finalQiblatDegree);
+ELEMENTS.angleLabel.textContent = `${angleBetweenLines.toFixed(2)}°`;
 };
 
 function calculateAngleBetweenLines(degree1, degree2) {
-  let angle = Math.abs(degree2 - degree1);
-  if (angle > 180) {
-    angle = 360 - angle;
-  }
-  return angle;
+let angle = Math.abs(degree2 - degree1);
+if (angle > 180) {
+  angle = 360 - angle;
+}
+return angle;
 }
 
 const toggleDateTimeInputVisibility = () => {
-  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-    ELEMENTS.dateTimeInput.style.display = DISPLAY.BLOCK;
-  } else {
-    ELEMENTS.dateTimeInput.style.display = DISPLAY.NONE;
-  }
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+  ELEMENTS.dateTimeInput.style.display = DISPLAY.BLOCK;
+} else {
+  ELEMENTS.dateTimeInput.style.display = DISPLAY.NONE;
+}
 };
 
 ELEMENTS.qiblatInput.addEventListener('input', () => {
-  updateCompassDisplay();
-  resetActivityTimer();
+updateCompassDisplay();
+resetActivityTimer();
 });
 
 ELEMENTS.degreeInput.addEventListener('input', () => {
-  updateCompassDisplay();
-  resetActivityTimer();
+updateCompassDisplay();
+resetActivityTimer();
 });
 
 // Reset the activity timer and make the circle non-sticky
 function resetActivityTimer() {
-  clearTimeout(activityTimeout);
-  const circleWrapper = document.querySelector('.sticky-wrapper');
-  circleWrapper.classList.add('non-sticky');
-  activityTimeout = setTimeout(() => {
-    circleWrapper.classList.remove('non-sticky');
-  }, 1000);
+clearTimeout(activityTimeout);
+const circleWrapper = document.querySelector('.sticky-wrapper');
+circleWrapper.classList.add('non-sticky');
+activityTimeout = setTimeout(() => {
+  circleWrapper.classList.remove('non-sticky');
+}, 1000);
 }
 
 const populateDegreeNumbers = () => {
-  const radius = ELEMENTS.circle.offsetWidth / 2;
-  const offset = 20;
-  for (let i = 0; i < 360; i += 10) {
-    const degreeNumber = document.createElement('div');
-    degreeNumber.className = 'degree-number';
-    degreeNumber.textContent = i;
+const radius = ELEMENTS.circle.offsetWidth / 2;
+const offset = 20;
+for (let i = 0; i < 360; i += 10) {
+  const degreeNumber = document.createElement('div');
+  degreeNumber.className = 'degree-number';
+  degreeNumber.textContent = i;
 
-    const angle = i * (Math.PI / 180);
-    const x = radius + (radius + offset) * Math.cos(angle);
-    const y = radius + (radius + offset) * Math.sin(angle);
+  const angle = i * (Math.PI / 180);
+  const x = radius + (radius + offset) * Math.cos(angle);
+  const y = radius + (radius + offset) * Math.sin(angle);
 
-    degreeNumber.style.left = `${x}px`;
-    degreeNumber.style.top = `${y}px`;
-    degreeNumber.style.transform = `translate(-50%, -50%) rotate(${i}deg)`;
+  degreeNumber.style.left = `${x}px`;
+  degreeNumber.style.top = `${y}px`;
+  degreeNumber.style.transform = `translate(-50%, -50%) rotate(${i}deg)`;
 
-    ELEMENTS.circle.appendChild(degreeNumber);
-  }
+  ELEMENTS.circle.appendChild(degreeNumber);
+}
 };
 
 function createAngleLabel() {
-  const angleLabel = document.createElement('div');
-  angleLabel.className = 'angle-label';
-  ELEMENTS.arrowLine.appendChild(angleLabel);
-  ELEMENTS.angleLabel = angleLabel;
+const angleLabel = document.createElement('div');
+angleLabel.className = 'angle-label';
+ELEMENTS.arrowLine.appendChild(angleLabel);
+ELEMENTS.angleLabel = angleLabel;
 }
 
 // Function to toggle sticky class on the circle
 function toggleStickyOnFocus(inputElement, circleWrapper) {
-  inputElement.addEventListener('focus', () => {
-    circleWrapper.classList.add('non-sticky');
-    setTimeout(() => {
-      inputElement.scrollIntoView({behavior: 'smooth', block: 'center'});
-    }, 300);
-  });
+inputElement.addEventListener('focus', () => {
+  circleWrapper.classList.add('non-sticky');
+  setTimeout(() => {
+    inputElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+  }, 300);
+});
 
-  inputElement.addEventListener('blur', () => {
-    circleWrapper.classList.remove('non-sticky');
-    resetActivityTimer(); // Ensure the timer is reset on blur
-  });
+inputElement.addEventListener('blur', () => {
+  circleWrapper.classList.remove('non-sticky');
+  resetActivityTimer(); // Ensure the timer is reset on blur
+});
 }
 
 // Function to toggle the map's circle class
 function toggleMapCircle() {
-  const mapElement = document.getElementById('map');
-  const circleContainer = document.querySelector('.circle-container');
+const mapElement = document.getElementById('map');
+const circleContainer = document.querySelector('.circle-container');
 
-  if (circleContainer.contains(mapElement)) {
-    // Move the map outside the circle and restore original styles
-    document.querySelector('.map-fieldset').appendChild(mapElement);
-    mapElement.style.borderRadius = '0'; // Remove circular shape
-    mapElement.style.height = '50vh'; // Original height
-    mapElement.style.width = '100%'; // Original width
-    mapElement.style.position = 'relative'; // Reset position
-    mapElement.style.top = ''; // Reset top
-    mapElement.style.left = ''; // Reset left
-  } else {
-    // Move the map inside the circle and make it circular
-    circleContainer.appendChild(mapElement);
-    mapElement.classList.add('circle-map'); // Add the class for circular shape
-    alignMapWithCircle(); // Align map size with circle
-    mapElement.style.borderRadius = '50%'; // Make it circular
-    mapElement.style.position = 'absolute'; // Position absolutely
-    mapElement.style.top = '0'; // Align at top
-    mapElement.style.left = '0'; // Align at left
-  }
+if (circleContainer.contains(mapElement)) {
+  // Move the map outside the circle and restore original styles
+  document.querySelector('.map-fieldset').appendChild(mapElement);
+  mapElement.style.borderRadius = '0'; // Remove circular shape
+  mapElement.style.height = '50vh'; // Original height
+  mapElement.style.width = '100%'; // Original width
+  mapElement.style.position = 'relative'; // Reset position
+  mapElement.style.top = ''; // Reset top
+  mapElement.style.left = ''; // Reset left
+} else {
+  // Move the map inside the circle and make it circular
+  circleContainer.appendChild(mapElement);
+  mapElement.classList.add('circle-map'); // Add the class for circular shape
+  alignMapWithCircle(); // Align map size with circle
+  mapElement.style.borderRadius = '50%'; // Make it circular
+  mapElement.style.position = 'absolute'; // Position absolutely
+  mapElement.style.top = '0'; // Align at top
+  mapElement.style.left = '0'; // Align at left
+}
 }
 
 function alignMapWithCircle() {
-  const mapElement = document.getElementById('map');
-  const circleContainer = document.querySelector('.circle');
+const mapElement = document.getElementById('map');
+const circleContainer = document.querySelector('.circle');
 
-  mapElement.style.width = circleContainer.offsetWidth + 'px';
-  mapElement.style.height = circleContainer.offsetHeight + 'px';
+mapElement.style.width = circleContainer.offsetWidth + 'px';
+mapElement.style.height = circleContainer.offsetHeight + 'px';
 }
 
 window.addEventListener('resize', alignMapWithCircle); // Ensure alignment when resizing window
@@ -1040,61 +1046,61 @@ toggleDateTimeInputVisibility();
 createAngleLabel();
 
 if (!isOnline()) {
-  updateBearingAndLines = function() {
-    console.warn("Offline mode: updateBearingAndLines cannot be executed.");
-  };
+updateBearingAndLines = function() {
+  console.warn("Offline mode: updateBearingAndLines cannot be executed.");
+};
 }
 
 // Function to initialize the map rotation slider
 function initializeRotationSlider() {
-  const rotationSlider = document.getElementById('rotationSlider');
-  const rotationValue = document.getElementById('rotationValue');
-  const mapElement = document.getElementById('map');
+const rotationSlider = document.getElementById('rotationSlider');
+const rotationValue = document.getElementById('rotationValue');
+const mapElement = document.getElementById('map');
 
-  rotationSlider.addEventListener('input', (event) => {
-    const rotationDegree = event.target.value;
-    rotationValue.textContent = `${rotationDegree}°`;
-    mapElement.style.transform = `rotate(${rotationDegree}deg)`;
-  });
+rotationSlider.addEventListener('input', (event) => {
+  const rotationDegree = event.target.value;
+  rotationValue.textContent = `${rotationDegree}°`;
+  mapElement.style.transform = `rotate(${rotationDegree}deg)`;
+});
 }
 
 function showInstallPromotion() {
-  if (deferredPrompt) {
-    // Create a custom UI element (e.g., a banner or modal)
-    const installBanner = document.createElement('div');
-    installBanner.classList.add('install-banner');
-    installBanner.textContent = 'Install this app on your device?';
+if (deferredPrompt) {
+  // Create a custom UI element (e.g., a banner or modal)
+  const installBanner = document.createElement('div');
+  installBanner.classList.add('install-banner');
+  installBanner.textContent = 'Install this app on your device?';
 
-    // Add a click event listener to the banner
-    installBanner.addEventListener('click', () => {
-      // Show the installation prompt
-      deferredPrompt.prompt();
-      // Wait for the user's response
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-        } else {
-          console.log('User dismissed the install prompt');
-        }
-        // Remove the install banner
-        installBanner.remove();
-        // Reset the deferred prompt variable
-        deferredPrompt = null;
-      });
+  // Add a click event listener to the banner
+  installBanner.addEventListener('click', () => {
+    // Show the installation prompt
+    deferredPrompt.prompt();
+    // Wait for the user's response
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      // Remove the install banner
+      installBanner.remove();
+      // Reset the deferred prompt variable
+      deferredPrompt = null;
     });
+  });
 
-    // Append the install banner to your UI
-    document.body.appendChild(installBanner);
-  }
+  // Append the install banner to your UI
+  document.body.appendChild(installBanner);
+}
 }
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Prevent the mini-infobar from appearing on mobile
-  e.preventDefault();
-  // Stash the event so it can be triggered later.
-  deferredPrompt = e;
-  // Update UI to notify the user they can install the PWA
-  showInstallPromotion();
+// Prevent the mini-infobar from appearing on mobile
+e.preventDefault();
+// Stash the event so it can be triggered later.
+deferredPrompt = e;
+// Update UI to notify the user they can install the PWA
+showInstallPromotion();
 });
   </script>
 </body>
