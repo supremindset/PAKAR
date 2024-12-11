@@ -703,7 +703,8 @@ function initializeMap() {
         }
       } else {
         if (shadowLine) {
-          shadowLine.setStyle({ color: 'transparent' }); // Set the color to transparent when not visible
+      map.removeLayer(shadowLine); // Remove the shadow line from the map
+      shadowLine = null; // Reset the shadowLine variable
         }
       }
 
