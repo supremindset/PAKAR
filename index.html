@@ -13,6 +13,7 @@
         {scope: '/PAKAR/'}
       )
     }
+    
   </script>
   <style>
     body {
@@ -443,261 +444,270 @@
   </div>
   <script>
     function isOnline() {
-      return navigator.onLine;
+  return navigator.onLine;
+}
+
+function loadScript(url, callback) {
+  const script = document.createElement('script');
+  script.src = url;
+  script.defer = true; // Ensure script is deferred
+  script.onload = callback;
+  document.body.appendChild(script);
+}
+
+let updateBearingAndLines;
+let shadowLine;
+let mapInitialized = false;
+let activityTimeout; // Variable to store the timeout ID
+
+window.onload = function() {
+  if (isOnline()) {
+    initializeMapIfOnline();
+  } else {
+    document.getElementById('map').style.display = 'none';
+  }
+
+  // Ensure the circle can toggle stickiness based on input focus
+  const circleWrapper = document.querySelector('.sticky-wrapper');
+  toggleStickyOnFocus(ELEMENTS.degreeInput, circleWrapper);
+  toggleStickyOnFocus(ELEMENTS.qiblatInput, circleWrapper);
+
+  // Add the event listener to the button for fitting the map into a circle
+  const toggleMapCircleButton = document.getElementById('toggleMapCircle');
+  toggleMapCircleButton.addEventListener('click', toggleMapCircle);
+
+  // Initialize the map rotation slider
+  initializeRotationSlider();
+};
+
+function initializeMapIfOnline() {
+  if (!mapInitialized) {
+    loadLeafletResources(function() {
+      initializeMap();
+      mapInitialized = true;
+    });
+  }
+}
+
+function loadLeafletResources(callback) {
+  const leafletCSS = document.createElement('link');
+  leafletCSS.rel = 'stylesheet';
+  leafletCSS.href = 'https://unpkg.com/leaflet/dist/leaflet.css';
+  document.head.appendChild(leafletCSS);
+
+  const geocoderCSS = document.createElement('link');
+  geocoderCSS.rel = 'stylesheet';
+  geocoderCSS.href = 'https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css';
+  document.head.appendChild(geocoderCSS);
+
+  loadScript('https://unpkg.com/leaflet/dist/leaflet.js', function() {
+    loadScript('https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js', function() {
+      loadScript('https://unpkg.com/suncalc/suncalc.js', callback);
+    });
+  });
+}
+
+function checkNetworkStatus() {
+  if (navigator.onLine) {
+    document.getElementById('map').style.display = 'block';
+    initializeMapIfOnline();
+  } else {
+    document.getElementById('map').style.display = 'none';
+  }
+}
+
+window.addEventListener('online', checkNetworkStatus);
+window.addEventListener('offline', checkNetworkStatus);
+
+function initializeMap() {
+  if (!L.Control.Geocoder) {
+    console.error('Geocoder library not loaded.');
+    return;
+  }
+
+  const redIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg',
+    iconSize: [100, 100],
+    iconAnchor: [30, 100],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28]
+  });
+
+  const yellowIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/yellowPin.svg',
+    iconSize: [100, 100],
+    iconAnchor: [30, 100],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28]
+  });
+
+  const defaultLocation = [2.8126, 101.5018];
+  const map = L.map('map').setView(defaultLocation, 19);
+
+  const esriLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>',
+    maxZoom: 23
+  }).addTo(map);
+
+  const hereSatelliteLayer = L.tileLayer('https://{s}.aerial.maps.ls.hereapi.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8?apiKey=SGBRZo_mNVRWzb2ZckNSjTi2SVZKIgsoW57piYr_uWM&lg=eng', {
+    attribution: 'Map data © 2024 HERE',
+    subdomains: '1234',
+    maxZoom: 22
+  });
+
+  const hereNormalDayLayer = L.tileLayer('https://{s}.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?apiKey=SGBRZo_mNVRWzb2ZckNSjTi2SVZKIgsoW57piYr_uWM&lg=eng', {
+    attribution: 'Map data © 2024 HERE',
+    subdomains: '1234',
+    maxZoom: 20
+  });
+
+  const openStreetMapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data © OpenStreetMap contributors',
+    maxZoom: 19
+  });
+
+  const baseMaps = {
+    "Esri World Imagery": esriLayer,
+    "HERE Satellite": hereSatelliteLayer,
+    "HERE Normal Day": hereNormalDayLayer,
+    "OpenStreetMap": openStreetMapLayer
+  };
+
+  L.control.layers(baseMaps).addTo(map);
+
+  const kaabahLatLng = [21.4225, 39.8262];
+  const firstPin = L.marker(defaultLocation, {icon: redIcon, draggable: true}).addTo(map);
+  const secondPin = L.marker([3.1390, 101.6869], {icon: yellowIcon, draggable: true}).addTo(map);
+
+  map.on('zoomend', function() {
+    if (firstPin) {
+      map.setView(firstPin.getLatLng(), map.getZoom());
     }
+  });
 
-    function loadScript(url, callback) {
-      const script = document.createElement('script');
-      script.src = url;
-      script.defer = true; // Ensure script is deferred
-      script.onload = callback;
-      document.body.appendChild(script);
-    }
+  const initialPath = interpolateGreatCircle(2.8126, 101.5018, kaabahLatLng[0], kaabahLatLng[1], 100);
+  const lineToKaabah = L.polyline(initialPath, {color: 'red'}).addTo(map);
+  const lineBetweenPins = L.polyline([[2.8126, 101.5018], [3.1390, 101.6869]], {color: 'yellow'}).addTo(map);
 
-    let updateBearingAndLines;
-    let shadowLine;
-    let mapInitialized = false;
-    let activityTimeout; // Variable to store the timeout ID
+  firstPin.on('drag', function() {
+    updateBearingAndLines('firstPin');
+  });
+  secondPin.on('drag', function() {
+    updateBearingAndLines('secondPin');
+  });
 
-    window.onload = function() {
-      if (isOnline()) {
-        initializeMapIfOnline();
-      } else {
-        document.getElementById('map').style.display = 'none';
-      }
+  map.on('click', function(e) {
+    secondPin.setLatLng(e.latlng);
+    updateBearingAndLines('secondPin');
+  });
 
-      // Ensure the circle can toggle stickiness based on input focus
-      const circleWrapper = document.querySelector('.sticky-wrapper');
-      toggleStickyOnFocus(ELEMENTS.degreeInput, circleWrapper);
-      toggleStickyOnFocus(ELEMENTS.qiblatInput, circleWrapper);
+  map.on('contextmenu', function(e) {
+    firstPin.setLatLng(e.latlng);
+    updateBearingAndLines('firstPin');
+  });
 
-      // Add the event listener to the button for fitting the map into a circle
-      const toggleMapCircleButton = document.getElementById('toggleMapCircle');
-      toggleMapCircleButton.addEventListener('click', toggleMapCircle);
+  L.Control.geocoder({
+    defaultMarkGeocode: false
+  })
+  .on('markgeocode', function(e) {
+    const bbox = e.geocode.bbox;
+    const poly = L.polygon([
+      bbox.getSouthEast(),
+      bbox.getNorthEast(),
+      bbox.getNorthWest(),
+      bbox.getSouthWest()
+    ]).addTo(map);
+    map.fitBounds(poly.getBounds());
+    firstPin.setLatLng(e.geocode.center);
+    updateBearingAndLines('firstPin');
+  })
+  .addTo(map);
 
-      // Initialize the map rotation slider
-      initializeRotationSlider();
-    };
+  function centerMapOnFirstPin() {
+    const pinLatLng = firstPin.getLatLng();
+    const adjustedLatLng = L.latLng(pinLatLng.lat, pinLatLng.lng - 0.000001); // Adjust longitude slightly
+    map.setView(adjustedLatLng, map.getZoom());
+  }
 
-    function initializeMapIfOnline() {
-      if (!mapInitialized) {
-        loadLeafletResources(function() {
-          initializeMap();
-          mapInitialized = true;
-        });
-      }
-    }
+  firstPin.on('dragend', centerMapOnFirstPin);
+  map.on('zoomend', centerMapOnFirstPin);
 
-    function loadLeafletResources(callback) {
-      const leafletCSS = document.createElement('link');
-      leafletCSS.rel = 'stylesheet';
-      leafletCSS.href = 'https://unpkg.com/leaflet/dist/leaflet.css';
-      document.head.appendChild(leafletCSS);
-
-      const geocoderCSS = document.createElement('link');
-      geocoderCSS.rel = 'stylesheet';
-      geocoderCSS.href = 'https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css';
-      document.head.appendChild(geocoderCSS);
-
-      loadScript('https://unpkg.com/leaflet/dist/leaflet.js', function() {
-        loadScript('https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js', function() {
-          loadScript('https://unpkg.com/suncalc/suncalc.js', callback);
-        });
-      });
-    }
-
-    function checkNetworkStatus() {
-      if (navigator.onLine) {
-        document.getElementById('map').style.display = 'block';
-        initializeMapIfOnline();
-      } else {
-        document.getElementById('map').style.display = 'none';
-      }
-    }
-
-    window.addEventListener('online', checkNetworkStatus);
-    window.addEventListener('offline', checkNetworkStatus);
-
-    function initializeMap() {
-      if (!L.Control.Geocoder) {
-        console.error('Geocoder library not loaded.');
-        return;
-      }
-
-      const redIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg',
-        iconSize: [100, 100],
-        iconAnchor: [30, 100],
-        popupAnchor: [1, -34],
-        tooltipAnchor: [16, -28]
-      });
-
-      const yellowIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/yellowPin.svg',
-        iconSize: [100, 100],
-        iconAnchor: [30, 100],
-        popupAnchor: [1, -34],
-        tooltipAnchor: [16, -28]
-      });
-
-      const defaultLocation = [2.8126, 101.5018];
-      const map = L.map('map').setView(defaultLocation, 19);
-
-      const esriLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>',
-        maxZoom: 23
-      }).addTo(map);
-
-      const hereSatelliteLayer = L.tileLayer('https://{s}.aerial.maps.ls.hereapi.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8?apiKey=SGBRZo_mNVRWzb2ZckNSjTi2SVZKIgsoW57piYr_uWM&lg=eng', {
-        attribution: 'Map data © 2024 HERE',
-        subdomains: '1234',
-        maxZoom: 22
-      });
-
-      const hereNormalDayLayer = L.tileLayer('https://{s}.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?apiKey=SGBRZo_mNVRWzb2ZckNSjTi2SVZKIgsoW57piYr_uWM&lg=eng', {
-        attribution: 'Map data © 2024 HERE',
-        subdomains: '1234',
-        maxZoom: 20
-      });
-
-      const openStreetMapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data © OpenStreetMap contributors',
-        maxZoom: 19
-      });
-
-      const baseMaps = {
-        "Esri World Imagery": esriLayer,
-        "HERE Satellite": hereSatelliteLayer,
-        "HERE Normal Day": hereNormalDayLayer,
-        "OpenStreetMap": openStreetMapLayer
-      };
-
-      L.control.layers(baseMaps).addTo(map);
-
-      const kaabahLatLng = [21.4225, 39.8262];
-      const firstPin = L.marker(defaultLocation, {icon: redIcon, draggable: true}).addTo(map);
-      const secondPin = L.marker([3.1390, 101.6869], {icon: yellowIcon, draggable: true}).addTo(map);
-
-      map.on('zoomend', function() {
-        if (firstPin) {
-          map.setView(firstPin.getLatLng(), map.getZoom());
-        }
-      });
-
-      const initialPath = interpolateGreatCircle(2.8126, 101.5018, kaabahLatLng[0], kaabahLatLng[1], 100);
-      const lineToKaabah = L.polyline(initialPath, {color: 'red'}).addTo(map);
-      const lineBetweenPins = L.polyline([[2.8126, 101.5018], [3.1390, 101.6869]], {color: 'yellow'}).addTo(map);
-
-      firstPin.on('drag', function() {
-        updateBearingAndLines('firstPin');
-      });
-      secondPin.on('drag', function() {
-        updateBearingAndLines('secondPin');
-      });
-
-      map.on('click', function(e) {
-        secondPin.setLatLng(e.latlng);
-        updateBearingAndLines('secondPin');
-      });
-
-      map.on('contextmenu', function(e) {
-        firstPin.setLatLng(e.latlng);
-        updateBearingAndLines('firstPin');
-      });
-
-      L.Control.geocoder({
-        defaultMarkGeocode: false
-      })
-      .on('markgeocode', function(e) {
-        const bbox = e.geocode.bbox;
-        const poly = L.polygon([
-          bbox.getSouthEast(),
-          bbox.getNorthEast(),
-          bbox.getNorthWest(),
-          bbox.getSouthWest()
-        ]).addTo(map);
-        map.fitBounds(poly.getBounds());
-        firstPin.setLatLng(e.geocode.center);
-        updateBearingAndLines('firstPin');
-      })
-      .addTo(map);
-
-      function centerMapOnFirstPin() {
-        const pinLatLng = firstPin.getLatLng();
-        const adjustedLatLng = L.latLng(pinLatLng.lat, pinLatLng.lng - 0.000001); // Adjust longitude slightly
-        map.setView(adjustedLatLng, map.getZoom());
-      }
-
-      firstPin.on('dragend', centerMapOnFirstPin);
-      map.on('zoomend', centerMapOnFirstPin);
-
-      function updateLocation() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            function(position) {
-              const userLat = position.coords.latitude;
-              const userLng = position.coords.longitude;
-              firstPin.setLatLng([userLat, userLng]);
-              centerMapOnFirstPin();
-              updateBearingAndLines('firstPin');
-            },
-            function() {
-              alert('Unable to retrieve your location. Please enable location services.');
-              firstPin.setLatLng(defaultLocation);
-              centerMapOnFirstPin();
-              updateBearingAndLines('firstPin');
-            },
-            {
-              enableHighAccuracy: true,
-              timeout: 5000,
-              maximumAge: 0
-            }
-          );
-        } else {
-          alert('Geolocation is not supported by this browser.');
+  function updateLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+          firstPin.setLatLng([userLat, userLng]);
+          centerMapOnFirstPin();
+          updateBearingAndLines('firstPin');
+        },
+        function() {
+          alert('Unable to retrieve your location. Please enable location services.');
           firstPin.setLatLng(defaultLocation);
           centerMapOnFirstPin();
           updateBearingAndLines('firstPin');
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      alert('Geolocation is not supported by this browser.');
+      firstPin.setLatLng(defaultLocation);
+      centerMapOnFirstPin();
+      updateBearingAndLines('firstPin');
+    }
+  }
+
+  const updateLocationButton = document.getElementById('updateLocationButton');
+  updateLocationButton.addEventListener('click', updateLocation);
+
+  const centerDotButton = document.getElementById('centerDotButton');
+  centerDotButton.addEventListener('click', updateLocation);
+
+  const markerTooltipText1Element = document.getElementById('markerTooltipText1');
+  const markerTooltipText2Element = document.getElementById('markerTooltipText2');
+
+  updateBearingAndLines = function(changedPin) {
+    if (firstPin && secondPin) {
+      const firstLatLng = firstPin.getLatLng();
+      const secondLatLng = secondPin.getLatLng();
+
+      const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
+      lineToKaabah.setLatLngs(pathToKaabah);
+
+      lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
+
+      const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
+      const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
+      
+      let sunAzimuth;
+      if (changedPin === 'firstPin') {
+        sunAzimuth = updateSunAzimuth(firstLatLng);
+      } else {
+        sunAzimuth = parseFloat(ELEMENTS.degreeInput.value) || 0;
+      }
+
+      const shadowEndpoint = calculateShadowEndpoint(firstLatLng, 1000000);
+      const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+
+      if (isBetweenSunriseSunset(currentDate, firstLatLng.lat, firstLatLng.lng)) {
+        if (shadowLine) {
+          shadowLine.setLatLngs([firstLatLng, shadowEndpoint]);
+          shadowLine.setStyle({ color: 'green' }); // Set the color to green when visible
+        } else {
+          shadowLine = L.polyline([firstLatLng, shadowEndpoint], { color: 'green' }).addTo(map);
+        }
+      } else {
+        if (shadowLine) {
+          shadowLine.setStyle({ color: 'transparent' }); // Set the color to transparent when not visible
         }
       }
 
-      const updateLocationButton = document.getElementById('updateLocationButton');
-      updateLocationButton.addEventListener('click', updateLocation);
-
-      const centerDotButton = document.getElementById('centerDotButton');
-      centerDotButton.addEventListener('click', updateLocation);
-
-      const markerTooltipText1Element = document.getElementById('markerTooltipText1');
-const markerTooltipText2Element = document.getElementById('markerTooltipText2');
-
-      updateBearingAndLines = function(changedPin) {
-        if (firstPin && secondPin) {
-          const firstLatLng = firstPin.getLatLng();
-          const secondLatLng = secondPin.getLatLng();
-
-          const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
-          lineToKaabah.setLatLngs(pathToKaabah);
-
-          lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
-
-          const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
-          const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
-          
-          let sunAzimuth;
-          if (changedPin === 'firstPin') {
-            sunAzimuth = updateSunAzimuth(firstLatLng);
-          } else {
-            sunAzimuth = parseFloat(ELEMENTS.degreeInput.value) || 0;
-          }
-
-          const shadowEndpoint = calculateShadowEndpoint(firstLatLng, 1000000);
-          if (shadowLine) {
-            shadowLine.setLatLngs([firstLatLng, shadowEndpoint]);
-          } else {
-            shadowLine = L.polyline([firstLatLng, shadowEndpoint], { color: 'green' }).addTo(map);
-          }
-
-          // Update the new tooltip container
+      // Update the new tooltip container
           markerTooltipText1Element.innerHTML = `
             Red Pin - Qibla: ${bearingToKaabah.toFixed(2)}°<br/>
             Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>
@@ -725,60 +735,66 @@ const markerTooltipText2Element = document.getElementById('markerTooltipText2');
         }
       };
 
-      function updateSunAzimuth(position) {
-        const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
-        const sunPosition = SunCalc.getPosition(selectedDate, position.lat, position.lng);
-        const azimuth = sunPosition.azimuth * 180 / Math.PI + 180;
-        return azimuth;
-      }
+  function isBetweenSunriseSunset(date, latitude, longitude) {
+    const sunTimes = SunCalc.getTimes(date, latitude, longitude);
+    const currentTime = date.getTime();
+    return currentTime >= sunTimes.sunrise.getTime() && currentTime <= sunTimes.sunset.getTime();
+  }
 
-      ELEMENTS.dateTimeInput.addEventListener('change', function() {
-        if (typeof updateBearingAndLines === 'function') {
-          updateBearingAndLines('firstPin');
-        }
-      });
+  function updateSunAzimuth(position) {
+    const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+    const sunPosition = SunCalc.getPosition(selectedDate, position.lat, position.lng);
+    const azimuth = sunPosition.azimuth * 180 / Math.PI + 180;
+    return azimuth;
+  }
 
-      ELEMENTS.kaedahQiblat.addEventListener('change', () => {
-        updateDirectionLabels();
-        toggleDateTimeInputVisibility();
-        updateBearingAndLines('firstPin');
-        if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-          ELEMENTS.degreeInput.placeholder = "Bearing";
-          ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
-        } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-          ELEMENTS.degreeInput.placeholder = "Azimuth Matahari";
-          ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
-        }
-        updateCompassDisplay();
-      });
+  ELEMENTS.dateTimeInput.addEventListener('change', function() {
+    if (typeof updateBearingAndLines === 'function') {
+      updateBearingAndLines('firstPin');
     }
+  });
 
-    function calculateShadowEndpoint(startLatLng, objectHeight) {
-      const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
-      const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
-
-      const azimuth = position.azimuth;
-      const altitude = position.altitude;
-
-      const shadowLength = objectHeight / Math.tan(altitude);
-
-      const earthRadius = 6371000;
-
-      const angularDistance = shadowLength / earthRadius;
-      const bearing = azimuth;
-
-      const lat1 = toRadians(startLatLng.lat);
-      const lon1 = toRadians(startLatLng.lng);
-
-      const lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularDistance) +
-          Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing));
-      const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
-          Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2));
-
-      return L.latLng(toDegrees(lat2), toDegrees(lon2));
+  ELEMENTS.kaedahQiblat.addEventListener('change', () => {
+    updateDirectionLabels();
+    toggleDateTimeInputVisibility();
+    updateBearingAndLines('firstPin');
+    if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+      ELEMENTS.degreeInput.placeholder = "Bearing";
+      ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
+    } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+      ELEMENTS.degreeInput.placeholder = "Azimuth Matahari";
+      ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
     }
+    updateCompassDisplay();
+  });
+ }
 
-    const ELEMENTS = {
+  function calculateShadowEndpoint(startLatLng, objectHeight) {
+    const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+    const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
+
+    const azimuth = position.azimuth;
+    const altitude = position.altitude;
+
+    const shadowLength = objectHeight / Math.tan(altitude);
+
+    const earthRadius = 6371000;
+
+    const angularDistance = shadowLength / earthRadius;
+    const bearing = azimuth;
+
+    const lat1 = toRadians(startLatLng.lat);
+    const lon1 = toRadians(startLatLng.lng);
+
+    const lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularDistance) +
+        Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing));
+    const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
+        Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2));
+
+    return L.latLng(toDegrees(lat2), toDegrees(lon2));
+  }
+
+  const ELEMENTS = {
       circle: document.getElementById('circle'),
       centerLine: document.getElementById('centerLine'),
       arrowLine: document.getElementById('arrowLine'),
@@ -794,254 +810,254 @@ const markerTooltipText2Element = document.getElementById('markerTooltipText2');
       dateTimeInput: document.getElementById('dateTimeInput'),
       status: document.getElementById('status')
     };
-
-    const DISPLAY = {
-      BLOCK: 'block',
-      NONE: 'none',
-    };
-
-    const QIBLAT_METHODS = {
-      BANGUNAN: 'bangunan',
-      BAYANG: 'bayang',
-    };
-
-    function toRadians(degrees) {
-      return degrees * Math.PI / 180;
-    }
-
-    function toDegrees(radians) {
-      return radians * 180 / Math.PI;
-    }
-
-    function calculateBearing(lat1, lon1, lat2, lon2) {
-      var lat1Rad = toRadians(lat1);
-      var lat2Rad = toRadians(lat2);
-      var deltaLonRad = toRadians(lon2 - lon1);
-
-      var y = Math.sin(deltaLonRad) * Math.cos(lat2Rad);
-      var x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLonRad);
-
-      var bearing = Math.atan2(y, x);
-      return (toDegrees(bearing) + 360) % 360;
-    }
-
-    function interpolateGreatCircle(lat1, lon1, lat2, lon2, steps) {
-      var points = [];
-      var startLat = toRadians(lat1);
-      var startLon = toRadians(lon1);
-      var endLat = toRadians(lat2);
-      var endLon = toRadians(lon2);
-
-      var d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((endLat - startLat) / 2), 2) +
-          Math.cos(startLat) * Math.cos(endLat) * Math.pow(Math.sin((endLon - startLon) / 2), 2)));
-
-      for (var i = 0; i <= steps; i++) {
-        var f = i / steps;
-        var A = Math.sin((1 - f) * d) / Math.sin(d);
-        var B = Math.sin(f * d) / Math.sin(d);
-
-        var x = A * Math.cos(startLat) * Math.cos(startLon) + B * Math.cos(endLat) * Math.cos(endLon);
-        var y = A * Math.cos(startLat) * Math.sin(startLon) + B * Math.cos(endLat) * Math.sin(endLon);
-        var z = A * Math.sin(startLat) + B * Math.sin(endLat);
-
-        var newLat = Math.atan2(z, Math.sqrt(x * x + y * y));
-        var newLon = Math.atan2(y, x);
-
-        points.push([toDegrees(newLat), toDegrees(newLon)]);
-      }
-
-      return points;
-    }
-
-    const showTooltip = (tooltipElement) => {
-      tooltipElement.style.visibility = 'visible';
-      tooltipElement.style.opacity = '1';
-    };
-
-    const hideTooltip = (tooltipElement) => {
-      tooltipElement.style.visibility = 'hidden';
-      tooltipElement.style.opacity = '0';
-    };
-
-    const updateArrow = (element, degree) => {
-      element.style.transform = `translateY(-50%) rotate(${degree}deg)`;
-    };
-
-    const updateDirectionLabels = () => {
-      if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-        document.querySelector('.label-north').textContent = 'S';
-        document.querySelector('.label-south').textContent = 'N';
-        document.querySelector('.label-east').textContent = 'W';
-        document.querySelector('.label-west').textContent = 'E';
-      } else {
-        document.querySelector('.label-north').textContent = 'N';
-        document.querySelector('.label-south').textContent = 'S';
-        document.querySelector('.label-east').textContent = 'E';
-        document.querySelector('.label-west').textContent = 'W';
-      }
-    };
-
-    const updateCompassDisplay = () => {
-      const degree = parseFloat(ELEMENTS.degreeInput.value) || 0;
-      const inputQiblaDegree = parseFloat(ELEMENTS.qiblatInput.value) || 0;
-
-      let finalQiblatDegree = inputQiblaDegree;
-
-      if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-        finalQiblatDegree = (finalQiblatDegree + 180) % 360;
-      }
-
-      ELEMENTS.centerLine.style.transform = `translateY(-50%) rotate(${degree}deg)`;
-      ELEMENTS.circle.style.transform = `rotate(${90 - degree}deg)`;
-
-      updateArrow(ELEMENTS.blackArrowLine, degree);
-      updateArrow(ELEMENTS.blackArrowHead, degree);
-      updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
-      updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
-
-      const angleBetweenLines = calculateAngleBetweenLines(degree, finalQiblatDegree);
-      ELEMENTS.angleLabel.textContent = `${angleBetweenLines.toFixed(2)}°`;
-    };
-
-    function calculateAngleBetweenLines(degree1, degree2) {
-      let angle = Math.abs(degree2 - degree1);
-      if (angle > 180) {
-        angle = 360 - angle;
-      }
-      return angle;
-    }
-
-    const toggleDateTimeInputVisibility = () => {
-      if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-        ELEMENTS.dateTimeInput.style.display = DISPLAY.BLOCK;
-      } else {
-        ELEMENTS.dateTimeInput.style.display = DISPLAY.NONE;
-      }
-    };
-
-    ELEMENTS.qiblatInput.addEventListener('input', () => {
-      updateCompassDisplay();
-      resetActivityTimer();
-    });
-
-    ELEMENTS.degreeInput.addEventListener('input', () => {
-      updateCompassDisplay();
-      resetActivityTimer();
-    });
-
-    // Reset the activity timer and make the circle non-sticky
-    function resetActivityTimer() {
-      clearTimeout(activityTimeout);
-      const circleWrapper = document.querySelector('.sticky-wrapper');
-      circleWrapper.classList.add('non-sticky');
-      activityTimeout = setTimeout(() => {
-        circleWrapper.classList.remove('non-sticky');
-      }, 1000);
-    }
-
-    const populateDegreeNumbers = () => {
-      const radius = ELEMENTS.circle.offsetWidth / 2;
-      const offset = 20;
-      for (let i = 0; i < 360; i += 10) {
-        const degreeNumber = document.createElement('div');
-        degreeNumber.className = 'degree-number';
-        degreeNumber.textContent = i;
-
-        const angle = i * (Math.PI / 180);
-        const x = radius + (radius + offset) * Math.cos(angle);
-        const y = radius + (radius + offset) * Math.sin(angle);
-
-        degreeNumber.style.left = `${x}px`;
-        degreeNumber.style.top = `${y}px`;
-        degreeNumber.style.transform = `translate(-50%, -50%) rotate(${i}deg)`;
-
-        ELEMENTS.circle.appendChild(degreeNumber);
-      }
-    };
-
-    function createAngleLabel() {
-      const angleLabel = document.createElement('div');
-      angleLabel.className = 'angle-label';
-      ELEMENTS.arrowLine.appendChild(angleLabel);
-      ELEMENTS.angleLabel = angleLabel;
-    }
-
-    // Function to toggle sticky class on the circle
-    function toggleStickyOnFocus(inputElement, circleWrapper) {
-      inputElement.addEventListener('focus', () => {
-        circleWrapper.classList.add('non-sticky');
-        setTimeout(() => {
-          inputElement.scrollIntoView({behavior: 'smooth', block: 'center'});
-        }, 300);
-      });
-
-      inputElement.addEventListener('blur', () => {
-        circleWrapper.classList.remove('non-sticky');
-        resetActivityTimer(); // Ensure the timer is reset on blur
-      });
-    }
-
-    // Function to toggle the map's circle class
-    function toggleMapCircle() {
-      const mapElement = document.getElementById('map');
-      const circleContainer = document.querySelector('.circle-container');
-
-      if (circleContainer.contains(mapElement)) {
-        // Move the map outside the circle and restore original styles
-        document.querySelector('.map-fieldset').appendChild(mapElement);
-        mapElement.style.borderRadius = '0'; // Remove circular shape
-        mapElement.style.height = '50vh'; // Original height
-        mapElement.style.width = '100%'; // Original width
-        mapElement.style.position = 'relative'; // Reset position
-        mapElement.style.top = ''; // Reset top
-        mapElement.style.left = ''; // Reset left
-      } else {
-        // Move the map inside the circle and make it circular
-        circleContainer.appendChild(mapElement);
-        mapElement.classList.add('circle-map'); // Add the class for circular shape
-        alignMapWithCircle(); // Align map size with circle
-        mapElement.style.borderRadius = '50%'; // Make it circular
-        mapElement.style.position = 'absolute'; // Position absolutely
-        mapElement.style.top = '0'; // Align at top
-        mapElement.style.left = '0'; // Align at left
-      }
-    }
-
-    function alignMapWithCircle() {
-      const mapElement = document.getElementById('map');
-      const circleContainer = document.querySelector('.circle');
-
-      mapElement.style.width = circleContainer.offsetWidth + 'px';
-      mapElement.style.height = circleContainer.offsetHeight + 'px';
-    }
-
-    window.addEventListener('resize', alignMapWithCircle); // Ensure alignment when resizing window
-
-    populateDegreeNumbers();
-    updateDirectionLabels();
-    toggleDateTimeInputVisibility();
-    createAngleLabel();
-
-    if (!isOnline()) {
-      updateBearingAndLines = function() {
-        console.warn("Offline mode: updateBearingAndLines cannot be executed.");
-      };
-    }
-
-    // Function to initialize the map rotation slider
-    function initializeRotationSlider() {
-      const rotationSlider = document.getElementById('rotationSlider');
-      const rotationValue = document.getElementById('rotationValue');
-      const mapElement = document.getElementById('map');
-
-      rotationSlider.addEventListener('input', (event) => {
-        const rotationDegree = event.target.value;
-        rotationValue.textContent = `${rotationDegree}°`;
-        mapElement.style.transform = `rotate(${rotationDegree}deg)`;
-      });
-    }
     
-    function showInstallPromotion() {
+const DISPLAY = {
+  BLOCK: 'block',
+  NONE: 'none',
+};
+
+const QIBLAT_METHODS = {
+  BANGUNAN: 'bangunan',
+  BAYANG: 'bayang',
+};
+
+function toRadians(degrees) {
+  return degrees * Math.PI / 180;
+}
+
+function toDegrees(radians) {
+  return radians * 180 / Math.PI;
+}
+
+function calculateBearing(lat1, lon1, lat2, lon2) {
+  var lat1Rad = toRadians(lat1);
+  var lat2Rad = toRadians(lat2);
+  var deltaLonRad = toRadians(lon2 - lon1);
+
+  var y = Math.sin(deltaLonRad) * Math.cos(lat2Rad);
+  var x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLonRad);
+
+  var bearing = Math.atan2(y, x);
+  return (toDegrees(bearing) + 360) % 360;
+}
+
+function interpolateGreatCircle(lat1, lon1, lat2, lon2, steps) {
+  var points = [];
+  var startLat = toRadians(lat1);
+  var startLon = toRadians(lon1);
+  var endLat = toRadians(lat2);
+  var endLon = toRadians(lon2);
+
+  var d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((endLat - startLat) / 2), 2) +
+      Math.cos(startLat) * Math.cos(endLat) * Math.pow(Math.sin((endLon - startLon) / 2), 2)));
+
+  for (var i = 0; i <= steps; i++) {
+    var f = i / steps;
+    var A = Math.sin((1 - f) * d) / Math.sin(d);
+    var B = Math.sin(f * d) / Math.sin(d);
+
+    var x = A * Math.cos(startLat) * Math.cos(startLon) + B * Math.cos(endLat) * Math.cos(endLon);
+    var y = A * Math.cos(startLat) * Math.sin(startLon) + B * Math.cos(endLat) * Math.sin(endLon);
+    var z = A * Math.sin(startLat) + B * Math.sin(endLat);
+
+    var newLat = Math.atan2(z, Math.sqrt(x * x + y * y));
+    var newLon = Math.atan2(y, x);
+
+    points.push([toDegrees(newLat), toDegrees(newLon)]);
+  }
+
+  return points;
+}
+
+const showTooltip = (tooltipElement) => {
+  tooltipElement.style.visibility = 'visible';
+  tooltipElement.style.opacity = '1';
+};
+
+const hideTooltip = (tooltipElement) => {
+  tooltipElement.style.visibility = 'hidden';
+  tooltipElement.style.opacity = '0';
+};
+
+const updateArrow = (element, degree) => {
+  element.style.transform = `translateY(-50%) rotate(${degree}deg)`;
+};
+
+const updateDirectionLabels = () => {
+  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+    document.querySelector('.label-north').textContent = 'S';
+    document.querySelector('.label-south').textContent = 'N';
+    document.querySelector('.label-east').textContent = 'W';
+    document.querySelector('.label-west').textContent = 'E';
+  } else {
+    document.querySelector('.label-north').textContent = 'N';
+    document.querySelector('.label-south').textContent = 'S';
+    document.querySelector('.label-east').textContent = 'E';
+    document.querySelector('.label-west').textContent = 'W';
+  }
+};
+
+const updateCompassDisplay = () => {
+  const degree = parseFloat(ELEMENTS.degreeInput.value) || 0;
+  const inputQiblaDegree = parseFloat(ELEMENTS.qiblatInput.value) || 0;
+
+  let finalQiblatDegree = inputQiblaDegree;
+
+  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+    finalQiblatDegree = (finalQiblatDegree + 180) % 360;
+  }
+
+  ELEMENTS.centerLine.style.transform = `translateY(-50%) rotate(${degree}deg)`;
+  ELEMENTS.circle.style.transform = `rotate(${90 - degree}deg)`;
+
+  updateArrow(ELEMENTS.blackArrowLine, degree);
+  updateArrow(ELEMENTS.blackArrowHead, degree);
+  updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
+  updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
+
+  const angleBetweenLines = calculateAngleBetweenLines(degree, finalQiblatDegree);
+  ELEMENTS.angleLabel.textContent = `${angleBetweenLines.toFixed(2)}°`;
+};
+
+function calculateAngleBetweenLines(degree1, degree2) {
+  let angle = Math.abs(degree2 - degree1);
+  if (angle > 180) {
+    angle = 360 - angle;
+  }
+  return angle;
+}
+
+const toggleDateTimeInputVisibility = () => {
+  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+    ELEMENTS.dateTimeInput.style.display = DISPLAY.BLOCK;
+  } else {
+    ELEMENTS.dateTimeInput.style.display = DISPLAY.NONE;
+  }
+};
+
+ELEMENTS.qiblatInput.addEventListener('input', () => {
+  updateCompassDisplay();
+  resetActivityTimer();
+});
+
+ELEMENTS.degreeInput.addEventListener('input', () => {
+  updateCompassDisplay();
+  resetActivityTimer();
+});
+
+// Reset the activity timer and make the circle non-sticky
+function resetActivityTimer() {
+  clearTimeout(activityTimeout);
+  const circleWrapper = document.querySelector('.sticky-wrapper');
+  circleWrapper.classList.add('non-sticky');
+  activityTimeout = setTimeout(() => {
+    circleWrapper.classList.remove('non-sticky');
+  }, 1000);
+}
+
+const populateDegreeNumbers = () => {
+  const radius = ELEMENTS.circle.offsetWidth / 2;
+  const offset = 20;
+  for (let i = 0; i < 360; i += 10) {
+    const degreeNumber = document.createElement('div');
+    degreeNumber.className = 'degree-number';
+    degreeNumber.textContent = i;
+
+    const angle = i * (Math.PI / 180);
+    const x = radius + (radius + offset) * Math.cos(angle);
+    const y = radius + (radius + offset) * Math.sin(angle);
+
+    degreeNumber.style.left = `${x}px`;
+    degreeNumber.style.top = `${y}px`;
+    degreeNumber.style.transform = `translate(-50%, -50%) rotate(${i}deg)`;
+
+    ELEMENTS.circle.appendChild(degreeNumber);
+  }
+};
+
+function createAngleLabel() {
+  const angleLabel = document.createElement('div');
+  angleLabel.className = 'angle-label';
+  ELEMENTS.arrowLine.appendChild(angleLabel);
+  ELEMENTS.angleLabel = angleLabel;
+}
+
+// Function to toggle sticky class on the circle
+function toggleStickyOnFocus(inputElement, circleWrapper) {
+  inputElement.addEventListener('focus', () => {
+    circleWrapper.classList.add('non-sticky');
+    setTimeout(() => {
+      inputElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }, 300);
+  });
+
+  inputElement.addEventListener('blur', () => {
+    circleWrapper.classList.remove('non-sticky');
+    resetActivityTimer(); // Ensure the timer is reset on blur
+  });
+}
+
+// Function to toggle the map's circle class
+function toggleMapCircle() {
+  const mapElement = document.getElementById('map');
+  const circleContainer = document.querySelector('.circle-container');
+
+  if (circleContainer.contains(mapElement)) {
+    // Move the map outside the circle and restore original styles
+    document.querySelector('.map-fieldset').appendChild(mapElement);
+    mapElement.style.borderRadius = '0'; // Remove circular shape
+    mapElement.style.height = '50vh'; // Original height
+    mapElement.style.width = '100%'; // Original width
+    mapElement.style.position = 'relative'; // Reset position
+    mapElement.style.top = ''; // Reset top
+    mapElement.style.left = ''; // Reset left
+  } else {
+    // Move the map inside the circle and make it circular
+    circleContainer.appendChild(mapElement);
+    mapElement.classList.add('circle-map'); // Add the class for circular shape
+    alignMapWithCircle(); // Align map size with circle
+    mapElement.style.borderRadius = '50%'; // Make it circular
+    mapElement.style.position = 'absolute'; // Position absolutely
+    mapElement.style.top = '0'; // Align at top
+    mapElement.style.left = '0'; // Align at left
+  }
+}
+
+function alignMapWithCircle() {
+  const mapElement = document.getElementById('map');
+  const circleContainer = document.querySelector('.circle');
+
+  mapElement.style.width = circleContainer.offsetWidth + 'px';
+  mapElement.style.height = circleContainer.offsetHeight + 'px';
+}
+
+window.addEventListener('resize', alignMapWithCircle); // Ensure alignment when resizing window
+
+populateDegreeNumbers();
+updateDirectionLabels();
+toggleDateTimeInputVisibility();
+createAngleLabel();
+
+if (!isOnline()) {
+  updateBearingAndLines = function() {
+    console.warn("Offline mode: updateBearingAndLines cannot be executed.");
+  };
+}
+
+// Function to initialize the map rotation slider
+function initializeRotationSlider() {
+  const rotationSlider = document.getElementById('rotationSlider');
+  const rotationValue = document.getElementById('rotationValue');
+  const mapElement = document.getElementById('map');
+
+  rotationSlider.addEventListener('input', (event) => {
+    const rotationDegree = event.target.value;
+    rotationValue.textContent = `${rotationDegree}°`;
+    mapElement.style.transform = `rotate(${rotationDegree}deg)`;
+  });
+}
+
+function showInstallPromotion() {
   if (deferredPrompt) {
     // Create a custom UI element (e.g., a banner or modal)
     const installBanner = document.createElement('div');
