@@ -674,7 +674,7 @@
                 if (shadowLine) {
                     shadowLine.setLatLngs([firstLatLng, shadowEndpoint]);
                 } else {
-                    shadowLine = L.polyline([firstLatLng, shadowEndpoint], { color: 'grey' }).addTo(map);
+                    shadowLine = L.polyline([firstLatLng, shadowEndpoint], { color: 'green' }).addTo(map);
                 }
 
                 firstPin.setTooltipContent('Qibla: ' + bearingToKaabah.toFixed(2) + '°<br/> Sun Azimuth: ' + sunAzimuth.toFixed(2) + '°');
