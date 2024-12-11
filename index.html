@@ -6,6 +6,15 @@
   <title>Bayang-Bayang Qiblat</title>
   <link rel="canonical" href="https://supremindset.github.io/PAKAR/" />
   <link rel="manifest" href="/PAKAR/manifest.json">
+  <script>
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.register(
+        '/PAKAR/sw.js',
+        {scope: '/PAKAR/'}
+      )
+    }
+    
+  </script>
   <style>
     body {
       display: flex;
@@ -393,6 +402,8 @@
         </div>
       </div>
     </div>
+    
+    <div id="install-banner-container"></div>
     
     <fieldset class="map-fieldset">
       <legend><button id="updateLocationButton" class="location-btn">Update Location</button></legend>
@@ -1030,14 +1041,45 @@ const markerTooltipText2Element = document.getElementById('markerTooltipText2');
         mapElement.style.transform = `rotate(${rotationDegree}deg)`;
       });
     }
-  </script>
-  <script>
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.register(
-        '/PAKAR/sw.js',
-        {scope: '/PAKAR/'}
-      )
-    }
+    
+    function showInstallPromotion() {
+  if (deferredPrompt) {
+    // Create a custom UI element (e.g., a banner or modal)
+    const installBanner = document.createElement('div');
+    installBanner.classList.add('install-banner');
+    installBanner.textContent = 'Install this app on your device?';
+
+    // Add a click event listener to the banner
+    installBanner.addEventListener('click', () => {
+      // Show the installation prompt
+      deferredPrompt.prompt();
+      // Wait for the user's response
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+        // Remove the install banner
+        installBanner.remove();
+        // Reset the deferred prompt variable
+        deferredPrompt = null;
+      });
+    });
+
+    // Append the install banner to your UI
+    document.body.appendChild(installBanner);
+  }
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later.
+  deferredPrompt = e;
+  // Update UI to notify the user they can install the PWA
+  showInstallPromotion();
+});
   </script>
 </body>
 </html>
