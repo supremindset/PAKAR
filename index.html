@@ -344,14 +344,14 @@
     }
 
     #map {
-      position: relative;
-      height: 50vh;
-      width: 100%;
-      margin-top: 0;
-      border: none;
-      transition: all 0.3s ease; /* Smooth transition */
-      z-index: 8;
-    }
+  position: relative;
+  height: 80vh; /* Adjust the height as needed */
+  width: 100vw; /* Full width of the viewport */
+  margin-top: 0;
+  border: none;
+  transition: all 0.3s ease;
+  z-index: 8;
+}
 
     .slider-container {
       width: 300px;
@@ -391,6 +391,35 @@
   overflow: hidden;
   border-radius: 5px;
 }
+
+
+.degree-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+}
+
+.degree-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    margin: 0 10px;
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.degree-button:hover {
+    background-color: #3498db;
+}
+
+.degree-button:active {
+    background-color: #1e6a8d;
+}
   </style>
 </head>
 <body>
@@ -424,10 +453,11 @@
         </div>
       </div>
     </div>
-    <div class="slider-container">
-        <input type="range" id="rotationSlider" min="0" max="360" step="1" value="0">
-        <label for="rotationSlider" id="rotationValue">0°</label>
-      </div>
+    <div class="degree-button-container">
+    <button class="degree-button" id="decreaseButton">–</button>
+    <span id="rotationValue">0°</span>
+    <button class="degree-button" id="increaseButton">+</button>
+</div>
       
       <div id="install-banner-container"></div>
     
@@ -464,8 +494,8 @@
       </div>
     </fieldset>
   </div>
-  <script>
-    function isOnline() {
+<script>
+function isOnline() {
   return navigator.onLine;
 }
 
@@ -480,6 +510,10 @@ function loadScript(url, callback) {
 let updateBearingAndLines;
 let mapInitialized = false;
 let activityTimeout; // Variable to store the timeout ID
+let inputDebounceTimeout; // Timer for tracking input activity
+let degree = 0; // Initialize the degree value
+let holdInterval = null;
+let speed = 1000; // Initial speed in milliseconds
 
 window.onload = function() {
   if (isOnline()) {
@@ -493,17 +527,20 @@ window.onload = function() {
   toggleStickyOnFocus(ELEMENTS.degreeInput, circleWrapper);
   toggleStickyOnFocus(ELEMENTS.qiblatInput, circleWrapper);
 
+  setupInputWithDebounce(ELEMENTS.degreeInput); // Setup debounce for degree input
+  setupInputWithDebounce(ELEMENTS.qiblatInput); // Setup debounce for qiblat input
+
   // Add the event listener to the button for fitting the map into a circle
   const toggleMapCircleButton = document.getElementById('toggleMapCircle');
   toggleMapCircleButton.addEventListener('click', toggleMapCircle);
 
-  // Initialize the map rotation slider
-        initializeRotationSlider();
+  // Initialize the degree adjustment buttons
+  initializeDegreeButtons();
 
-        // Populate degree numbers and angle label
-        populateDegreeNumbers();
-        createAngleLabel();
-    };
+  // Populate degree numbers and angle label
+  populateDegreeNumbers();
+  createAngleLabel();
+};
 
 function initializeMapIfOnline() {
   if (!mapInitialized) {
@@ -708,55 +745,48 @@ function initializeMap() {
 
   updateBearingAndLines = function(changedPin) {
     if (firstPin && secondPin) {
-      const firstLatLng = firstPin.getLatLng();
-      const secondLatLng = secondPin.getLatLng();
+        const firstLatLng = firstPin.getLatLng();
+        const secondLatLng = secondPin.getLatLng();
 
-      const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
-      lineToKaabah.setLatLngs(pathToKaabah);
+        const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
+        lineToKaabah.setLatLngs(pathToKaabah);
 
-      lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
+        lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
 
-      const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
-      const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
-      
-      let sunAzimuth;
-      if (changedPin === 'firstPin') {
-        sunAzimuth = updateSunAzimuth(firstLatLng);
+        const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
+        const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
+
+        let sunAzimuth = updateSunAzimuth(firstLatLng);
         updateShadowLine(firstLatLng, sunAzimuth);
-      } else {
-        sunAzimuth = parseFloat(ELEMENTS.degreeInput.value) || 0;
-        updateShadowLine(firstLatLng, sunAzimuth);
-      }
 
-      const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+        const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
 
-      // Update the new tooltip container
-      markerTooltipText1Element.innerHTML = `
-        Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>
-        Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>
-      `;
-      
-      markerTooltipText2Element.innerHTML = `
-        Yellow Pin - Bearing bangunan: ${bearingToSecondPin.toFixed(2)}°
-      `;
-      
+        // Update the tooltip container
+        markerTooltipText1Element.innerHTML = `
+            Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>
+            Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>
+        `;
 
-      if (!ELEMENTS.dateTimeInput.value) {
-        ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
-      }
+        markerTooltipText2Element.innerHTML = `
+            Yellow Pin - Bearing bangunan: ${bearingToSecondPin.toFixed(2)}°
+        `;
 
-      if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-        ELEMENTS.degreeInput.value = bearingToSecondPin.toFixed(2);
-      } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-        ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
-      }
+        if (!ELEMENTS.dateTimeInput.value) {
+            ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
+        }
 
-      updateArrow(ELEMENTS.blackArrowLine, sunAzimuth);
-      updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
+        if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+            ELEMENTS.degreeInput.value = bearingToSecondPin.toFixed(2);
+        } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+            ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
+        }
 
-      updateCompassDisplay();
+        updateArrow(ELEMENTS.blackArrowLine, sunAzimuth);
+        updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
+
+        updateCompassDisplay();
     }
-  };
+};
 
   function updateSunAzimuth(position) {
     const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
@@ -829,6 +859,30 @@ function initializeMap() {
     }
     updateCompassDisplay();
   });
+}
+
+// Function to setup debounce behavior for inputs
+function setupInputWithDebounce(inputElement) {
+  inputElement.addEventListener('input', () => {
+    clearTimeout(inputDebounceTimeout);
+    inputDebounceTimeout = setTimeout(() => {
+      finalizeInput(inputElement);
+    }, 1000); // 1 seconds delay
+  });
+
+  inputElement.addEventListener('focus', () => {
+    clearTimeout(inputDebounceTimeout); // Clear timeout on focus
+  });
+
+  inputElement.addEventListener('blur', () => {
+    finalizeInput(inputElement); // Finalize immediately on blur
+  });
+}
+
+// Function to handle input finalization
+function finalizeInput(inputElement) {
+  inputElement.blur();  // Remove focus to stop editing
+  updateCompassDisplay(); // Ensure the display is updated with the final value
 }
 
 const ELEMENTS = {
@@ -1076,17 +1130,68 @@ if (!isOnline()) {
   };
 }
 
-// Function to initialize the map rotation slider
-function initializeRotationSlider() {
-  const rotationSlider = document.getElementById('rotationSlider');
+// Function to initialize the degree adjustment buttons
+function initializeDegreeButtons() {
+  const increaseButton = document.getElementById('increaseButton');
+  const decreaseButton = document.getElementById('decreaseButton');
   const rotationValue = document.getElementById('rotationValue');
   const mapElement = document.getElementById('map');
 
-  rotationSlider.addEventListener('input', (event) => {
-    const rotationDegree = event.target.value;
-    rotationValue.textContent = `${rotationDegree}°`;
-    mapElement.style.transform = `rotate(${rotationDegree}deg)`;
+  increaseButton.addEventListener('mousedown', () => {
+    speed = 1000; // Reset speed
+    handleButtonHold(increaseDegree);
   });
+
+  decreaseButton.addEventListener('mousedown', () => {
+    speed = 1000; // Reset speed
+    handleButtonHold(decreaseDegree);
+  });
+
+  document.addEventListener('mouseup', () => {
+    clearInterval(holdInterval);
+  });
+
+  // For touch devices
+  increaseButton.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    speed = 1000; // Reset speed
+    handleButtonHold(increaseDegree);
+  });
+
+  decreaseButton.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    speed = 1000; // Reset speed
+    handleButtonHold(decreaseDegree);
+  });
+
+  document.addEventListener('touchend', () => {
+    clearInterval(holdInterval);
+  });
+
+  function updateRotation() {
+    rotationValue.textContent = `${degree}°`;
+    mapElement.style.transform = `rotate(${degree}deg)`;
+  }
+
+  function increaseDegree() {
+    degree = (degree + 0.5) % 360;
+    updateRotation();
+  }
+
+  function decreaseDegree() {
+    degree = (degree - 0.5 + 360) % 360; // Ensure the value stays positive
+    updateRotation();
+  }
+
+  function handleButtonHold(callback) {
+    callback();
+    holdInterval = setInterval(() => {
+      callback();
+      speed = Math.max(30, speed - 10000000); // Decrease interval time to speed up
+      clearInterval(holdInterval); // Clear previous interval
+      holdInterval = setInterval(callback, speed); // Set new faster interval
+    }, speed);
+  }
 }
 
 function showInstallPromotion() {
@@ -1133,6 +1238,6 @@ function isSunDown(date, latitude, longitude) {
   const currentTime = date.getTime();
   return currentTime < sunTimes.sunrise.getTime() || currentTime > sunTimes.sunset.getTime();
 }
-  </script>
+</script>
 </body>
 </html>
