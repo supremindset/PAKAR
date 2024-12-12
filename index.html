@@ -424,8 +424,12 @@
         </div>
       </div>
     </div>
-    
-    <div id="install-banner-container"></div>
+    <div class="slider-container">
+        <input type="range" id="rotationSlider" min="0" max="360" step="1" value="0">
+        <label for="rotationSlider" id="rotationValue">0°</label>
+      </div>
+      
+      <div id="install-banner-container"></div>
     
     <fieldset class="map-fieldset">
       <legend><button id="updateLocationButton" class="location-btn">Update Location</button></legend>
@@ -457,10 +461,6 @@
         
           <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
           
-      </div>
-      <div class="slider-container">
-        <input type="range" id="rotationSlider" min="0" max="360" step="1" value="0">
-        <label for="rotationSlider" id="rotationValue">0°</label>
       </div>
     </fieldset>
   </div>
@@ -498,8 +498,12 @@ window.onload = function() {
   toggleMapCircleButton.addEventListener('click', toggleMapCircle);
 
   // Initialize the map rotation slider
-  initializeRotationSlider();
-};
+        initializeRotationSlider();
+
+        // Populate degree numbers and angle label
+        populateDegreeNumbers();
+        createAngleLabel();
+    };
 
 function initializeMapIfOnline() {
   if (!mapInitialized) {
@@ -1065,11 +1069,6 @@ function alignMapWithCircle() {
 }
 
 window.addEventListener('resize', alignMapWithCircle); // Ensure alignment when resizing window
-
-populateDegreeNumbers();
-updateDirectionLabels();
-toggleDateTimeInputVisibility();
-createAngleLabel();
 
 if (!isOnline()) {
   updateBearingAndLines = function() {
