@@ -326,17 +326,6 @@
       padding: 0 10px;
     }
 
-    .angle-label {
-      position: absolute;
-      top: 60%; /* Move it further down below the red line */
-      left: 90%; /* Center it horizontally relative to the line */
-      transform: translate(-50%, 0); /* Adjust vertical positioning */
-      font-size: 16px;
-      color: #333;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    }
-
     #map.circle-map {
       border-radius: 50%; /* Ensure circular shape */
       overflow: hidden; /* Hide overflow */
@@ -352,12 +341,6 @@
   transition: all 0.3s ease;
   z-index: 8;
 }
-
-    .slider-container {
-      width: 300px;
-      margin: 20px auto;
-      text-align: center;
-    }
 
     input[type="range"] {
       width: 100%;
@@ -437,7 +420,6 @@
           <div class="center-line" id="centerLine"></div>
           <div class="arrow-line" id="arrowLine">
             <div class="arrow-head" id="arrowHead"></div>
-            <div class="angle-label" id="angleLabel"></div>
           </div>
           <div class="black-arrow-line" id="blackArrowLine">
             <div class="black-arrow-head" id="blackArrowHead"></div>
@@ -482,10 +464,10 @@
           <option value="bayang">Bayang-Bayang</option>
         </select>
         
-          <input class="custom-select" type="number" id="degreeInput" placeholder="Bearing" min="0" max="360" step="0.1">
+          <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
           
         
-          <input class="custom-select" type="number" id="qiblatInput" placeholder="True North Qiblat" min="0" max="360" step="0.1">
+          <input class="custom-select" type="number" id="qiblatInput" placeholder="Qiblat" min="0" max="360" step="0.1">
           
         
         
@@ -537,9 +519,8 @@ window.onload = function() {
   // Initialize the degree adjustment buttons
   initializeDegreeButtons();
 
-  // Populate degree numbers and angle label
+  // Populate degree numbers
   populateDegreeNumbers();
-  createAngleLabel();
 };
 
 function initializeMapIfOnline() {
@@ -1005,18 +986,7 @@ const updateCompassDisplay = () => {
   updateArrow(ELEMENTS.blackArrowHead, degree);
   updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
   updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
-
-  const angleBetweenLines = calculateAngleBetweenLines(degree, finalQiblatDegree);
-  ELEMENTS.angleLabel.textContent = `${angleBetweenLines.toFixed(2)}°`;
 };
-
-function calculateAngleBetweenLines(degree1, degree2) {
-  let angle = Math.abs(degree2 - degree1);
-  if (angle > 180) {
-    angle = 360 - angle;
-  }
-  return angle;
-}
 
 const toggleDateTimeInputVisibility = () => {
   if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
@@ -1065,13 +1035,6 @@ const populateDegreeNumbers = () => {
     ELEMENTS.circle.appendChild(degreeNumber);
   }
 };
-
-function createAngleLabel() {
-  const angleLabel = document.createElement('div');
-  angleLabel.className = 'angle-label';
-  ELEMENTS.arrowLine.appendChild(angleLabel);
-  ELEMENTS.angleLabel = angleLabel;
-}
 
 // Function to toggle sticky class on the circle
 function toggleStickyOnFocus(inputElement, circleWrapper) {
