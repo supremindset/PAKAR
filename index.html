@@ -42,15 +42,27 @@
     }
 
     .circle-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin-bottom: 50px;
-      background-color: #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      z-index: 1;
-    }
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin-bottom: 50px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.circle {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	border: 1px solid #2980b9;
+	transition: transform 0.5s ease;
+	background-color: #ffffff;
+	z-index: 1;
+}
     
     .sticky-wrapper {
       position: relative;
@@ -71,17 +83,6 @@
       flex-direction: column;
       align-items: center;
       margin-bottom: 20px; /* Add some margin to prevent overlap with other elements */
-    }
-
-    .circle {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 2px solid #2980b9;
-      transition: transform 0.5s ease;
-      background-color: #ffffff;
-      z-index: 1; /* Base z-index for the circle */
     }
     
     .degree-number {
@@ -105,7 +106,7 @@
       cursor: pointer;
       border: 2px solid #ffffff;
       transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-      z-index: 3; /* Higher z-index to place it on top of lines */
+      z-index: 8; /* Higher z-index to place it on top of lines */
     }
 
     .center-dot:hover {
@@ -122,7 +123,7 @@
     .center-line {
       position: absolute;
       width: 100%;
-      height: 2px;
+      height: 4px;
       background-color: #333;
       top: 50%;
       left: 0;
@@ -135,7 +136,7 @@
     .arrow-line {
       position: absolute;
       width: 100%;
-      height: 2px;
+      height: 4px;
       background-color: red;
       top: 50%;
       left: 0;
@@ -326,20 +327,22 @@
       padding: 0 10px;
     }
 
-    #map.circle-map {
-      border-radius: 50%; /* Ensure circular shape */
-      overflow: hidden; /* Hide overflow */
-      transition: all 0.3s ease; /* Smooth transition for resizing */
-    }
-
     #map {
   position: relative;
-  height: 80vh; /* Adjust the height as needed */
-  width: 100vw; /* Full width of the viewport */
+  height: 50vh;
+  width: 100vw;
   margin-top: 0;
   border: none;
   transition: all 0.3s ease;
   z-index: 8;
+  border-radius: 0; /* Default non-circular shape */
+}
+
+#circle #map {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Ensure the map doesn't exceed the circle's bounds */
 }
 
     input[type="range"] {
@@ -403,20 +406,47 @@
 .degree-button:active {
     background-color: #1e6a8d;
 }
+
+.svg {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 100%;
+  height: 100%;
+  z-index: 7;
+}
+
+.svg text {
+    font-size: 10px; /* Adjust the size as needed */
+    fill: #333;
+}
+
   </style>
 </head>
 <body>
   <div id="install-banner-container">
   <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner">
-    PAKAR Qiblat
+    Cara guna app Pakar, malam ini 8.30pm
   </marquee>
 </div>
 </br>
   <div class="container">
     <div class="sticky-wrapper">
       <div class="circle-container">
+        <svg class="svg" width="200" height="200" viewBox="0 0 200 200">
+    <path id="sector1" fill="rgba(41, 128, 185, 0.2)"></path> <!-- #2980b9 with transparency -->
+    <path id="sector2" fill="rgba(214, 234, 248, 0.5)"></path> <!-- Light blue with transparency -->
+    <path id="sector3" fill="rgba(41, 128, 185, 0.2)"></path> <!-- #2980b9 with transparency -->
+    <path id="sector4" fill="rgba(214, 234, 248, 0.5)"></path> <!-- Light blue with transparency -->
+    <text id="label1" x="0" y="0" text-anchor="middle"></text>
+    <text id="label2" x="0" y="0" text-anchor="middle"></text>
+    <text id="label3" x="0" y="0" text-anchor="middle"></text>
+    <text id="label4" x="0" y="0" text-anchor="middle"></text>
+</svg>
+<button class="center-dot" id="centerDotButton"></button>
         <div class="circle" id="circle">
-          <button class="center-dot" id="centerDotButton"></button>
+          
+          
           <div class="center-line" id="centerLine"></div>
           <div class="arrow-line" id="arrowLine">
             <div class="arrow-head" id="arrowHead"></div>
@@ -434,6 +464,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="degree-button-container">
+    <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
     </div>
     <div class="degree-button-container">
     <button class="degree-button" id="decreaseButton">–</button>
@@ -458,11 +491,14 @@
     <fieldset class="data-inputs-fieldset">
       <legend>Qiblat Settings</legend>
       <div class="data-inputs">
-        <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
+        
+        
         <select class="custom-select" id="kaedahQiblat">
-          <option value="bangunan" selected>Bangunan</option>
-          <option value="bayang">Bayang-Bayang</option>
+          <option value="bayang" selected>Bayang-Bayang</option>
+          <option value="bangunan">Bearing Bangunan</option>
         </select>
+        
+        
         
           <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
           
@@ -484,18 +520,19 @@ function isOnline() {
 function loadScript(url, callback) {
   const script = document.createElement('script');
   script.src = url;
-  script.defer = true; // Ensure script is deferred
+  script.defer = true;
   script.onload = callback;
   document.body.appendChild(script);
 }
 
 let updateBearingAndLines;
 let mapInitialized = false;
-let activityTimeout; // Variable to store the timeout ID
-let inputDebounceTimeout; // Timer for tracking input activity
-let degree = 0; // Initialize the degree value
+let activityTimeout;
+let inputDebounceTimeout;
+let degree = 0;
 let holdInterval = null;
-let speed = 1000; // Initial speed in milliseconds
+let speed = 1000;
+let firstPin, secondPin;
 
 window.onload = function() {
   if (isOnline()) {
@@ -504,23 +541,19 @@ window.onload = function() {
     document.getElementById('map').style.display = 'none';
   }
 
-  // Ensure the circle can toggle stickiness based on input focus
   const circleWrapper = document.querySelector('.sticky-wrapper');
   toggleStickyOnFocus(ELEMENTS.degreeInput, circleWrapper);
   toggleStickyOnFocus(ELEMENTS.qiblatInput, circleWrapper);
 
-  setupInputWithDebounce(ELEMENTS.degreeInput); // Setup debounce for degree input
-  setupInputWithDebounce(ELEMENTS.qiblatInput); // Setup debounce for qiblat input
+  setupInputWithDebounce(ELEMENTS.degreeInput);
+  setupInputWithDebounce(ELEMENTS.qiblatInput);
 
-  // Add the event listener to the button for fitting the map into a circle
   const toggleMapCircleButton = document.getElementById('toggleMapCircle');
   toggleMapCircleButton.addEventListener('click', toggleMapCircle);
 
-  // Initialize the degree adjustment buttons
   initializeDegreeButtons();
-
-  // Populate degree numbers
   populateDegreeNumbers();
+  initializeDynamicAngleUpdates();
 };
 
 function initializeMapIfOnline() {
@@ -766,6 +799,7 @@ function initializeMap() {
         updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
 
         updateCompassDisplay();
+        updateAngles();
     }
 };
 
@@ -840,6 +874,73 @@ function initializeMap() {
     }
     updateCompassDisplay();
   });
+}
+
+function calculateAndLabelAngles(angleA, angleB) {
+  angleA = (angleA + 360) % 360;
+  angleB = (angleB + 360) % 360;
+
+  const oppositeAngleB = (angleB + 180) % 360;
+  const sector1 = (angleB - angleA + 360) % 360 <= 180 ? (angleB - angleA + 360) % 360 : (oppositeAngleB - angleA + 360) % 360;
+  const sector2 = 180 - sector1;
+  const sector3 = sector1;
+  const sector4 = sector2;
+
+  const radius = 100;
+  drawSectorArc(100, 100, radius, 0, sector1, document.getElementById('sector1'), document.getElementById('label1'), sector1.toFixed(2));
+  drawSectorArc(100, 100, radius, sector1, sector1 + sector2, document.getElementById('sector2'), document.getElementById('label2'), sector2.toFixed(2));
+  drawSectorArc(100, 100, radius, sector1 + sector2, sector1 + sector2 + sector3, document.getElementById('sector3'), document.getElementById('label3'), sector3.toFixed(2));
+  drawSectorArc(100, 100, radius, sector1 + sector2 + sector3, 360, document.getElementById('sector4'), document.getElementById('label4'), sector4.toFixed(2));
+}
+
+function drawSectorArc(cx, cy, radius, startAngle, endAngle, pathElement, labelElement, label) {
+  const start = polarToCartesian(cx, cy, radius, endAngle);
+  const end = polarToCartesian(cx, cy, radius, startAngle);
+  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+  const d = [
+    "M", cx, cy,
+    "L", start.x, start.y,
+    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+    "Z"
+  ].join(" ");
+
+  pathElement.setAttribute("d", d);
+
+  const midAngle = startAngle + (endAngle - startAngle) / 2;
+  const labelPos = polarToCartesian(cx, cy, radius / 1.5, midAngle);
+  labelElement.setAttribute("x", labelPos.x);
+  labelElement.setAttribute("y", labelPos.y);
+  labelElement.textContent = `${label}°`;
+}
+
+function polarToCartesian(cx, cy, radius, angleInDegrees) {
+  const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+  return {
+    x: cx + (radius * Math.cos(angleInRadians)),
+    y: cy + (radius * Math.sin(angleInRadians))
+  };
+}
+
+function updateAngles() {
+  const angleA = parseFloat(ELEMENTS.degreeInput.value) || 0;
+  const angleB = parseFloat(ELEMENTS.qiblatInput.value) || 0;
+
+  calculateAndLabelAngles(angleA, angleB);
+}
+
+function initializeDynamicAngleUpdates() {
+  ELEMENTS.degreeInput.addEventListener('input', updateAngles);
+  ELEMENTS.qiblatInput.addEventListener('input', updateAngles);
+
+  if (firstPin && secondPin) {
+    firstPin.on('drag', function() {
+      updateBearingAndLines('firstPin');
+    });
+    secondPin.on('drag', function() {
+      updateBearingAndLines('secondPin');
+    });
+  }
 }
 
 // Function to setup debounce behavior for inputs
@@ -1054,29 +1155,26 @@ function toggleStickyOnFocus(inputElement, circleWrapper) {
 // Function to toggle the map's circle class
 function toggleMapCircle() {
   const mapElement = document.getElementById('map');
-  const circleContainer = document.querySelector('.circle-container');
+  const circleContainer = document.querySelector('.circle');
 
   if (circleContainer.contains(mapElement)) {
     // Move the map outside the circle and restore original styles
     document.querySelector('.map-fieldset').appendChild(mapElement);
     mapElement.style.borderRadius = '0'; // Remove circular shape
     mapElement.style.height = '50vh'; // Original height
-    mapElement.style.width = '100%'; // Original width
+    mapElement.style.width = '100vw'; // Original width
     mapElement.style.position = 'relative'; // Reset position
-    mapElement.style.top = ''; // Reset top
-    mapElement.style.left = ''; // Reset left
   } else {
     // Move the map inside the circle and make it circular
     circleContainer.appendChild(mapElement);
-    mapElement.classList.add('circle-map'); // Add the class for circular shape
-    alignMapWithCircle(); // Align map size with circle
+    mapElement.style.width = '100%'; // Fill the circle
+    mapElement.style.height = '100%'; // Fill the circle
     mapElement.style.borderRadius = '50%'; // Make it circular
     mapElement.style.position = 'absolute'; // Position absolutely
     mapElement.style.top = '0'; // Align at top
     mapElement.style.left = '0'; // Align at left
   }
 }
-
 function alignMapWithCircle() {
   const mapElement = document.getElementById('map');
   const circleContainer = document.querySelector('.circle');
