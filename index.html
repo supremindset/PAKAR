@@ -419,6 +419,17 @@
     fill: #333;
 }
 
+.arah-qiblat {
+      position: absolute;
+      top: 60%; /* Move it further down below the red line */
+      left: 95%; /* Center it horizontally relative to the line */
+      transform: translate(-50%, 0); /* Adjust vertical positioning */
+      font-size: 16px;
+      color: #333;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
   </style>
 </head>
 <body>
@@ -448,6 +459,9 @@
           <div class="center-line" id="centerLine"></div>
           <div class="arrow-line" id="arrowLine">
             <div class="arrow-head" id="arrowHead"></div>
+            <div class="arah-qiblat">
+  <span class="qiblat-arrow">🕋</span>
+</div>
           </div>
           <div class="black-arrow-line" id="blackArrowLine">
             <div class="black-arrow-head" id="blackArrowHead"></div>
@@ -885,7 +899,7 @@ function calculateAndLabelAngles(angleA, angleB) {
   const sector3 = sector1;
   const sector4 = sector2;
 
-  const radius = 100;
+  const radius = 60;
   drawSectorArc(100, 100, radius, 0, sector1, document.getElementById('sector1'), document.getElementById('label1'), sector1.toFixed(2));
   drawSectorArc(100, 100, radius, sector1, sector1 + sector2, document.getElementById('sector2'), document.getElementById('label2'), sector2.toFixed(2));
   drawSectorArc(100, 100, radius, sector1 + sector2, sector1 + sector2 + sector3, document.getElementById('sector3'), document.getElementById('label3'), sector3.toFixed(2));
