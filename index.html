@@ -327,22 +327,20 @@
       padding: 0 10px;
     }
 
+    #map.circle-map {
+      border-radius: 50%; /* Ensure circular shape */
+      overflow: hidden; /* Hide overflow */
+      transition: all 0.3s ease; /* Smooth transition for resizing */
+    }
+
     #map {
   position: relative;
-  height: 50vh;
-  width: 100vw;
+  height: 50vh; /* Adjust the height as needed */
+  width: 100vw; /* Full width of the viewport */
   margin-top: 0;
   border: none;
   transition: all 0.3s ease;
   z-index: 8;
-  border-radius: 0; /* Default non-circular shape */
-}
-
-#circle #map {
-  border-radius: 50%;
-  width: 100%;
-  height: 100%;
-  overflow: hidden; /* Ensure the map doesn't exceed the circle's bounds */
 }
 
     input[type="range"] {
@@ -426,7 +424,7 @@
 <body>
   <div id="install-banner-container">
   <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner">
-    Cara guna app Pakar, malam ini 8.30pm
+    Cara guna app Pakar. 8.30pm
   </marquee>
 </div>
 </br>
@@ -492,13 +490,10 @@
       <legend>Qiblat Settings</legend>
       <div class="data-inputs">
         
-        
         <select class="custom-select" id="kaedahQiblat">
           <option value="bayang" selected>Bayang-Bayang</option>
           <option value="bangunan">Bearing Bangunan</option>
         </select>
-        
-        
         
           <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
           
@@ -622,16 +617,16 @@ function initializeMap() {
 
   const esriLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>',
-    maxZoom: 22
+    maxZoom: 19
   }).addTo(map);
 
-  const hereSatelliteLayer = L.tileLayer('https://{s}.aerial.maps.ls.hereapi.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8?apiKey=SGBRZo_mNVRWzb2ZckNSjTi2SVZKIgsoW57piYr_uWM&lg=eng', {
+  const hereSatelliteLayer = L.tileLayer('https://{s}.aerial.maps.ls.hereapi.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8?apiKey=ZrGsYcNXW4T_cGxQWLiIZ0DdraWLJ2XaCfI8axrRCkw&lg=eng', {
     attribution: 'Map data © 2024 HERE',
     subdomains: '1234',
     maxZoom: 22
   });
 
-  const hereNormalDayLayer = L.tileLayer('https://{s}.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?apiKey=SGBRZo_mNVRWzb2ZckNSjTi2SVZKIgsoW57piYr_uWM&lg=eng', {
+  const hereNormalDayLayer = L.tileLayer('https://{s}.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?apiKey=ZrGsYcNXW4T_cGxQWLiIZ0DdraWLJ2XaCfI8axrRCkw&lg=eng', {
     attribution: 'Map data © 2024 HERE',
     subdomains: '1234',
     maxZoom: 20
@@ -1155,26 +1150,29 @@ function toggleStickyOnFocus(inputElement, circleWrapper) {
 // Function to toggle the map's circle class
 function toggleMapCircle() {
   const mapElement = document.getElementById('map');
-  const circleContainer = document.querySelector('.circle');
+  const circleContainer = document.querySelector('.circle-container');
 
   if (circleContainer.contains(mapElement)) {
     // Move the map outside the circle and restore original styles
     document.querySelector('.map-fieldset').appendChild(mapElement);
     mapElement.style.borderRadius = '0'; // Remove circular shape
     mapElement.style.height = '50vh'; // Original height
-    mapElement.style.width = '100vw'; // Original width
+    mapElement.style.width = '100%'; // Original width
     mapElement.style.position = 'relative'; // Reset position
+    mapElement.style.top = ''; // Reset top
+    mapElement.style.left = ''; // Reset left
   } else {
     // Move the map inside the circle and make it circular
     circleContainer.appendChild(mapElement);
-    mapElement.style.width = '100%'; // Fill the circle
-    mapElement.style.height = '100%'; // Fill the circle
+    mapElement.classList.add('circle-map'); // Add the class for circular shape
+    alignMapWithCircle(); // Align map size with circle
     mapElement.style.borderRadius = '50%'; // Make it circular
     mapElement.style.position = 'absolute'; // Position absolutely
     mapElement.style.top = '0'; // Align at top
     mapElement.style.left = '0'; // Align at left
   }
 }
+
 function alignMapWithCircle() {
   const mapElement = document.getElementById('map');
   const circleContainer = document.querySelector('.circle');
