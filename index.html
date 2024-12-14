@@ -714,34 +714,36 @@ function initializeMap() {
   map.on('zoomend', centerMapOnFirstPin);
 
   function updateLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          const userLat = position.coords.latitude;
-          const userLng = position.coords.longitude;
-          firstPin.setLatLng([userLat, userLng]);
-          centerMapOnFirstPin();
-          updateBearingAndLines('firstPin');
-        },
-        function() {
-          alert('Unable to retrieve your location. Please enable location services.');
-          firstPin.setLatLng(defaultLocation);
-          centerMapOnFirstPin();
-          updateBearingAndLines('firstPin');
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      );
-    } else {
-      alert('Geolocation is not supported by this browser.');
-      firstPin.setLatLng(defaultLocation);
-      centerMapOnFirstPin();
-      updateBearingAndLines('firstPin');
-    }
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+        const zoomLevel = 19; // Set your desired zoom level here
+
+        firstPin.setLatLng([userLat, userLng]);
+        map.setView([userLat, userLng], zoomLevel); // Update the view with the new location and zoom level
+        updateBearingAndLines('firstPin');
+      },
+      function() {
+        alert('Unable to retrieve your location. Please enable location services.');
+        firstPin.setLatLng(defaultLocation);
+        map.setView(defaultLocation, 19); // Reset to default location with default zoom level
+        updateBearingAndLines('firstPin');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    );
+  } else {
+    alert('Geolocation is not supported by this browser.');
+    firstPin.setLatLng(defaultLocation);
+    map.setView(defaultLocation, 19); // Reset to default location with default zoom level
+    updateBearingAndLines('firstPin');
   }
+}
 
   const updateLocationButton = document.getElementById('updateLocationButton');
   updateLocationButton.addEventListener('click', updateLocation);
