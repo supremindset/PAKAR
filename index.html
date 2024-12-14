@@ -424,7 +424,7 @@
 <body>
   <div id="install-banner-container">
   <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner">
-    Cara guna app Pakar. 8.30pm
+    PAKAR Qiblat
   </marquee>
 </div>
 </br>
@@ -463,9 +463,9 @@
         </div>
       </div>
     </div>
-    <div class="degree-button-container">
-    <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
-    </div>
+    
+    
+    
     <div class="degree-button-container">
     <button class="degree-button" id="decreaseButton">–</button>
     <span id="rotationValue">0°</span>
@@ -488,7 +488,9 @@
 
     <fieldset class="data-inputs-fieldset">
       <legend>Qiblat Settings</legend>
+      
       <div class="data-inputs">
+        <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
         
         <select class="custom-select" id="kaedahQiblat">
           <option value="bayang" selected>Bayang-Bayang</option>
@@ -1182,8 +1184,6 @@ function alignMapWithCircle() {
   mapElement.style.width = circleContainer.offsetWidth + 'px';
   mapElement.style.height = circleContainer.offsetHeight + 'px';
 }
-
-window.addEventListener('resize', alignMapWithCircle); // Ensure alignment when resizing window
 
 if (!isOnline()) {
   updateBearingAndLines = function() {
