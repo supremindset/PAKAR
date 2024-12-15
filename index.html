@@ -435,7 +435,7 @@
 <body>
   <div id="install-banner-container">
   <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner">
-    PAKAR Qiblat
+    Semoga Berjaya
   </marquee>
 </div>
 </br>
@@ -676,21 +676,28 @@ function initializeMap() {
     lineJoin: 'round'
   }).addTo(map);
 
-  map.on('zoomend', function() {
-    if (firstPin) {
-      map.setView(firstPin.getLatLng(), map.getZoom());
-    }
-  });
-
   const initialPath = interpolateGreatCircle(2.8126, 101.5018, kaabahLatLng[0], kaabahLatLng[1], 100);
   const lineToKaabah = L.polyline(initialPath, {color: 'red'}).addTo(map);
   const lineBetweenPins = L.polyline([[2.8126, 101.5018], [3.1390, 101.6869]], {color: 'yellow'}).addTo(map);
 
-  firstPin.on('drag', function() {
-    updateBearingAndLines('firstPin');
+  // Hide specific lines when dragging starts
+  firstPin.on('dragstart', function() {
+    lineToKaabah.setStyle({opacity: 0});
   });
-  secondPin.on('drag', function() {
+
+  secondPin.on('dragstart', function() {
+    lineBetweenPins.setStyle({opacity: 0});
+  });
+
+  // Show lines and update positions when dragging ends
+  firstPin.on('dragend', function() {
+    updateBearingAndLines('firstPin');
+    lineToKaabah.setStyle({opacity: 1});
+  });
+
+  secondPin.on('dragend', function() {
     updateBearingAndLines('secondPin');
+    lineBetweenPins.setStyle({opacity: 1});
   });
 
   map.on('click', function(e) {
@@ -720,46 +727,37 @@ function initializeMap() {
   })
   .addTo(map);
 
-  function centerMapOnFirstPin() {
-    const pinLatLng = firstPin.getLatLng();
-    const adjustedLatLng = L.latLng(pinLatLng.lat, pinLatLng.lng - 0.000001); // Adjust longitude slightly
-    map.setView(adjustedLatLng, map.getZoom());
-  }
-
-  firstPin.on('dragend', centerMapOnFirstPin);
-  map.on('zoomend', centerMapOnFirstPin);
-
   function updateLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      function(position) {
-        const userLat = position.coords.latitude;
-        const userLng = position.coords.longitude;
-        const zoomLevel = 19; // Set your desired zoom level here
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+          const zoomLevel = 19; // Set your desired zoom level here
 
-        firstPin.setLatLng([userLat, userLng]);
-        map.setView([userLat, userLng], zoomLevel); // Update the view with the new location and zoom level
-        updateBearingAndLines('firstPin');
-      },
-      function() {
-        alert('Unable to retrieve your location. Please enable location services.');
-        firstPin.setLatLng(defaultLocation);
-        map.setView(defaultLocation, 19); // Reset to default location with default zoom level
-        updateBearingAndLines('firstPin');
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-      }
-    );
-  } else {
-    alert('Geolocation is not supported by this browser.');
-    firstPin.setLatLng(defaultLocation);
-    map.setView(defaultLocation, 19); // Reset to default location with default zoom level
-    updateBearingAndLines('firstPin');
+          firstPin.setLatLng([userLat, userLng]);
+          map.setView([userLat, userLng], zoomLevel); // Update the view with the new location and zoom level
+          updateBearingAndLines('firstPin');
+        },
+        function() {
+          alert('Unable to retrieve your location. Please enable location services.');
+          firstPin.setLatLng(defaultLocation);
+          map.setView(defaultLocation, 19); // Reset to default location with default zoom level
+          updateBearingAndLines('firstPin');
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      alert('Geolocation is not supported by this browser.');
+      firstPin.setLatLng(defaultLocation);
+      map.setView(defaultLocation, 19); // Reset to default location with default zoom level
+      updateBearingAndLines('firstPin');
+    }
   }
-}
 
   const updateLocationButton = document.getElementById('updateLocationButton');
   updateLocationButton.addEventListener('click', updateLocation);
@@ -772,49 +770,49 @@ function initializeMap() {
 
   updateBearingAndLines = function(changedPin) {
     if (firstPin && secondPin) {
-        const firstLatLng = firstPin.getLatLng();
-        const secondLatLng = secondPin.getLatLng();
+      const firstLatLng = firstPin.getLatLng();
+      const secondLatLng = secondPin.getLatLng();
 
-        const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
-        lineToKaabah.setLatLngs(pathToKaabah);
+      const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
+      lineToKaabah.setLatLngs(pathToKaabah);
 
-        lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
+      lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
 
-        const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
-        const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
+      const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
+      const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
 
-        let sunAzimuth = updateSunAzimuth(firstLatLng);
-        updateShadowLine(firstLatLng, sunAzimuth);
+      let sunAzimuth = updateSunAzimuth(firstLatLng);
+      updateShadowLine(firstLatLng, sunAzimuth);
 
-        const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+      const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
 
-        // Update the tooltip container
-        markerTooltipText1Element.innerHTML = `
-            Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>
-            Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>
-        `;
+      // Update the tooltip container
+      markerTooltipText1Element.innerHTML = `
+          Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>
+          Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>
+      `;
 
-        markerTooltipText2Element.innerHTML = `
-            Yellow Pin - Bearing bangunan: ${bearingToSecondPin.toFixed(2)}°
-        `;
+      markerTooltipText2Element.innerHTML = `
+          Yellow Pin - Bearing bangunan: ${bearingToSecondPin.toFixed(2)}°
+      `;
 
-        if (!ELEMENTS.dateTimeInput.value) {
-            ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
-        }
+      if (!ELEMENTS.dateTimeInput.value) {
+          ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
+      }
 
-        if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-            ELEMENTS.degreeInput.value = bearingToSecondPin.toFixed(2);
-        } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-            ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
-        }
+      if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+          ELEMENTS.degreeInput.value = bearingToSecondPin.toFixed(2);
+      } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+          ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
+      }
 
-        updateArrow(ELEMENTS.blackArrowLine, sunAzimuth);
-        updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
+      updateArrow(ELEMENTS.blackArrowLine, sunAzimuth);
+      updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
 
-        updateCompassDisplay();
-        updateAngles();
+      updateCompassDisplay();
+      updateAngles();
     }
-};
+  };
 
   function updateSunAzimuth(position) {
     const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
@@ -888,7 +886,6 @@ function initializeMap() {
     updateCompassDisplay();
   });
 }
-
 function calculateAndLabelAngles(angleA, angleB) {
   angleA = (angleA + 360) % 360;
   angleB = (angleB + 360) % 360;
