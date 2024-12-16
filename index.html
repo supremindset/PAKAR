@@ -17,7 +17,6 @@
   </script>
   <style>
     body {
-      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
@@ -295,6 +294,7 @@
       border-radius: 5px;
       padding: 10px;
       margin: 10px 0;
+      width: 100vw;
     }
 
     .location-btn {
@@ -365,7 +365,7 @@
 }
 
 .install-banner {
-  width: 100%;
+  width: 100vw;
   background-color: #2980b9;
   color: white;
   font-size: 18px;
@@ -429,15 +429,62 @@
       font-weight: bold;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
+    
+    .round-button {
+  position: absolute;
+  top: -50px; /* Adjust this value to position it above the firstPin */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  z-index: 1001; /* Ensure it's above other elements */
+}
+
+.round-button:hover {
+  background-color: #3498db;
+}
+
+.round-button:active {
+  background-color: #1e6a8d;
+}
 
   </style>
 </head>
 <body>
   <div id="install-banner-container">
   <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner">
-    Semoga Berjaya
+    PAKAR
   </marquee>
 </div>
+<fieldset class="data-inputs-fieldset">
+      <legend>Qiblat Settings</legend>
+      
+      <div class="data-inputs">
+        
+        
+        <select class="custom-select" id="kaedahQiblat">
+          <option value="bayang" selected>Bayang-Bayang</option>
+          <option value="bangunan">Bearing Bangunan</option>
+        </select>
+        
+          <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
+          
+        
+          <input class="custom-select" type="number" id="qiblatInput" placeholder="Qiblat" min="0" max="360" step="0.1">
+        
+          <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
+          
+          <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
+          
+      </div>
+    </fieldset>
 </br>
   <div class="container">
     <div class="sticky-wrapper">
@@ -478,13 +525,12 @@
       </div>
     </div>
     
-    
-    
     <div class="degree-button-container">
     <button class="degree-button" id="decreaseButton">–</button>
     <span id="rotationValue">0°</span>
     <button class="degree-button" id="increaseButton">+</button>
 </div>
+
       
       <div id="install-banner-container"></div>
     
@@ -500,28 +546,6 @@
   </p>
 </div>
 
-    <fieldset class="data-inputs-fieldset">
-      <legend>Qiblat Settings</legend>
-      
-      <div class="data-inputs">
-        <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
-        
-        <select class="custom-select" id="kaedahQiblat">
-          <option value="bayang" selected>Bayang-Bayang</option>
-          <option value="bangunan">Bearing Bangunan</option>
-        </select>
-        
-          <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
-          
-        
-          <input class="custom-select" type="number" id="qiblatInput" placeholder="Qiblat" min="0" max="360" step="0.1">
-          
-        
-        
-          <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
-          
-      </div>
-    </fieldset>
   </div>
 <script>
 function isOnline() {
@@ -663,8 +687,8 @@ function initializeMap() {
   L.control.layers(baseMaps).addTo(map);
 
   const kaabahLatLng = [21.4225, 39.8262];
-  const firstPin = L.marker(defaultLocation, {icon: redIcon, draggable: true}).addTo(map);
-  const secondPin = L.marker([3.1390, 101.6869], {icon: yellowIcon, draggable: true}).addTo(map);
+  firstPin = L.marker(defaultLocation, {icon: redIcon, draggable: true}).addTo(map);
+  secondPin = L.marker([3.1390, 101.6869], {icon: yellowIcon, draggable: true}).addTo(map);
 
   // Create the shadow line object
   const shadowLine = L.polyline([[0, 0], [0, 0]], {
@@ -680,6 +704,45 @@ function initializeMap() {
   const lineToKaabah = L.polyline(initialPath, {color: 'red'}).addTo(map);
   const lineBetweenPins = L.polyline([[2.8126, 101.5018], [3.1390, 101.6869]], {color: 'yellow'}).addTo(map);
 
+  // Create and append the round button
+const roundButton = document.createElement('button');
+roundButton.className = 'round-button';
+roundButton.id = 'newRoundButton';
+roundButton.innerText = 'OK'; // Add text or any content
+document.querySelector('.leaflet-map-pane').appendChild(roundButton);
+
+// Prevent map clicks when the button is clicked
+roundButton.addEventListener('click', (event) => {
+  event.stopPropagation(); // This prevents the click from affecting the map
+  console.log('Round button clicked'); // You can add other actions here
+
+  // Scroll to the install-banner-container
+  const bannerContainer = document.getElementById('install-banner-container');
+  if (bannerContainer) {
+    bannerContainer.scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+// Function to update button position
+function updateButtonPosition() {
+  const firstPinLatLng = firstPin.getLatLng();
+  const point = map.latLngToLayerPoint(firstPinLatLng);
+
+  roundButton.style.left = `${point.x + 20}px`;
+  roundButton.style.top = `${point.y - 60}px`; // Adjust this value for vertical positioning
+}
+
+  // Set initial position
+  updateButtonPosition();
+
+  // Update button position on drag
+  firstPin.on('drag', updateButtonPosition);
+  firstPin.on('dragend', function() {
+    updateBearingAndLines('firstPin');
+    lineToKaabah.setStyle({opacity: 1});
+    updateButtonPosition();
+  });
+
   // Hide specific lines when dragging starts
   firstPin.on('dragstart', function() {
     lineToKaabah.setStyle({opacity: 0});
@@ -690,11 +753,6 @@ function initializeMap() {
   });
 
   // Show lines and update positions when dragging ends
-  firstPin.on('dragend', function() {
-    updateBearingAndLines('firstPin');
-    lineToKaabah.setStyle({opacity: 1});
-  });
-
   secondPin.on('dragend', function() {
     updateBearingAndLines('secondPin');
     lineBetweenPins.setStyle({opacity: 1});
@@ -708,6 +766,7 @@ function initializeMap() {
   map.on('contextmenu', function(e) {
     firstPin.setLatLng(e.latlng);
     updateBearingAndLines('firstPin');
+    updateButtonPosition();
   });
 
   L.Control.geocoder({
@@ -724,6 +783,7 @@ function initializeMap() {
     map.fitBounds(poly.getBounds());
     firstPin.setLatLng(e.geocode.center);
     updateBearingAndLines('firstPin');
+    updateButtonPosition();
   })
   .addTo(map);
 
@@ -738,12 +798,14 @@ function initializeMap() {
           firstPin.setLatLng([userLat, userLng]);
           map.setView([userLat, userLng], zoomLevel); // Update the view with the new location and zoom level
           updateBearingAndLines('firstPin');
+          updateButtonPosition();
         },
         function() {
           alert('Unable to retrieve your location. Please enable location services.');
           firstPin.setLatLng(defaultLocation);
           map.setView(defaultLocation, 19); // Reset to default location with default zoom level
           updateBearingAndLines('firstPin');
+          updateButtonPosition();
         },
         {
           enableHighAccuracy: true,
@@ -756,6 +818,7 @@ function initializeMap() {
       firstPin.setLatLng(defaultLocation);
       map.setView(defaultLocation, 19); // Reset to default location with default zoom level
       updateBearingAndLines('firstPin');
+      updateButtonPosition();
     }
   }
 
@@ -886,6 +949,7 @@ function initializeMap() {
     updateCompassDisplay();
   });
 }
+
 function calculateAndLabelAngles(angleA, angleB) {
   angleA = (angleA + 360) % 360;
   angleB = (angleB + 360) % 360;
