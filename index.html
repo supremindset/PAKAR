@@ -13,7 +13,6 @@
         {scope: '/PAKAR/'}
       )
     }
-    
   </script>
   <style>
     body {
@@ -376,7 +375,6 @@
   border-radius: 5px;
 }
 
-
 .degree-button-container {
     display: flex;
     align-items: center;
@@ -455,6 +453,18 @@
   background-color: #1e6a8d;
 }
 
+#searchResults li {
+  background-color: #f7f9fc;
+  border: 1px solid #2980b9;
+  padding: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#searchResults li:hover {
+  background-color: #dfe6e9;
+}
   </style>
 </head>
 <body>
@@ -464,28 +474,19 @@
   </marquee>
 </div>
 <fieldset class="data-inputs-fieldset">
-      <legend>Qiblat Settings</legend>
-      
-      <div class="data-inputs">
-        
-        
-        <select class="custom-select" id="kaedahQiblat">
-          <option value="bayang" selected>Bayang-Bayang</option>
-          <option value="bangunan">Bearing Bangunan</option>
-        </select>
-        
-          <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
-          
-        
-          <input class="custom-select" type="number" id="qiblatInput" placeholder="Qiblat" min="0" max="360" step="0.1">
-        
-          <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
-          
-          <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
-          
-      </div>
-    </fieldset>
-</br>
+    <legend>Qiblat Settings</legend>
+    <div class="data-inputs">
+      <select class="custom-select" id="kaedahQiblat">
+        <option value="bayang" selected>Bayang-Bayang</option>
+        <option value="bangunan">Bearing Bangunan</option>
+      </select>
+      <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
+      <input class="custom-select" type="number" id="qiblatInput" placeholder="Qiblat" min="0" max="360" step="0.1">
+      <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
+      <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
+    </div>
+  </fieldset>
+  <br>
   <div class="container">
     <div class="sticky-wrapper">
       <div class="circle-container">
@@ -501,8 +502,6 @@
 </svg>
 <button class="center-dot" id="centerDotButton"></button>
         <div class="circle" id="circle">
-          
-          
           <div class="center-line" id="centerLine"></div>
           <div class="arrow-line" id="arrowLine">
             <div class="arrow-head" id="arrowHead"></div>
@@ -531,11 +530,16 @@
     <button class="degree-button" id="increaseButton">+</button>
 </div>
 
-      
       <div id="install-banner-container"></div>
     
     <fieldset class="map-fieldset">
       <legend><button id="updateLocationButton" class="location-btn">Update Location</button></legend>
+      <div class="location-search-container">
+  <input type="text" id="locationSearch" placeholder="Search location..." class="custom-select" />
+  <button id="searchButton" class="location-btn">Search</button>
+  <button id="clearSearchButton" class="location-btn">Clear</button>
+</div>
+<ul id="searchResults" style="list-style-type: none; padding: 0; margin: 10px 0; display: none;"></ul>
       <div id="map" style="position: relative; height: 50vh; width: 100%; margin-top: 0; border: none;"></div>
     </fieldset>
 
@@ -568,6 +572,8 @@ let degree = 0;
 let holdInterval = null;
 let speed = 1000;
 let firstPin, secondPin;
+let map; // Declare map here to make it accessible globally
+let updateButtonPosition; // Declare the function variable here
 
 window.onload = function() {
   if (isOnline()) {
@@ -589,6 +595,14 @@ window.onload = function() {
   initializeDegreeButtons();
   populateDegreeNumbers();
   initializeDynamicAngleUpdates();
+
+  // Add event listener for the search button
+  document.getElementById('searchButton').addEventListener('click', function() {
+    const query = document.getElementById('locationSearch').value;
+    if (query) {
+      searchLocation(query);
+    }
+  });
 };
 
 function initializeMapIfOnline() {
@@ -606,15 +620,8 @@ function loadLeafletResources(callback) {
   leafletCSS.href = 'https://unpkg.com/leaflet/dist/leaflet.css';
   document.head.appendChild(leafletCSS);
 
-  const geocoderCSS = document.createElement('link');
-  geocoderCSS.rel = 'stylesheet';
-  geocoderCSS.href = 'https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css';
-  document.head.appendChild(geocoderCSS);
-
   loadScript('https://unpkg.com/leaflet/dist/leaflet.js', function() {
-    loadScript('https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js', function() {
-      loadScript('https://unpkg.com/suncalc/suncalc.js', callback);
-    });
+    loadScript('https://unpkg.com/suncalc/suncalc.js', callback);
   });
 }
 
@@ -631,11 +638,6 @@ window.addEventListener('online', checkNetworkStatus);
 window.addEventListener('offline', checkNetworkStatus);
 
 function initializeMap() {
-  if (!L.Control.Geocoder) {
-    console.error('Geocoder library not loaded.');
-    return;
-  }
-
   const redIcon = L.icon({
     iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg',
     iconSize: [100, 100],
@@ -653,7 +655,7 @@ function initializeMap() {
   });
 
   const defaultLocation = [2.8126, 101.5018];
-  const map = L.map('map').setView(defaultLocation, 19);
+  map = L.map('map').setView(defaultLocation, 19); // Initialize map here
 
   const esriLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>',
@@ -705,32 +707,32 @@ function initializeMap() {
   const lineBetweenPins = L.polyline([[2.8126, 101.5018], [3.1390, 101.6869]], {color: 'yellow'}).addTo(map);
 
   // Create and append the round button
-const roundButton = document.createElement('button');
-roundButton.className = 'round-button';
-roundButton.id = 'newRoundButton';
-roundButton.innerText = 'OK'; // Add text or any content
-document.querySelector('.leaflet-map-pane').appendChild(roundButton);
+  const roundButton = document.createElement('button');
+  roundButton.className = 'round-button';
+  roundButton.id = 'newRoundButton';
+  roundButton.innerText = 'OK'; // Add text or any content
+  document.querySelector('.leaflet-map-pane').appendChild(roundButton);
 
-// Prevent map clicks when the button is clicked
-roundButton.addEventListener('click', (event) => {
-  event.stopPropagation(); // This prevents the click from affecting the map
-  console.log('Round button clicked'); // You can add other actions here
+  // Prevent map clicks when the button is clicked
+  roundButton.addEventListener('click', (event) => {
+    event.stopPropagation(); // This prevents the click from affecting the map
+    console.log('Round button clicked'); // You can add other actions here
 
-  // Scroll to the install-banner-container
-  const bannerContainer = document.getElementById('install-banner-container');
-  if (bannerContainer) {
-    bannerContainer.scrollIntoView({ behavior: 'smooth' });
-  }
-});
+    // Scroll to the install-banner-container
+    const bannerContainer = document.getElementById('install-banner-container');
+    if (bannerContainer) {
+      bannerContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
 
-// Function to update button position
-function updateButtonPosition() {
-  const firstPinLatLng = firstPin.getLatLng();
-  const point = map.latLngToLayerPoint(firstPinLatLng);
+  // Define the updateButtonPosition globally for access
+  updateButtonPosition = function() {
+    const firstPinLatLng = firstPin.getLatLng();
+    const point = map.latLngToLayerPoint(firstPinLatLng);
 
-  roundButton.style.left = `${point.x + 20}px`;
-  roundButton.style.top = `${point.y - 60}px`; // Adjust this value for vertical positioning
-}
+    roundButton.style.left = `${point.x + 20}px`;
+    roundButton.style.top = `${point.y - 60}px`; // Adjust this value for vertical positioning
+  };
 
   // Set initial position
   updateButtonPosition();
@@ -768,24 +770,6 @@ function updateButtonPosition() {
     updateBearingAndLines('firstPin');
     updateButtonPosition();
   });
-
-  L.Control.geocoder({
-    defaultMarkGeocode: false
-  })
-  .on('markgeocode', function(e) {
-    const bbox = e.geocode.bbox;
-    const poly = L.polygon([
-      bbox.getSouthEast(),
-      bbox.getNorthEast(),
-      bbox.getNorthWest(),
-      bbox.getSouthWest()
-    ]).addTo(map);
-    map.fitBounds(poly.getBounds());
-    firstPin.setLatLng(e.geocode.center);
-    updateBearingAndLines('firstPin');
-    updateButtonPosition();
-  })
-  .addTo(map);
 
   function updateLocation() {
     if (navigator.geolocation) {
@@ -948,6 +932,61 @@ function updateButtonPosition() {
     }
     updateCompassDisplay();
   });
+}
+
+document.getElementById('searchButton').addEventListener('click', function() {
+  const query = document.getElementById('locationSearch').value;
+  if (query) {
+    searchLocation(query);
+  }
+});
+
+document.getElementById('clearSearchButton').addEventListener('click', function() {
+  const searchResults = document.getElementById('searchResults');
+  searchResults.innerHTML = ''; // Clear the list
+  searchResults.style.display = 'none'; // Hide the list
+  document.getElementById('locationSearch').value = ''; // Clear the search input
+});
+
+function searchLocation(query) {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const searchResults = document.getElementById('searchResults');
+      searchResults.innerHTML = ''; // Clear previous results
+
+      if (data && data.length > 0) {
+        data.forEach(location => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `${location.display_name} (${location.lat}, ${location.lon})`;
+
+          listItem.addEventListener('click', () => {
+            const lat = parseFloat(location.lat);
+            const lon = parseFloat(location.lon);
+            if (firstPin) {
+              firstPin.setLatLng([lat, lon]);
+              map.setView([lat, lon], 19); // Adjust the zoom level as needed
+              updateBearingAndLines('firstPin');
+              if (typeof updateButtonPosition === 'function') {
+                updateButtonPosition(); // Ensure button position is updated
+              }
+            }
+            searchResults.innerHTML = ''; // Clear the list
+            searchResults.style.display = 'none'; // Hide the list
+          });
+
+          searchResults.appendChild(listItem);
+        });
+        searchResults.style.display = 'block'; // Show results when available
+      } else {
+        alert('Location not found. Please try a different search.');
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching location:', error);
+      alert('An error occurred while searching for the location.');
+    });
 }
 
 function calculateAndLabelAngles(angleA, angleB) {
