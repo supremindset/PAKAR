@@ -513,12 +513,12 @@
             <div class="black-arrow-head" id="blackArrowHead"></div>
           </div>
           <div class="short-horizontal-line" id="shortHorizontalLine">
-            <div class="label-north">N</div>
-            <div class="label-south">S</div>
+            <div class="label-north">S</div>
+            <div class="label-south">N</div>
           </div>
           <div class="vertical-line" id="verticalLine">
-            <div class="label-east">E</div>
-            <div class="label-west">W</div>
+            <div class="label-east">W</div>
+            <div class="label-west">E</div>
           </div>
         </div>
       </div>
@@ -920,7 +920,6 @@ function initializeMap() {
   });
 
   ELEMENTS.kaedahQiblat.addEventListener('change', () => {
-    updateDirectionLabels();
     toggleDateTimeInputVisibility();
     updateBearingAndLines('firstPin');
     if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
@@ -1169,20 +1168,6 @@ const updateArrow = (element, degree) => {
   element.style.transform = `translateY(-50%) rotate(${degree}deg)`;
 };
 
-const updateDirectionLabels = () => {
-  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-    document.querySelector('.label-north').textContent = 'S';
-    document.querySelector('.label-south').textContent = 'N';
-    document.querySelector('.label-east').textContent = 'W';
-    document.querySelector('.label-west').textContent = 'E';
-  } else {
-    document.querySelector('.label-north').textContent = 'N';
-    document.querySelector('.label-south').textContent = 'S';
-    document.querySelector('.label-east').textContent = 'E';
-    document.querySelector('.label-west').textContent = 'W';
-  }
-};
-
 const updateCompassDisplay = () => {
   const degree = parseFloat(ELEMENTS.degreeInput.value) || 0;
   const inputQiblaDegree = parseFloat(ELEMENTS.qiblatInput.value) || 0;
@@ -1190,11 +1175,12 @@ const updateCompassDisplay = () => {
   let finalQiblatDegree = inputQiblaDegree;
 
   if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-    finalQiblatDegree = (finalQiblatDegree + 180) % 360;
+    ELEMENTS.circle.style.transform = `rotate(${-90 - degree}deg)`;
+  } else {
+    ELEMENTS.circle.style.transform = `rotate(${90 - degree}deg)`;
   }
 
   ELEMENTS.centerLine.style.transform = `translateY(-50%) rotate(${degree}deg)`;
-  ELEMENTS.circle.style.transform = `rotate(${90 - degree}deg)`;
 
   updateArrow(ELEMENTS.blackArrowLine, degree);
   updateArrow(ELEMENTS.blackArrowHead, degree);
