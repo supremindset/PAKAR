@@ -149,6 +149,7 @@
       width: 250px;
       height: 2px;
       background-color: #2980b9;
+      opacity: 0.2;
       top: 50%;
       left: 50%;
       transform-origin: center;
@@ -163,6 +164,7 @@
       width: 2px;
       height: 250px;
       background-color: #2980b9;
+      opacity: 0.2;
       top: 50%;
       left: 50%;
       transform-origin: center;
@@ -603,7 +605,34 @@ window.onload = function() {
       searchLocation(query);
     }
   });
+  
+  // change sector color
+  const kaedahQiblatSelect = document.getElementById('kaedahQiblat');
+    kaedahQiblatSelect.addEventListener('change', updateSectorColors);
+
+    updateSectorColors(); // Call once on load to set initial colors
+    
 };
+
+function updateSectorColors() {
+    const kaedahQiblatValue = document.getElementById('kaedahQiblat').value;
+    const sector1 = document.getElementById('sector1');
+    const sector2 = document.getElementById('sector2');
+    const sector3 = document.getElementById('sector3');
+    const sector4 = document.getElementById('sector4');
+
+    if (kaedahQiblatValue === 'bayang') {
+  sector1.setAttribute('fill', 'rgba(34, 139, 34, 0.8)'); // darker green
+  sector3.setAttribute('fill', 'rgba(34, 139, 34, 0.8)');
+  sector2.setAttribute('fill', 'rgba(34, 139, 34, 0.2)'); // slightly lighter shade of green
+  sector4.setAttribute('fill', 'rgba(34, 139, 34, 0.2)');
+} else if (kaedahQiblatValue === 'bangunan') {
+  sector1.setAttribute('fill', 'rgba(255, 223, 70, 0.8)'); // darker yellow
+  sector3.setAttribute('fill', 'rgba(255, 223, 70, 0.8)');
+  sector2.setAttribute('fill', 'rgba(255, 223, 70, 0.2)'); // slightly lighter shade of yellow
+  sector4.setAttribute('fill', 'rgba(255, 223, 70, 0.2)');
+}
+  }
 
 function initializeMapIfOnline() {
   if (!mapInitialized) {
