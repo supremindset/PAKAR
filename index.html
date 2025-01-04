@@ -729,6 +729,11 @@ options[i].style.display = 'block'; // Make the option visible again
 }
 }
 
+// Show the map when online
+    const mapElement = document.getElementById('map');
+    mapElement.style.display = 'block';
+    initializeMapIfOnline();
+    
 // Add your custom logic for a successful connection here
 }
 
@@ -744,7 +749,11 @@ options[i].style.display = 'none'; // Hide the options
 }
 }
 
-// Add your custom logic for when the server is unreachable here
+// Hide the map when offline
+    const mapElement = document.getElementById('map');
+    mapElement.style.display = 'none';
+
+    // Add your custom logic for when the server is unreachable here
 }
 
 // Check server reachability every 2 seconds
@@ -785,11 +794,6 @@ dateTimeInput.style.display = 'block';
 // Trigger the change event on page load to set initial visibility
 document.getElementById('kaedahQiblat').dispatchEvent(new Event('change'));
 // End OnlineOffline
-
-
-
-
-
 
 const modalData = [{
 image: "image1-url.jpg",
@@ -978,12 +982,6 @@ let map; // Declare map here to make it accessible globally
 let updateButtonPosition; // Declare the function variable here
 
 window.onload = () => {
-if (isOnline()) {
-initializeMapIfOnline();
-} else {
-document.getElementById('map').style.display = 'none';
-}
-
 // Initialize the firstPin and secondPin only if the map is loaded
 if (typeof L !== 'undefined' && map) {
 const defaultLocation = [2.8126,
@@ -1068,19 +1066,6 @@ document.head.appendChild(leafletCSS);
 
 loadScript('https://unpkg.com/leaflet/dist/leaflet.js', callback);
 }
-
-const checkNetworkStatus = () => {
-const mapElement = document.getElementById('map');
-if (navigator.onLine) {
-mapElement.style.display = 'block';
-initializeMapIfOnline();
-} else {
-mapElement.style.display = 'none';
-}
-}
-
-window.addEventListener('online', checkNetworkStatus);
-window.addEventListener('offline', checkNetworkStatus);
 
 const initializeMap = () => {
 const iconSettings = {
