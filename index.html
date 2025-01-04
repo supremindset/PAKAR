@@ -1,1085 +1,806 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PAKAR QIBLAT</title>
-  <link rel="canonical" href="https://supremindset.github.io/PAKAR/" />
-  <link rel="manifest" href="/PAKAR/manifest.json">
-  <script>
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.register(
-        '/PAKAR/sw.js',
-        {scope: '/PAKAR/'}
-      )
-    }
-  </script>
-  <style>
-    body {
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f7f9fc;
-    }
-    
-    #status {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAKAR QIBLAT</title>
+    <link rel="canonical" href="https://supremindset.github.io/PAKAR/" />
+    <link rel="manifest" href="/PAKAR/manifest.json">
+    <script>
+        if (navigator.serviceWorker) {
+            navigator.serviceWorker.register(
+                '/PAKAR/sw.js',
+                {
+                    scope: '/PAKAR/'
+                }
+            )
+        }
+    </script>
+    <style>
+        body {
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+        }
+
+        #status {
             margin-top: 20px;
             font-weight: bold;
         }
 
-    h2 {
-      color: #34495e;
-      margin-bottom: 20px;
-    }
+        h2 {
+            color: #34495e;
+            margin-bottom: 20px;
+        }
 
-    .container {
-      height: auto;
-      min-height: 100vh;
-      overflow-y: auto; /* Ensure the container can scroll */
-      width: 100%;
-      position: relative;
-      padding-top: 30px;
-    }
+        .container {
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+            /* Ensure the container can scroll */
+            width: 100%;
+            position: relative;
+            padding-top: 30px;
+        }
 
-    .circle-container {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  margin-bottom: 50px;
-  background-color: #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  z-index: 1;
-}
+        .circle-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 50px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
 
-.circle {
-	position: absolute;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	border-radius: 50%;
-	border: 1px solid #2980b9;
-	transition: transform 0.5s ease;
-	background-color: #ffffff;
-	z-index: 1;
-}
-    
-    .sticky-wrapper {
-      position: relative;
-      top: 0;
-      z-index: 2;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      background-color: #f7f9fc;
-    }
+        .circle {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid #2980b9;
+            transition: transform 0.5s ease;
+            background-color: #ffffff;
+            z-index: 1;
+        }
 
-    .non-sticky {
-      position: static; /* Changes from sticky to static */
-    }
+        .sticky-wrapper {
+            position: relative;
+            top: 0;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background-color: #f7f9fc;
+        }
 
-    .data-inputs {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 20px; /* Add some margin to prevent overlap with other elements */
-    }
-    
-    .degree-number {
-      position: absolute;
-      transform-origin: center;
-      transform: translate(-50%, -50%);
-      font-size: 12px;
-      color: #2980b9;
-    }
+        .non-sticky {
+            position: static;
+            /* Changes from sticky to static */
+        }
 
-    .center-dot {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background-color: #2980b9;
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      border: 2px solid #ffffff;
-      transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-      z-index: 8; /* Higher z-index to place it on top of lines */
-    }
+        .data-inputs {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            /* Add some margin to prevent overlap with other elements */
+        }
 
-    .center-dot:hover {
-      background-color: #3498db;
-      transform: translate(-50%, -50%) scale(1.1);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.3);
-    }
+        .degree-number {
+            position: absolute;
+            transform-origin: center;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: #2980b9;
+        }
 
-    .center-dot:active {
-      background-color: #1e6a8d;
-      transform: translate(-50%, -50%) scale(0.95);
-    }
+        .center-dot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #2980b9;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            z-index: 8;
+            /* Higher z-index to place it on top of lines */
+        }
 
-    .center-line {
-      position: absolute;
-      width: 100%;
-      height: 4px;
-      background-color: #333;
-      top: 50%;
-      left: 0;
-      transform-origin: center;
-      transform: translateY(-50%);
-      transition: transform 0.5s ease;
-      z-index: 2; /* Ensure lines are behind the center-dot */
-    }
+        .center-dot:hover {
+            background-color: #3498db;
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
 
-    .arrow-line {
-      position: absolute;
-      width: 100%;
-      height: 4px;
-      background-color: red;
-      top: 50%;
-      left: 0;
-      transform-origin: center;
-      transform: translateY(-50%) rotate(0deg);
-      transition: transform 0.5s ease;
-      z-index: 2; /* Ensure lines are behind the center-dot */
-    }
+        .center-dot:active {
+            background-color: #1e6a8d;
+            transform: translate(-50%, -50%) scale(0.95);
+        }
 
-    .short-horizontal-line {
-      position: absolute;
-      width: 250px;
-      height: 2px;
-      background-color: #2980b9;
-      opacity: 0.2;
-      top: 50%;
-      left: 50%;
-      transform-origin: center;
-      transform: translate(-50%, -50%);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        .center-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background-color: #333;
+            top: 50%;
+            left: 0;
+            transform-origin: center;
+            transform: translateY(-50%);
+            transition: transform 0.5s ease;
+            z-index: 2;
+            /* Ensure lines are behind the center-dot */
+        }
 
-    .vertical-line {
-      position: absolute;
-      width: 2px;
-      height: 250px;
-      background-color: #2980b9;
-      opacity: 0.2;
-      top: 50%;
-      left: 50%;
-      transform-origin: center;
-      transform: translate(-50%, -50%);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-    }
+        .arrow-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background-color: red;
+            top: 50%;
+            left: 0;
+            transform-origin: center;
+            transform: translateY(-50%) rotate(0deg);
+            transition: transform 0.5s ease;
+            z-index: 2;
+            /* Ensure lines are behind the center-dot */
+        }
 
-    .label-west, .label-east {
-      color: #2980b9;
-      font-size: 14px;
-      font-weight: bold;
-      margin: -20px 0;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    }
+        .short-horizontal-line {
+            position: absolute;
+            width: 250px;
+            height: 2px;
+            background-color: #2980b9;
+            opacity: 0.2;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .label-north, .label-south {
-      color: #2980b9;
-      font-size: 14px;
-      font-weight: bold;
-      margin: 0 5px;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    }
+        .vertical-line {
+            position: absolute;
+            width: 2px;
+            height: 250px;
+            background-color: #2980b9;
+            opacity: 0.2;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .label-north {
-      margin-left: -20px;
-    }
+        .label-west, .label-east {
+            color: #2980b9;
+            font-size: 14px;
+            font-weight: bold;
+            margin: -20px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
 
-    .label-south {
-      margin-right: -20px;
-    }
+        .label-north, .label-south {
+            color: #2980b9;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0 5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
 
-    .label-east {
-      margin-bottom: -20px;
-    }
+        .label-north {
+            margin-left: -20px;
+        }
 
-    .label-west {
-      margin-top: -20px;
-    }
+        .label-south {
+            margin-right: -20px;
+        }
 
-    .arrow-head {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: red;
-      border-radius: 50%;
-      top: 50%;
-      left: 100%;
-      transform: translate(-100%, -50%);
-      transition: transform 0.5s ease;
-      z-index: 2; /* Ensure heads are behind the center-dot */
-    }
+        .label-east {
+            margin-bottom: -20px;
+        }
 
-    .black-arrow-line {
-      position: absolute;
-      width: 100%;
-      height: 2px;
-      background-color: #333;
-      top: 50%;
-      left: 0;
-      transform-origin: center;
-      transform: translateY(-50%);
-      transition: transform 0.5s ease;
-      z-index: 2; /* Ensure lines are behind the center-dot */
-    }
+        .label-west {
+            margin-top: -20px;
+        }
 
-    .black-arrow-head {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: #333;
-      border-radius: 50%;
-      top: 50%;
-      left: 100%;
-      transform: translate(-100%, -50%);
-      transition: transform 0.5s ease;
-      z-index: 2; /* Ensure heads are behind the center-dot */
-    }
+        .arrow-head {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            top: 50%;
+            left: 100%;
+            transform: translate(-100%, -50%);
+            transition: transform 0.5s ease;
+            z-index: 2;
+            /* Ensure heads are behind the center-dot */
+        }
 
-    .custom-select {
-      box-sizing: border-box;
-      width: 300px;
-      height: 41px;
-      padding: 10px;
-      font-size: 14px;
-      text-align: center;
-      margin: 5px 0; /* Slightly larger margin for better spacing */
-      border: 2px solid #2980b9;
-      border-radius: 5px;
-      outline: none;
-      transition: border-color 0.3s;
-      background-color: #ffffff;
-      cursor: pointer;
-    }
+        .black-arrow-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: #333;
+            top: 50%;
+            left: 0;
+            transform-origin: center;
+            transform: translateY(-50%);
+            transition: transform 0.5s ease;
+            z-index: 2;
+            /* Ensure lines are behind the center-dot */
+        }
 
-    select {
-      background-color: #ffffff;
-      cursor: pointer;
-    }
+        .black-arrow-head {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 50%;
+            top: 50%;
+            left: 100%;
+            transform: translate(-100%, -50%);
+            transition: transform 0.5s ease;
+            z-index: 2;
+            /* Ensure heads are behind the center-dot */
+        }
 
-    input[type="number"]::placeholder {
-      color: #7f8c8d;
-      font-size: 14px;
-      opacity: 0.7;
-    }
+        .custom-select {
+            box-sizing: border-box;
+            width: 300px;
+            height: 41px;
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+            margin: 5px 0;
+            /* Slightly larger margin for better spacing */
+            border: 2px solid #2980b9;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s;
+            background-color: #ffffff;
+            cursor: pointer;
+        }
 
-    input[type="number"]:focus, select:focus {
-      border-color: #3498db;
-    }
+        select {
+            background-color: #ffffff;
+            cursor: pointer;
+        }
 
-    select::-ms-expand {
-      display: none;
-    }
-    
-    .all-fieldset {
-      border: 2px solid #2980b9;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 20px 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
+        input[type="number"]::placeholder {
+            color: #7f8c8d;
+            font-size: 14px;
+            opacity: 0.7;
+        }
 
-    .data-inputs-fieldset {
-      border: 2px solid #2980b9;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 10px 0;
-    }
+        input[type="number"]:focus, select:focus {
+            border-color: #3498db;
+        }
 
-    .location-btn {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #2980b9;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+        select::-ms-expand {
+            display: none;
+        }
 
-    .location-btn:hover {
-      background-color: #3498db;
-    }
+        .all-fieldset {
+            border: 2px solid #2980b9;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-    .map-fieldset {
-      border: 2px solid #2980b9;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 20px 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
+        .data-inputs-fieldset {
+            border: 2px solid #2980b9;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
 
-    .map-fieldset legend {
-      font-size: 1.2em;
-      color: #2980b9;
-      font-weight: bold;
-      padding: 0 10px;
-    }
+        .location-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    #map.circle-map {
-      border-radius: 50%; /* Ensure circular shape */
-      overflow: hidden; /* Hide overflow */
-      transition: all 0.3s ease; /* Smooth transition for resizing */
-    }
+        .location-btn:hover {
+            background-color: #3498db;
+        }
 
-    #map {
-  position: relative;
-  height: 50vh; /* Adjust the height as needed */
-  width: 100vw; /* Full width of the viewport */
-  margin-top: 0;
-  border: none;
-  transition: all 0.3s ease;
-  z-index: 8;
-}
+        .map-fieldset {
+            border: 2px solid #2980b9;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-    input[type="range"] {
-      width: 100%;
-      margin: 10px 0;
-    }
+        .map-fieldset legend {
+            font-size: 1.2em;
+            color: #2980b9;
+            font-weight: bold;
+            padding: 0 10px;
+        }
 
-    .leaflet-control {
-      top: 100px;
-    }
-    
-    .red-text {
-  color: #1e6a8d;
-}
+        #map.circle-map {
+            border-radius: 50%;
+            /* Ensure circular shape */
+            overflow: hidden;
+            /* Hide overflow */
+            transition: all 0.3s ease;
+            /* Smooth transition for resizing */
+        }
 
-.yellow-text {
-  color: #1e6a8d;
-}
+        #map {
+            position: relative;
+            height: 50vh;
+            /* Adjust the height as needed */
+            width: 100vw;
+            /* Full width of the viewport */
+            margin-top: 0;
+            border: none;
+            transition: all 0.3s ease;
+            z-index: 8;
+        }
 
-.firstPin-shadow {
-  filter: drop-shadow(0 0 100000px rgba(0, 255, 0, 0.5));
-}
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
 
-.install-banner {
-  background-color: #2980b9;
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  padding: 10px;
-  white-space: nowrap;
-  overflow: hidden;
-  border-radius: 5px;
-}
+        .leaflet-control {
+            top: 100px;
+        }
 
-.degree-button-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px auto;
-}
+        .red-text {
+            color: #1e6a8d;
+        }
 
-.degree-button {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-    margin: 0 10px;
-    background-color: #2980b9;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+        .yellow-text {
+            color: #1e6a8d;
+        }
 
-.degree-button:hover {
-    background-color: #3498db;
-}
+        .firstPin-shadow {
+            filter: drop-shadow(0 0 100000px rgba(0, 255, 0, 0.5));
+        }
 
-.degree-button:active {
-    background-color: #1e6a8d;
-}
+        .install-banner {
+            background-color: #2980b9;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-radius: 5px;
+        }
 
-.svg {
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 100%;
-  height: 100%;
-  z-index: 7;
-}
+        .degree-button-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+        }
 
-.svg text {
-    font-size: 10px; /* Adjust the size as needed */
-    fill: #333;
-}
+        .degree-button {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            margin: 0 10px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-.arah-qiblat {
-      position: absolute;
-      top: 60%; /* Move it further down below the red line */
-      left: 95%; /* Center it horizontally relative to the line */
-      transform: translate(-50%, 0); /* Adjust vertical positioning */
-      font-size: 16px;
-      color: #333;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    }
-    
-    .round-button {
-  position: absolute;
-  top: -50px; /* Adjust this value to position it above the firstPin */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 32px;
-  height: 32px;
-  background-color: #2980b9;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-  z-index: 1001; /* Ensure it's above other elements */
-}
+        .degree-button:hover {
+            background-color: #3498db;
+        }
 
-.round-button:hover {
-  background-color: #3498db;
-}
+        .degree-button:active {
+            background-color: #1e6a8d;
+        }
 
-.round-button:active {
-  background-color: #1e6a8d;
-}
+        .svg {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 100%;
+            height: 100%;
+            z-index: 7;
+        }
 
-#searchResults li {
-  background-color: #f7f9fc;
-  border: 1px solid #2980b9;
-  padding: 10px;
-  margin-bottom: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
+        .svg text {
+            font-size: 10px;
+            /* Adjust the size as needed */
+            fill: #333;
+        }
 
-#searchResults li:hover {
-  background-color: #dfe6e9;
-}
+        .arah-qiblat {
+            position: absolute;
+            top: 60%;
+            /* Move it further down below the red line */
+            left: 95%;
+            /* Center it horizontally relative to the line */
+            transform: translate(-50%, 0);
+            /* Adjust vertical positioning */
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
 
-.modal {
-      display: none; /* Hidden by default */
-      position: fixed; /* Stay in place */
-      z-index: 1000; /* Sit on top */
-      left: 0;
-      top: 0;
-      width: 100%; /* Full width */
-      height: 100%; /* Full height */
-      overflow: auto; /* Enable scroll if needed */
-      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    }
+        .round-button {
+            position: absolute;
+            top: -50px;
+            /* Adjust this value to position it above the firstPin */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 1001;
+            /* Ensure it's above other elements */
+        }
 
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto; /* 15% from the top and centered */
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%; /* Could be more or less, depending on screen size */
-      border-radius: 10px;
-    }
+        .round-button:hover {
+            background-color: #3498db;
+        }
 
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-    }
+        .round-button:active {
+            background-color: #1e6a8d;
+        }
 
-    .close:hover,
-    .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-    }
+        #searchResults li {
+            background-color: #f7f9fc;
+            border: 1px solid #2980b9;
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-    .modal-image {
-      width: 100%;
-      height: auto;
-      border-radius: 5px;
-      margin-bottom: 15px;
-    }
+        #searchResults li:hover {
+            background-color: #dfe6e9;
+        }
 
-    .modal-text {
-      font-size: 16px;
-      color: #333;
-    }
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1000;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4);
+            /* Black w/ opacity */
+        }
 
-    .modal-text ul {
-      list-style-type: disc;
-      margin: 0;
-      padding-left: 20px;
-    }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            /* Could be more or less, depending on screen size */
+            border-radius: 10px;
+        }
 
-    /* Style the marquee container as a button */
-    .marquee-button {
-      cursor: pointer;
-    }
-  </style>
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .modal-text ul {
+            list-style-type: disc;
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        /* Style the marquee container as a button */
+        .marquee-button {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <div id="install-banner-container">
-  <div class="marquee-button">
-    <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner" id="marqueeText">
-      KEM FALAK (Sempena Hujan Meteor Quadrantids) | 4-5 Januari 2025 (Sabtu-Ahad) | Baitul Hilal Bukit Jugra Kuala Langat Banting
-    </marquee>
-  </div>
-</div>
-<div id="status">Checking...</div>
-
-<!-- The Modal -->
-<div id="myModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <img id="modalImage" src="" alt="Event Image" class="modal-image">
-    <div id="modalText" class="modal-text">
-      <ul id="modalList"></ul>
-    </div>
-  </div>
-</div>
-<fieldset class="data-inputs-fieldset">
-    <legend>Qiblat Settings</legend>
-    <div class="data-inputs">
-      <select class="custom-select" id="kaedahQiblat">
-  <option value="bayang" selected>Bayang-Bayang</option>
-  <option value="bangunan">Bearing Bangunan</option>
-  <option value="offlineLatLong">Offline Lat/Long</option>
-</select>
-<input class="custom-select" type="number" id="latInput" placeholder="Latitude" step="0.000001">
-<input class="custom-select" type="number" id="longInput" placeholder="Longitude" step="0.000001">
-      <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
-      <input class="custom-select" type="number" id="qiblatInput" placeholder="Qiblat" min="0" max="360" step="0.1">
-      <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
-      <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
-    </div>
-  </fieldset>
-  <br>
-  <div class="container">
-    <div class="sticky-wrapper">
-      <div class="circle-container">
-        <svg class="svg" width="200" height="200" viewBox="0 0 200 200">
-    <path id="sector1" fill="rgba(41, 128, 185, 0.2)"></path> <!-- #2980b9 with transparency -->
-    <path id="sector2" fill="rgba(214, 234, 248, 0.5)"></path> <!-- Light blue with transparency -->
-    <path id="sector3" fill="rgba(41, 128, 185, 0.2)"></path> <!-- #2980b9 with transparency -->
-    <path id="sector4" fill="rgba(214, 234, 248, 0.5)"></path> <!-- Light blue with transparency -->
-    <text id="label1" x="0" y="0" text-anchor="middle"></text>
-    <text id="label2" x="0" y="0" text-anchor="middle"></text>
-    <text id="label3" x="0" y="0" text-anchor="middle"></text>
-    <text id="label4" x="0" y="0" text-anchor="middle"></text>
-</svg>
-<button class="center-dot" id="centerDotButton"></button>
-        <div class="circle" id="circle">
-          <div class="center-line" id="centerLine"></div>
-          <div class="arrow-line" id="arrowLine">
-            <div class="arrow-head" id="arrowHead"></div>
-            <div class="arah-qiblat">
-  <span class="qiblat-arrow">🕋</span>
-</div>
-          </div>
-          <div class="black-arrow-line" id="blackArrowLine">
-            <div class="black-arrow-head" id="blackArrowHead"></div>
-          </div>
-          <div class="short-horizontal-line" id="shortHorizontalLine">
-            <div class="label-north">S</div>
-            <div class="label-south">N</div>
-          </div>
-          <div class="vertical-line" id="verticalLine">
-            <div class="label-east">W</div>
-            <div class="label-west">E</div>
-          </div>
+    <div id="install-banner-container">
+        <div class="marquee-button">
+            <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner" id="marqueeText">
+                KEM FALAK (Sempena Hujan Meteor Quadrantids) | 4-5 Januari 2025 (Sabtu-Ahad) | Baitul Hilal Bukit Jugra Kuala Langat Banting
+            </marquee>
         </div>
-      </div>
     </div>
-    
-    <div class="degree-button-container">
-    <button class="degree-button" id="decreaseButton">–</button>
-    <span id="rotationValue">0°</span>
-    <button class="degree-button" id="increaseButton">+</button>
-</div>
+    <div id="status">
+        Checking...
+    </div>
 
-      <div id="install-banner-container"></div>
-    
-    <fieldset class="map-fieldset">
-      <legend><button id="updateLocationButton" class="location-btn">Update Location</button></legend>
-      <div class="location-search-container">
-  <input type="text" id="locationSearch" placeholder="Search location..." class="custom-select" /></br>
-  <button id="searchButton" class="location-btn">Search</button>
-  <button id="clearSearchButton" class="location-btn">Clear</button>
-</div>
-<ul id="searchResults" style="list-style-type: none; padding: 0; margin: 10px 0; display: none;"></ul></br>
-<div id="markerTooltipContainer" style="padding: 10px; background-color: #f7f9fc; border-top: 1px solid #2980b9;">
-  <p>
-    <span class="red-text" id="markerTooltipText1"></span>
-    <span class="yellow-text" id="markerTooltipText2"></span>
-  </p>
-  <p id="firstPinData">
-    <!-- This will hold the extra data for the firstPin -->
-  </p>
-</div>
-      <div id="map" style="position: relative; height: 90vh; width: 100%; margin-top: 0; border: none;"></div>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="Event Image" class="modal-image">
+            <div id="modalText" class="modal-text">
+                <ul id="modalList"></ul>
+            </div>
+        </div>
+    </div>
+    <fieldset class="data-inputs-fieldset">
+        <legend>Qiblat Settings</legend>
+        <div class="data-inputs">
+            <select class="custom-select" id="kaedahQiblat">
+                <option value="bayang" selected>Bayang-Bayang</option>
+                <option value="bangunan">Bearing Bangunan</option>
+                <option value="offlineLatLong">Offline Lat/Long</option>
+            </select>
+            <input class="custom-select" type="number" id="latInput" placeholder="Latitude" step="0.000001">
+            <input class="custom-select" type="number" id="longInput" placeholder="Longitude" step="0.000001">
+            <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
+            <input class="custom-select" type="number" id="qiblatInput" placeholder="Qiblat" min="0" max="360" step="0.1">
+            <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
+            <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
+        </div>
     </fieldset>
-    
-  </div>
-  <script>
-        (function () {
-  'use strict';
-  /*
- (c) 2011-2015, Vladimir Agafonkin
- SunCalc is a JavaScript library for calculating sun/moon position and light phases.
- https://github.com/mourner/suncalc
-*/
-
-(function () { 'use strict';
-
-// shortcuts for easier to read formulas
-
-var PI   = Math.PI,
-    sin  = Math.sin,
-    cos  = Math.cos,
-    tan  = Math.tan,
-    asin = Math.asin,
-    atan = Math.atan2,
-    acos = Math.acos,
-    rad  = PI / 180;
-
-// sun calculations are based on http://aa.quae.nl/en/reken/zonpositie.html formulas
-
-
-// date/time constants and conversions
-
-var dayMs = 1000 * 60 * 60 * 24,
-    J1970 = 2440588,
-    J2000 = 2451545;
-
-function toJulian(date) { return date.valueOf() / dayMs - 0.5 + J1970; }
-function fromJulian(j)  { return new Date((j + 0.5 - J1970) * dayMs); }
-function toDays(date)   { return toJulian(date) - J2000; }
-
-
-// general calculations for position
-
-var e = rad * 23.4397; // obliquity of the Earth
-
-function rightAscension(l, b) { return atan(sin(l) * cos(e) - tan(b) * sin(e), cos(l)); }
-function declination(l, b)    { return asin(sin(b) * cos(e) + cos(b) * sin(e) * sin(l)); }
-
-function azimuth(H, phi, dec)  { return atan(sin(H), cos(H) * sin(phi) - tan(dec) * cos(phi)); }
-function altitude(H, phi, dec) { return asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(H)); }
-
-function siderealTime(d, lw) { return rad * (280.16 + 360.9856235 * d) - lw; }
-
-function astroRefraction(h) {
-    if (h < 0) // the following formula works for positive altitudes only.
-        h = 0; // if h = -0.08901179 a div/0 would occur.
-
-    // formula 16.4 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
-    // 1.02 / tan(h + 10.26 / (h + 5.10)) h in degrees, result in arc minutes -> converted to rad:
-    return 0.0002967 / Math.tan(h + 0.00312536 / (h + 0.08901179));
-}
-
-// general sun calculations
-
-function solarMeanAnomaly(d) { return rad * (357.5291 + 0.98560028 * d); }
-
-function eclipticLongitude(M) {
-
-    var C = rad * (1.9148 * sin(M) + 0.02 * sin(2 * M) + 0.0003 * sin(3 * M)), // equation of center
-        P = rad * 102.9372; // perihelion of the Earth
-
-    return M + C + P + PI;
-}
-
-function sunCoords(d) {
-
-    var M = solarMeanAnomaly(d),
-        L = eclipticLongitude(M);
-
-    return {
-        dec: declination(L, 0),
-        ra: rightAscension(L, 0)
-    };
-}
-
-
-var SunCalc = {};
-
-
-// calculates sun position for a given date and latitude/longitude
-
-SunCalc.getPosition = function (date, lat, lng) {
-
-    var lw  = rad * -lng,
-        phi = rad * lat,
-        d   = toDays(date),
-
-        c  = sunCoords(d),
-        H  = siderealTime(d, lw) - c.ra;
-
-    return {
-        azimuth: azimuth(H, phi, c.dec),
-        altitude: altitude(H, phi, c.dec)
-    };
-};
-
-
-// sun times configuration (angle, morning name, evening name)
-
-var times = SunCalc.times = [
-    [-0.833, 'sunrise',       'sunset'      ],
-    [  -0.3, 'sunriseEnd',    'sunsetStart' ],
-    [    -6, 'dawn',          'dusk'        ],
-    [   -12, 'nauticalDawn',  'nauticalDusk'],
-    [   -18, 'nightEnd',      'night'       ],
-    [     6, 'goldenHourEnd', 'goldenHour'  ]
-];
-
-// adds a custom time to the times config
-
-SunCalc.addTime = function (angle, riseName, setName) {
-    times.push([angle, riseName, setName]);
-};
-
-
-// calculations for sun times
-
-var J0 = 0.0009;
-
-function julianCycle(d, lw) { return Math.round(d - J0 - lw / (2 * PI)); }
-
-function approxTransit(Ht, lw, n) { return J0 + (Ht + lw) / (2 * PI) + n; }
-function solarTransitJ(ds, M, L)  { return J2000 + ds + 0.0053 * sin(M) - 0.0069 * sin(2 * L); }
-
-function hourAngle(h, phi, d) { return acos((sin(h) - sin(phi) * sin(d)) / (cos(phi) * cos(d))); }
-function observerAngle(height) { return -2.076 * Math.sqrt(height) / 60; }
-
-// returns set time for the given sun altitude
-function getSetJ(h, lw, phi, dec, n, M, L) {
-
-    var w = hourAngle(h, phi, dec),
-        a = approxTransit(w, lw, n);
-    return solarTransitJ(a, M, L);
-}
-
-
-// calculates sun times for a given date, latitude/longitude, and, optionally,
-// the observer height (in meters) relative to the horizon
-
-SunCalc.getTimes = function (date, lat, lng, height) {
-
-    height = height || 0;
-
-    var lw = rad * -lng,
-        phi = rad * lat,
-
-        dh = observerAngle(height),
-
-        d = toDays(date),
-        n = julianCycle(d, lw),
-        ds = approxTransit(0, lw, n),
-
-        M = solarMeanAnomaly(ds),
-        L = eclipticLongitude(M),
-        dec = declination(L, 0),
-
-        Jnoon = solarTransitJ(ds, M, L),
-
-        i, len, time, h0, Jset, Jrise;
-
-
-    var result = {
-        solarNoon: fromJulian(Jnoon),
-        nadir: fromJulian(Jnoon - 0.5)
-    };
-
-    for (i = 0, len = times.length; i < len; i += 1) {
-        time = times[i];
-        h0 = (time[0] + dh) * rad;
-
-        Jset = getSetJ(h0, lw, phi, dec, n, M, L);
-        Jrise = Jnoon - (Jset - Jnoon);
-
-        result[time[1]] = fromJulian(Jrise);
-        result[time[2]] = fromJulian(Jset);
-    }
-
-    return result;
-};
-
-
-// moon calculations, based on http://aa.quae.nl/en/reken/hemelpositie.html formulas
-
-function moonCoords(d) { // geocentric ecliptic coordinates of the moon
-
-    var L = rad * (218.316 + 13.176396 * d), // ecliptic longitude
-        M = rad * (134.963 + 13.064993 * d), // mean anomaly
-        F = rad * (93.272 + 13.229350 * d),  // mean distance
-
-        l  = L + rad * 6.289 * sin(M), // longitude
-        b  = rad * 5.128 * sin(F),     // latitude
-        dt = 385001 - 20905 * cos(M);  // distance to the moon in km
-
-    return {
-        ra: rightAscension(l, b),
-        dec: declination(l, b),
-        dist: dt
-    };
-}
-
-SunCalc.getMoonPosition = function (date, lat, lng) {
-
-    var lw  = rad * -lng,
-        phi = rad * lat,
-        d   = toDays(date),
-
-        c = moonCoords(d),
-        H = siderealTime(d, lw) - c.ra,
-        h = altitude(H, phi, c.dec),
-        // formula 14.1 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
-        pa = atan(sin(H), tan(phi) * cos(c.dec) - sin(c.dec) * cos(H));
-
-    h = h + astroRefraction(h); // altitude correction for refraction
-
-    return {
-        azimuth: azimuth(H, phi, c.dec),
-        altitude: h,
-        distance: c.dist,
-        parallacticAngle: pa
-    };
-};
-
-
-// calculations for illumination parameters of the moon,
-// based on http://idlastro.gsfc.nasa.gov/ftp/pro/astro/mphase.pro formulas and
-// Chapter 48 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
-
-SunCalc.getMoonIllumination = function (date) {
-
-    var d = toDays(date || new Date()),
-        s = sunCoords(d),
-        m = moonCoords(d),
-
-        sdist = 149598000, // distance from Earth to Sun in km
-
-        phi = acos(sin(s.dec) * sin(m.dec) + cos(s.dec) * cos(m.dec) * cos(s.ra - m.ra)),
-        inc = atan(sdist * sin(phi), m.dist - sdist * cos(phi)),
-        angle = atan(cos(s.dec) * sin(s.ra - m.ra), sin(s.dec) * cos(m.dec) -
-                cos(s.dec) * sin(m.dec) * cos(s.ra - m.ra));
-
-    return {
-        fraction: (1 + cos(inc)) / 2,
-        phase: 0.5 + 0.5 * inc * (angle < 0 ? -1 : 1) / Math.PI,
-        angle: angle
-    };
-};
-
-
-function hoursLater(date, h) {
-    return new Date(date.valueOf() + h * dayMs / 24);
-}
-
-// calculations for moon rise/set times are based on http://www.stargazing.net/kepler/moonrise.html article
-
-SunCalc.getMoonTimes = function (date, lat, lng, inUTC) {
-    var t = new Date(date);
-    if (inUTC) t.setUTCHours(0, 0, 0, 0);
-    else t.setHours(0, 0, 0, 0);
-
-    var hc = 0.133 * rad,
-        h0 = SunCalc.getMoonPosition(t, lat, lng).altitude - hc,
-        h1, h2, rise, set, a, b, xe, ye, d, roots, x1, x2, dx;
-
-    // go in 2-hour chunks, each time seeing if a 3-point quadratic curve crosses zero (which means rise or set)
-    for (var i = 1; i <= 24; i += 2) {
-        h1 = SunCalc.getMoonPosition(hoursLater(t, i), lat, lng).altitude - hc;
-        h2 = SunCalc.getMoonPosition(hoursLater(t, i + 1), lat, lng).altitude - hc;
-
-        a = (h0 + h2) / 2 - h1;
-        b = (h2 - h0) / 2;
-        xe = -b / (2 * a);
-        ye = (a * xe + b) * xe + h1;
-        d = b * b - 4 * a * h1;
-        roots = 0;
-
-        if (d >= 0) {
-            dx = Math.sqrt(d) / (Math.abs(a) * 2);
-            x1 = xe - dx;
-            x2 = xe + dx;
-            if (Math.abs(x1) <= 1) roots++;
-            if (Math.abs(x2) <= 1) roots++;
-            if (x1 < -1) x1 = x2;
-        }
-
-        if (roots === 1) {
-            if (h0 < 0) rise = i + x1;
-            else set = i + x1;
-
-        } else if (roots === 2) {
-            rise = i + (ye < 0 ? x2 : x1);
-            set = i + (ye < 0 ? x1 : x2);
-        }
-
-        if (rise && set) break;
-
-        h0 = h2;
-    }
-
-    var result = {};
-
-    if (rise) result.rise = hoursLater(t, rise);
-    if (set) result.set = hoursLater(t, set);
-
-    if (!rise && !set) result[ye > 0 ? 'alwaysUp' : 'alwaysDown'] = true;
-
-    return result;
-};
-
-
-// export as Node module / AMD module / browser variable
-if (typeof exports === 'object' && typeof module !== 'undefined') module.exports = SunCalc;
-else if (typeof define === 'function' && define.amd) define(SunCalc);
-else window.SunCalc = SunCalc;
-
-}());
-  }());
+    <br>
+    <div class="container">
+        <div class="sticky-wrapper">
+            <div class="circle-container">
+                <svg class="svg" width="200" height="200" viewBox="0 0 200 200">
+                    <path id="sector1" fill="rgba(41, 128, 185, 0.2)"></path> <!-- #2980b9 with transparency -->
+                    <path id="sector2" fill="rgba(214, 234, 248, 0.5)"></path> <!-- Light blue with transparency -->
+                    <path id="sector3" fill="rgba(41, 128, 185, 0.2)"></path> <!-- #2980b9 with transparency -->
+                    <path id="sector4" fill="rgba(214, 234, 248, 0.5)"></path> <!-- Light blue with transparency -->
+                    <text id="label1" x="0" y="0" text-anchor="middle"></text>
+                    <text id="label2" x="0" y="0" text-anchor="middle"></text>
+                    <text id="label3" x="0" y="0" text-anchor="middle"></text>
+                    <text id="label4" x="0" y="0" text-anchor="middle"></text>
+                </svg>
+                <button class="center-dot" id="centerDotButton"></button>
+                <div class="circle" id="circle">
+                    <div class="center-line" id="centerLine"></div>
+                    <div class="arrow-line" id="arrowLine">
+                        <div class="arrow-head" id="arrowHead"></div>
+                        <div class="arah-qiblat">
+                            <span class="qiblat-arrow">🕋</span>
+                        </div>
+                    </div>
+                    <div class="black-arrow-line" id="blackArrowLine">
+                        <div class="black-arrow-head" id="blackArrowHead"></div>
+                    </div>
+                    <div class="short-horizontal-line" id="shortHorizontalLine">
+                        <div class="label-north">
+                            S
+                        </div>
+                        <div class="label-south">
+                            N
+                        </div>
+                    </div>
+                    <div class="vertical-line" id="verticalLine">
+                        <div class="label-east">
+                            W
+                        </div>
+                        <div class="label-west">
+                            E
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="degree-button-container">
+            <button class="degree-button" id="decreaseButton">–</button>
+            <span id="rotationValue">0°</span>
+            <button class="degree-button" id="increaseButton">+</button>
+        </div>
+
+        <div id="install-banner-container"></div>
+
+        <fieldset class="map-fieldset">
+            <legend><button id="updateLocationButton" class="location-btn">Update Location</button></legend>
+            <div class="location-search-container">
+                <input type="text" id="locationSearch" placeholder="Search location..." class="custom-select" /></br>
+            <button id="searchButton" class="location-btn">Search</button>
+            <button id="clearSearchButton" class="location-btn">Clear</button>
+        </div>
+        <ul id="searchResults" style="list-style-type: none; padding: 0; margin: 10px 0; display: none;"></ul>
+    </br>
+    <div id="markerTooltipContainer" style="padding: 10px; background-color: #f7f9fc; border-top: 1px solid #2980b9;">
+        <p>
+            <span class="red-text" id="markerTooltipText1"></span>
+            <span class="yellow-text" id="markerTooltipText2"></span>
+        </p>
+        <p id="firstPinData">
+            <!-- This will hold the extra data for the firstPin -->
+        </p>
+    </div>
+    <div id="map" style="position: relative; height: 90vh; width: 100%; margin-top: 0; border: none;"></div>
+</fieldset>
+
+</div>
+<script>
+!function(){"use strict";!function(){var n=Math.PI,t=Math.sin,e=Math.cos,r=Math.tan,a=Math.asin,u=Math.atan2,o=Math.acos,i=n/180,c=864e5,d=2440588,s=2451545;function f(n){return new Date((n+.5-d)*c)}function l(n){return function(n){return n.valueOf()/c-.5+d}(n)-s}var h=23.4397*i;function M(n,a){return u(t(n)*e(h)-r(a)*t(h),e(n))}function v(n,r){return a(t(r)*e(h)+e(r)*t(h)*t(n))}function g(n,a,o){return u(t(n),e(n)*t(a)-r(o)*e(a))}function w(n,r,u){return a(t(r)*t(u)+e(r)*e(u)*e(n))}function m(n,t){return i*(280.16+360.9856235*n)-t}function p(n){return i*(357.5291+.98560028*n)}function D(e){return e+i*(1.9148*t(e)+.02*t(2*e)+3e-4*t(3*e))+102.9372*i+n}function P(n){var t=D(p(n));return{dec:v(t,0),ra:M(t,0)}}var y={getPosition:function(n,t,e){var r=i*-e,a=i*t,u=l(n),o=P(u),c=m(u,r)-o.ra;return{azimuth:g(c,a,o.dec),altitude:w(c,a,o.dec)}}},b=y.times=[[-.833,"sunrise","sunset"],[-.3,"sunriseEnd","sunsetStart"],[-6,"dawn","dusk"],[-12,"nauticalDawn","nauticalDusk"],[-18,"nightEnd","night"],[6,"goldenHourEnd","goldenHour"]];y.addTime=function(n,t,e){b.push([n,t,e])};var H=9e-4;function T(t,e,r){return H+(t+e)/(2*n)+r}function E(n,e,r){return s+n+.0053*t(e)-.0069*t(2*r)}function I(n,r,a,u,i,c,d){var s=function(n,r,a){return o((t(n)-t(r)*t(a))/(e(r)*e(a)))}(n,a,u);return E(T(s,r,i),c,d)}function k(n){var r=i*(134.963+13.064993*n),a=i*(93.272+13.22935*n),u=i*(218.316+13.176396*n)+6.289*i*t(r),o=5.128*i*t(a),c=385001-20905*e(r);return{ra:M(u,o),dec:v(u,o),dist:c}}function q(n,t){return new Date(n.valueOf()+t*c/24)}y.getTimes=function(t,e,r,a){var u,o,c,d,s,h=i*-r,M=i*e,g=function(n){return-2.076*Math.sqrt(n)/60}(a=a||0),w=function(t,e){return Math.round(t-H-e/(2*n))}(l(t),h),m=T(0,h,w),P=p(m),y=D(P),k=v(y,0),q=E(m,P,y),x={solarNoon:f(q),nadir:f(q-.5)};for(u=0,o=b.length;u<o;u+=1)s=q-((d=I(((c=b[u])[0]+g)*i,h,M,k,w,P,y))-q),x[c[1]]=f(s),x[c[2]]=f(d);return x},y.getMoonPosition=function(n,a,o){var c=i*-o,d=i*a,s=l(n),f=k(s),h=m(s,c)-f.ra,M=w(h,d,f.dec),v=u(t(h),r(d)*e(f.dec)-t(f.dec)*e(h));return M+=function(n){return n<0&&(n=0),2967e-7/Math.tan(n+.00312536/(n+.08901179))}(M),{azimuth:g(h,d,f.dec),altitude:M,distance:f.dist,parallacticAngle:v}},y.getMoonIllumination=function(n){var r=l(n||new Date),a=P(r),i=k(r),c=149598e3,d=o(t(a.dec)*t(i.dec)+e(a.dec)*e(i.dec)*e(a.ra-i.ra)),s=u(c*t(d),i.dist-c*e(d)),f=u(e(a.dec)*t(a.ra-i.ra),t(a.dec)*e(i.dec)-e(a.dec)*t(i.dec)*e(a.ra-i.ra));return{fraction:(1+e(s))/2,phase:.5+.5*s*(f<0?-1:1)/Math.PI,angle:f}},y.getMoonTimes=function(n,t,e,r){var a=new Date(n);r?a.setUTCHours(0,0,0,0):a.setHours(0,0,0,0);for(var u,o,c,d,s,f,l,h,M,v,g,w,m,p=.133*i,D=y.getMoonPosition(a,t,e).altitude-p,P=1;P<=24&&(u=y.getMoonPosition(q(a,P),t,e).altitude-p,h=((s=(D+(o=y.getMoonPosition(q(a,P+1),t,e).altitude-p))/2-u)*(l=-(f=(o-D)/2)/(2*s))+f)*l+u,v=0,(M=f*f-4*s*u)>=0&&(g=l-(m=Math.sqrt(M)/(2*Math.abs(s))),w=l+m,Math.abs(g)<=1&&v++,Math.abs(w)<=1&&v++,g<-1&&(g=w)),1===v?D<0?c=P+g:d=P+g:2===v&&(c=P+(h<0?w:g),d=P+(h<0?g:w)),!c||!d);P+=2)D=o;var b={};return c&&(b.rise=q(a,c)),d&&(b.set=q(a,d)),c||d||(b[h>0?"alwaysUp":"alwaysDown"]=!0),b},"object"==typeof exports&&"undefined"!=typeof module?module.exports=y:"function"==typeof define&&define.amd?define(y):window.SunCalc=y}()}();
 </script>
-    <script>
-        async function checkServerReachability() {
-        const statusElement = document.getElementById('status');
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+<script>
+async function checkServerReachability() {
+const statusElement = document.getElementById('status');
+const controller = new AbortController();
+const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-        try {
-            const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
-                method: 'HEAD',
-                cache: 'no-cache',
-                signal: controller.signal
-            });
-
-            clearTimeout(timeoutId);
-
-            if (response.ok) {
-                statusElement.textContent = 'Online';
-                statusElement.style.color = 'green';
-                onConnect(); // Call your function when connected
-            } else {
-                statusElement.textContent = 'Public server is unreachable';
-                statusElement.style.color = 'red';
-                onDisconnect(); // Call your function when disconnected
-        }
-    } catch (error) {
-        clearTimeout(timeoutId);
-
-        if (error.name === 'AbortError') {
-            statusElement.textContent = 'Offline';
-        } else {
-            statusElement.textContent = 'Offline: ' + error.message;
-        }
-
-        statusElement.style.color = 'red';
-        onDisconnect(); // Call your function when disconnected
-    }
-}
-
-    // Function to call when the server is reachable
-    function onConnect() {
-        console.log('Execute logic for successful connection');
-        const selectElement = document.getElementById('kaedahQiblat');
-        const options = selectElement.options;
-
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value === 'bayang' || options[i].value === 'bangunan') {
-            options[i].style.display = 'block'; // Make the option visible again
-            }
-        }
-
-        // Add your custom logic for a successful connection here
-    }
-
-    // Function to call when the server is unreachable
-    function onDisconnect() {
-    console.log('Execute logic for unsuccessful connection');
-    const selectElement = document.getElementById('kaedahQiblat');
-    const options = selectElement.options;
-
-    for (let i = 0; i < options.length; i++) {
-        if (options[i].value === 'bayang' || options[i].value === 'bangunan') {
-            options[i].style.display = 'none'; // Hide the options
-        }
-    }
-
-    // Add your custom logic for when the server is unreachable here
-}
-
-    // Check server reachability every 2 seconds
-    setInterval(checkServerReachability, 2000);
-    
-    document.getElementById('kaedahQiblat').addEventListener('change', function() {
-  const selectedValue = this.value;
-  const degreeInput = document.getElementById('degreeInput');
-  const qiblatInput = document.getElementById('qiblatInput');
-  const dateTimeInput = document.getElementById('dateTimeInput');
-  const latInput = document.getElementById('latInput');
-  const longInput = document.getElementById('longInput');
-
-  // Hide all inputs initially
-  degreeInput.style.display = 'none';
-  qiblatInput.style.display = 'none';
-  dateTimeInput.style.display = 'none';
-  latInput.style.display = 'none';
-  longInput.style.display = 'none';
-
-  // Show inputs and reset values based on selected value
-  if (selectedValue === 'bayang') {
-    degreeInput.style.display = 'block';
-    qiblatInput.style.display = 'block';
-    dateTimeInput.style.display = 'block';
-  } else if (selectedValue === 'bangunan') {
-    degreeInput.style.display = 'block';
-    qiblatInput.style.display = 'block';
-  } else if (selectedValue === 'offlineLatLong') {
-    latInput.style.display = 'block';
-    longInput.style.display = 'block';
-    dateTimeInput.style.display = 'block';
-
-    // Reset latitude and longitude to placeholders
-    latInput.value = '';   // Clear the value to allow placeholder to show
-    longInput.value = '';  // Clear the value to allow placeholder to show
-  }
+try {
+const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+method: 'HEAD',
+cache: 'no-cache',
+signal: controller.signal
 });
 
-    // Trigger the change event on page load to set initial visibility
-    document.getElementById('kaedahQiblat').dispatchEvent(new Event('change'));
-    // End OnlineOffline
-    
-    
-    
-    
-    
-        
-        const modalData = [
-  {
-    image: "image1-url.jpg",
-    text: [
-      "Date: 4-5 Januari 2025",
-      "Location: Baitul Hilal Bukit Jugra Kuala Langat Banting",
-      "Event: KEM FALAK (Sempena Hujan Meteor Quadrantids)"
-    ],
-    important: 3 // Show this modal 3 times consecutively
-  },
-  /*
+clearTimeout(timeoutId);
+
+if (response.ok) {
+statusElement.textContent = 'Online';
+statusElement.style.color = 'green';
+onConnect(); // Call your function when connected
+} else {
+statusElement.textContent = 'Public server is unreachable';
+statusElement.style.color = 'red';
+onDisconnect(); // Call your function when disconnected
+}
+} catch (error) {
+clearTimeout(timeoutId);
+
+if (error.name === 'AbortError') {
+statusElement.textContent = 'Offline';
+} else {
+statusElement.textContent = 'Offline: ' + error.message;
+}
+
+statusElement.style.color = 'red';
+onDisconnect(); // Call your function when disconnected
+}
+}
+
+// Function to call when the server is reachable
+function onConnect() {
+console.log('Execute logic for successful connection');
+const selectElement = document.getElementById('kaedahQiblat');
+const options = selectElement.options;
+
+for (let i = 0; i < options.length; i++) {
+if (options[i].value === 'bayang' || options[i].value === 'bangunan') {
+options[i].style.display = 'block'; // Make the option visible again
+}
+}
+
+// Add your custom logic for a successful connection here
+}
+
+// Function to call when the server is unreachable
+function onDisconnect() {
+console.log('Execute logic for unsuccessful connection');
+const selectElement = document.getElementById('kaedahQiblat');
+const options = selectElement.options;
+
+for (let i = 0; i < options.length; i++) {
+if (options[i].value === 'bayang' || options[i].value === 'bangunan') {
+options[i].style.display = 'none'; // Hide the options
+}
+}
+
+// Add your custom logic for when the server is unreachable here
+}
+
+// Check server reachability every 2 seconds
+setInterval(checkServerReachability, 2000);
+
+document.getElementById('kaedahQiblat').addEventListener('change', function() {
+const selectedValue = this.value;
+const degreeInput = document.getElementById('degreeInput');
+const qiblatInput = document.getElementById('qiblatInput');
+const dateTimeInput = document.getElementById('dateTimeInput');
+const latInput = document.getElementById('latInput');
+const longInput = document.getElementById('longInput');
+
+// Hide all inputs initially
+degreeInput.style.display = 'none';
+qiblatInput.style.display = 'none';
+dateTimeInput.style.display = 'none';
+latInput.style.display = 'none';
+longInput.style.display = 'none';
+
+// Show inputs and reset values based on selected value
+if (selectedValue === 'bayang') {
+degreeInput.style.display = 'block';
+qiblatInput.style.display = 'block';
+dateTimeInput.style.display = 'block';
+} else if (selectedValue === 'bangunan') {
+degreeInput.style.display = 'block';
+qiblatInput.style.display = 'block';
+} else if (selectedValue === 'offlineLatLong') {
+latInput.style.display = 'block';
+longInput.style.display = 'block';
+dateTimeInput.style.display = 'block';
+
+
+}
+});
+
+// Trigger the change event on page load to set initial visibility
+document.getElementById('kaedahQiblat').dispatchEvent(new Event('change'));
+// End OnlineOffline
+
+
+
+
+
+
+const modalData = [{
+image: "image1-url.jpg",
+text: [
+"Date: 4-5 Januari 2025",
+"Location: Baitul Hilal Bukit Jugra Kuala Langat Banting",
+"Event: KEM FALAK (Sempena Hujan Meteor Quadrantids)"
+],
+important: 3 // Show this modal 3 times consecutively
+},
+/*
   // temp hide
   {
     image: "https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/IMG_20240215_102404.jpg",
@@ -1105,46 +826,46 @@ else window.SunCalc = SunCalc;
 
 // Function to create and display the modal
 const showModal = (degree) => {
-  const modal = document.createElement('div');
-  modal.className = 'modal';
-  modal.style.display = 'block';
+const modal = document.createElement('div');
+modal.className = 'modal';
+modal.style.display = 'block';
 
-  let content = '';
+let content = '';
 
-  // Customize the content based on the degree
-  if (degree === 100) {
-    content = `<p>You are lucky!</p>`;
-  } else if (degree === 200) {
-    content = `<p>You are kind!</p>`;
-  } else if (degree === 230) {
-    content = `
-      <p>You found me. Saya developer app ini. Banyak orang yang suka menerima, tetapi masih ada orang yang suka memberi. Semoga kamu diberkati dunia akhirat. ❤️</p>
-      <img src="https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/IMG_20240215_102404.jpg" alt="Sample Image" class="modal-image">
-    `;
-  }
+// Customize the content based on the degree
+if (degree === 100) {
+content = `<p>You are lucky!</p>`;
+} else if (degree === 200) {
+content = `<p>You are kind!</p>`;
+} else if (degree === 230) {
+content = `
+<p>You found me. Saya developer app ini. Banyak orang yang suka menerima, tetapi masih ada orang yang suka memberi. Semoga kamu diberkati dunia akhirat. ❤️</p>
+<img src="https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/IMG_20240215_102404.jpg" alt="Sample Image" class="modal-image">
+`;
+}
 
-  modal.innerHTML = `
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      ${content}
-    </div>
-  `;
+modal.innerHTML = `
+<div class="modal-content">
+<span class="close">&times;</span>
+${content}
+</div>
+`;
 
-  document.body.appendChild(modal);
+document.body.appendChild(modal);
 
-  // Close the modal when the close button is clicked
-  modal.querySelector('.close').onclick = () => {
-    modal.style.display = 'none';
-    document.body.removeChild(modal);
-  };
+// Close the modal when the close button is clicked
+modal.querySelector('.close').onclick = () => {
+modal.style.display = 'none';
+document.body.removeChild(modal);
+};
 
-  // Close the modal when clicking outside of the modal
-  window.onclick = (event) => {
-    if (event.target === modal) {
-      modal.style.display = 'none';
-      document.body.removeChild(modal);
-    }
-  };
+// Close the modal when clicking outside of the modal
+window.onclick = (event) => {
+if (event.target === modal) {
+modal.style.display = 'none';
+document.body.removeChild(modal);
+}
+};
 };
 
 let currentModalIndex = null;
@@ -1153,33 +874,35 @@ let clickCount = 0;
 
 // Function to update modal content
 const updateModalContent = () => {
-  const modalImage = document.getElementById("modalImage");
-  const modalList = document.getElementById("modalList");
+const modalImage = document.getElementById("modalImage");
+const modalList = document.getElementById("modalList");
 
-  clickCount++;
+clickCount++;
 
-  // Check for modals with 'latest' importance
-  const latestModal = modalData.find(({ important }) => important === "latest");
+// Check for modals with 'latest' importance
+const latestModal = modalData.find(({
+important
+}) => important === "latest");
 
-  if (clickCount % 2 === 0 && latestModal) {
-    currentModalIndex = modalData.indexOf(latestModal);
-    repeatCount = 1; // Show 'latest' modal on every second click
-  } else if (currentModalIndex === null || repeatCount <= 0) {
-    // Select a random index for other modals
-    do {
-      currentModalIndex = Math.floor(Math.random() * modalData.length);
-    } while (modalData[currentModalIndex].important === "latest");
+if (clickCount % 2 === 0 && latestModal) {
+currentModalIndex = modalData.indexOf(latestModal);
+repeatCount = 1; // Show 'latest' modal on every second click
+} else if (currentModalIndex === null || repeatCount <= 0) {
+// Select a random index for other modals
+do {
+currentModalIndex = Math.floor(Math.random() * modalData.length);
+} while (modalData[currentModalIndex].important === "latest");
 
-    repeatCount = modalData[currentModalIndex].important || 1;
-  }
+repeatCount = modalData[currentModalIndex].important || 1;
+}
 
-  const currentData = modalData[currentModalIndex];
+const currentData = modalData[currentModalIndex];
 
-  modalImage.src = currentData.image;
-  modalList.innerHTML = currentData.text.map(item => `<li>${item}</li>`).join('');
+modalImage.src = currentData.image;
+modalList.innerHTML = currentData.text.map(item => `<li>${item}</li>`).join('');
 
-  // Decrease the repeat count
-  repeatCount--;
+// Decrease the repeat count
+repeatCount--;
 }
 
 // JavaScript to handle modal display
@@ -1188,55 +911,60 @@ const span = document.getElementsByClassName("close")[0];
 const marqueeButton = document.querySelector(".marquee-button");
 
 marqueeButton.onclick = () => {
-  updateModalContent(); // Update content before showing
-  modal.style.display = "block";
+updateModalContent(); // Update content before showing
+modal.style.display = "block";
 }
 
 span.onclick = () => {
-  modal.style.display = "none";
+modal.style.display = "none";
 }
 
 window.onclick = event => {
-  if (event.target === modal) {
-    modal.style.display = "none";
-  }
+if (event.target === modal) {
+modal.style.display = "none";
+}
 }
 
 const isOnline = () => navigator.onLine;
 
 const loadScript = (url, callback) => {
-  const script = document.createElement('script');
-  script.src = url;
-  script.defer = true;
-  script.onload = callback;
-  document.body.appendChild(script);
+const script = document.createElement('script');
+script.src = url;
+script.defer = true;
+script.onload = callback;
+document.body.appendChild(script);
 }
 
 // Array of birthdays
-  const birthdays = [
-    { name: "Abi", birthdate: "01-01" }, // December 21st
-    { name: "Bob", birthdate: "01-15" },   // January 15th
-    // Add more birthdays here
-  ];
+const birthdays = [{
+name: "Abi",
+birthdate: "01-01"
+}, // December 21st
+{
+name: "Bob",
+birthdate: "01-15"
+}, // January 15th
+// Add more birthdays here
+];
 
-  // Function to check for birthdays and update marquee
-  const checkBirthdays = () => {
-    const today = new Date();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(today.getDate()).padStart(2, '0');
-    const currentDate = `${month}-${day}`;
+// Function to check for birthdays and update marquee
+const checkBirthdays = () => {
+const today = new Date();
+const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+const day = String(today.getDate()).padStart(2, '0');
+const currentDate = `${month}-${day}`;
 
-    const birthdayPerson = birthdays.find(person => person.birthdate === currentDate);
+const birthdayPerson = birthdays.find(person => person.birthdate === currentDate);
 
-    const marqueeText = document.getElementById("marqueeText");
+const marqueeText = document.getElementById("marqueeText");
 
-    if (birthdayPerson) {
-      marqueeText.innerHTML = `🎉 Happy Birthday, ${birthdayPerson.name}! 🎂`;
-    }
-  };
+if (birthdayPerson) {
+marqueeText.innerHTML = `🎉 Happy Birthday, ${birthdayPerson.name}! 🎂`;
+}
+};
 
-  // Call the function to check for birthdays
-  checkBirthdays();
+// Call the function to check for birthdays
+checkBirthdays();
 
 let updateBearingAndLines;
 let mapInitialized = false;
@@ -1250,173 +978,192 @@ let map; // Declare map here to make it accessible globally
 let updateButtonPosition; // Declare the function variable here
 
 window.onload = () => {
-  if (isOnline()) {
-    initializeMapIfOnline();
-  } else {
-    document.getElementById('map').style.display = 'none';
-  }
+if (isOnline()) {
+initializeMapIfOnline();
+} else {
+document.getElementById('map').style.display = 'none';
+}
 
-  // Initialize the firstPin and secondPin only if the map is loaded
-  if (typeof L !== 'undefined' && map) {
-    const defaultLocation = [2.8126, 101.5018];
-    firstPin = L.marker(defaultLocation, { icon: redIcon, draggable: true }).addTo(map);
-    secondPin = L.marker([3.1390, 101.6869], { icon: yellowIcon, draggable: true }).addTo(map);
-  }
+// Initialize the firstPin and secondPin only if the map is loaded
+if (typeof L !== 'undefined' && map) {
+const defaultLocation = [2.8126,
+101.5018];
+firstPin = L.marker(defaultLocation, {
+icon: redIcon, draggable: true
+}).addTo(map);
+secondPin = L.marker([3.1390, 101.6869], {
+icon: yellowIcon, draggable: true
+}).addTo(map);
+}
 
-  const circleWrapper = document.querySelector('.sticky-wrapper');
-  toggleStickyOnFocus(ELEMENTS.degreeInput, circleWrapper);
-  toggleStickyOnFocus(ELEMENTS.qiblatInput, circleWrapper);
+const circleWrapper = document.querySelector('.sticky-wrapper');
+toggleStickyOnFocus(ELEMENTS.degreeInput, circleWrapper);
+toggleStickyOnFocus(ELEMENTS.qiblatInput, circleWrapper);
 
-  setupInputWithDebounce(ELEMENTS.degreeInput);
-  setupInputWithDebounce(ELEMENTS.qiblatInput);
+setupInputWithDebounce(ELEMENTS.degreeInput);
+setupInputWithDebounce(ELEMENTS.qiblatInput);
 
-  const toggleMapCircleButton = document.getElementById('toggleMapCircle');
-  toggleMapCircleButton.addEventListener('click', toggleMapCircle);
+const toggleMapCircleButton = document.getElementById('toggleMapCircle');
+toggleMapCircleButton.addEventListener('click', toggleMapCircle);
 
-  initializeDegreeButtons();
-  populateDegreeNumbers();
-  initializeDynamicAngleUpdates();
+initializeDegreeButtons();
+populateDegreeNumbers();
+initializeDynamicAngleUpdates();
 
-  // Add event listener for the search button
-  document.getElementById('searchButton').addEventListener('click', () => {
-    const query = document.getElementById('locationSearch').value;
-    if (query) {
-      searchLocation(query);
-    }
-  });
+// Add event listener for the search button
+document.getElementById('searchButton').addEventListener('click', () => {
+const query = document.getElementById('locationSearch').value;
+if (query) {
+searchLocation(query);
+}
+});
 
-  // Change sector color
-  const kaedahQiblatSelect = document.getElementById('kaedahQiblat');
-  kaedahQiblatSelect.addEventListener('change', updateSectorColors);
+// Change sector color
+const kaedahQiblatSelect = document.getElementById('kaedahQiblat');
+kaedahQiblatSelect.addEventListener('change',
+updateSectorColors);
 
-  updateSectorColors(); // Call once on load to set initial colors
+updateSectorColors(); // Call once on load to set initial colors
 };
 
 const updateSectorColors = () => {
-  const kaedahQiblatValue = document.getElementById('kaedahQiblat').value;
-  const sectors = {
-    sector1: document.getElementById('sector1'),
-    sector2: document.getElementById('sector2'),
-    sector3: document.getElementById('sector3'),
-    sector4: document.getElementById('sector4')
-  };
+const kaedahQiblatValue = document.getElementById('kaedahQiblat').value;
+const sectors = {
+sector1: document.getElementById('sector1'),
+sector2: document.getElementById('sector2'),
+sector3: document.getElementById('sector3'),
+sector4: document.getElementById('sector4')
+};
 
-  const colors = {
-    bayang: ['rgba(34, 139, 34, 0.8)', 'rgba(34, 139, 34, 0.2)'],
-    bangunan: ['rgba(255, 223, 70, 0.8)', 'rgba(255, 223, 70, 0.2)'],
-    offlineLatLong: ['rgba(41, 128, 185, 0.8)', 'rgba(41, 128, 185, 0.2)']
-  };
+const colors = {
+bayang: ['rgba(34, 139, 34, 0.8)', 'rgba(34, 139, 34, 0.2)'],
+bangunan: ['rgba(255, 223, 70, 0.8)', 'rgba(255, 223, 70, 0.2)'],
+offlineLatLong: ['rgba(41, 128, 185, 0.8)', 'rgba(41, 128, 185, 0.2)']
+};
 
-  if (kaedahQiblatValue in colors) {
-    const [darkerColor, lighterColor] = colors[kaedahQiblatValue];
-    sectors.sector1.setAttribute('fill', darkerColor);
-    sectors.sector3.setAttribute('fill', darkerColor);
-    sectors.sector2.setAttribute('fill', lighterColor);
-    sectors.sector4.setAttribute('fill', lighterColor);
-  }
+if (kaedahQiblatValue in colors) {
+const [darkerColor,
+lighterColor] = colors[kaedahQiblatValue];
+sectors.sector1.setAttribute('fill', darkerColor);
+sectors.sector3.setAttribute('fill', darkerColor);
+sectors.sector2.setAttribute('fill', lighterColor);
+sectors.sector4.setAttribute('fill', lighterColor);
+}
 }
 
 const initializeMapIfOnline = () => {
-  if (!mapInitialized) {
-    loadLeafletResources(() => {
-      initializeMap();
-      mapInitialized = true;
-    });
-  }
+if (!mapInitialized) {
+loadLeafletResources(() => {
+initializeMap();
+mapInitialized = true;
+});
+}
 }
 
 const loadLeafletResources = (callback) => {
-  const leafletCSS = document.createElement('link');
-  leafletCSS.rel = 'stylesheet';
-  leafletCSS.href = 'https://unpkg.com/leaflet/dist/leaflet.css';
-  document.head.appendChild(leafletCSS);
+const leafletCSS = document.createElement('link');
+leafletCSS.rel = 'stylesheet';
+leafletCSS.href = 'https://unpkg.com/leaflet/dist/leaflet.css';
+document.head.appendChild(leafletCSS);
 
-  loadScript('https://unpkg.com/leaflet/dist/leaflet.js', callback);
+loadScript('https://unpkg.com/leaflet/dist/leaflet.js', callback);
 }
 
 const checkNetworkStatus = () => {
-  const mapElement = document.getElementById('map');
-  if (navigator.onLine) {
-    mapElement.style.display = 'block';
-    initializeMapIfOnline();
-  } else {
-    mapElement.style.display = 'none';
-  }
+const mapElement = document.getElementById('map');
+if (navigator.onLine) {
+mapElement.style.display = 'block';
+initializeMapIfOnline();
+} else {
+mapElement.style.display = 'none';
+}
 }
 
 window.addEventListener('online', checkNetworkStatus);
 window.addEventListener('offline', checkNetworkStatus);
 
 const initializeMap = () => {
-  const iconSettings = {
-    iconSize: [100, 100],
-    iconAnchor: [30, 100],
-    popupAnchor: [1, -34],
-    tooltipAnchor: [16, -28]
-  };
+const iconSettings = {
+iconSize: [100,
+100],
+iconAnchor: [30,
+100],
+popupAnchor: [1,
+-34],
+tooltipAnchor: [16,
+-28]
+};
 
-  const redIcon = L.icon({
-    ...iconSettings,
-    iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg'
-  });
+const redIcon = L.icon({
+...iconSettings,
+iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg'
+});
 
-  const yellowIcon = L.icon({
-    ...iconSettings,
-    iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/yellowPin.svg'
-  });
+const yellowIcon = L.icon({
+...iconSettings,
+iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/yellowPin.svg'
+});
 
-  const defaultLocation = [2.8126, 101.5018];
-  map = L.map('map').setView(defaultLocation, 19);
+const defaultLocation = [2.8126,
+101.5018];
+map = L.map('map').setView(defaultLocation, 19);
 
-  const addLayer = (url, attribution, maxZoom) => 
-    L.tileLayer(url, { attribution, maxZoom });
+const addLayer = (url, attribution, maxZoom) =>
+L.tileLayer(url, {
+attribution, maxZoom
+});
 
-  const baseMaps = {
-    "Esri World Imagery": addLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>', 19),
-    "HERE Satellite": addLayer('https://{s}.aerial.maps.ls.hereapi.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8?apiKey=ZrGsYcNXW4T_cGxQWLiIZ0DdraWLJ2XaCfI8axrRCkw&lg=eng', 'Map data © 2024 HERE', 22),
-    "HERE Normal Day": addLayer('https://{s}.base.maps.ls.hereapi.com/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?apiKey=ZrGsYcNXW4T_cGxQWLiIZ0DdraWLJ2XaCfI8axrRCkw&lg=eng', 'Map data © 2024 HERE', 20),
-    "OpenStreetMap": addLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 'Map data © OpenStreetMap contributors', 19)
-  };
+const baseMaps = {
+"Esri World Imagery": addLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>', 19),
+"HERE Satellite": addLayer('https://{s}.aerial.maps.ls.hereapi.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8?apiKey=ZrGsYcNXW4T_cGxQWLiIZ0DdraWLJ2XaCfI8axrRCkw&lg=eng', 'Map data © 2024 HERE', 22),
+"HERE Normal Day": addLayer('https://{s}.base.maps.ls.hereapi.com/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?apiKey=ZrGsYcNXW4T_cGxQWLiIZ0DdraWLJ2XaCfI8axrRCkw&lg=eng', 'Map data © 2024 HERE', 20),
+"OpenStreetMap": addLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 'Map data © OpenStreetMap contributors', 19)
+};
 
-  // Add the Esri World Imagery layer initially
-  baseMaps["Esri World Imagery"].addTo(map);
+// Add the Esri World Imagery layer initially
+baseMaps["Esri World Imagery"].addTo(map);
 
-  L.control.layers(baseMaps).addTo(map);
+L.control.layers(baseMaps).addTo(map);
 
-  const kaabahLatLng = [21.4225, 39.8262];
-  firstPin = L.marker(defaultLocation, { icon: redIcon, draggable: true }).addTo(map);
-  secondPin = L.marker([3.1390, 101.6869], { icon: yellowIcon, draggable: true }).addTo(map);
-
-  const shadowLine = L.polyline([[0, 0], [0, 0]], {
-    color: 'green',
-    weight: 10,
-    opacity: 0.5,
-    dashArray: '5, 5',
-    lineCap: 'round',
-    lineJoin: 'round'
-  }).addTo(map);
-
-  const initialPath = interpolateGreatCircle(2.8126, 101.5018, kaabahLatLng[0], kaabahLatLng[1], 100);
-  const lineToKaabah = L.polyline(initialPath, { 
-  color: 'red',
-  weight: 2, // Increase the weight for better visibility
-  interactive: false, // Make it non-interactive to ensure it renders smoothly
-  pane: 'overlayPane' // Ensure it's rendered on top of other layers
+const kaabahLatLng = [21.4225,
+39.8262];
+firstPin = L.marker(defaultLocation, {
+icon: redIcon, draggable: true
+}).addTo(map);
+secondPin = L.marker([3.1390, 101.6869], {
+icon: yellowIcon, draggable: true
 }).addTo(map);
 
-const lineBetweenPins = L.polyline([[2.8126, 101.5018], [3.1390, 101.6869]], { 
-  color: 'yellow',
-  weight: 2, // Increase the weight for better visibility
-  interactive: false, // Make it non-interactive to ensure it renders smoothly
-  pane: 'overlayPane' // Ensure it's rendered on top of other layers
+const shadowLine = L.polyline([[0, 0], [0, 0]], {
+color: 'green',
+weight: 10,
+opacity: 0.5,
+dashArray: '5, 5',
+lineCap: 'round',
+lineJoin: 'round'
 }).addTo(map);
 
-  // Function to update the button's position based on the pin's position
+const initialPath = interpolateGreatCircle(2.8126, 101.5018, kaabahLatLng[0], kaabahLatLng[1], 100);
+const lineToKaabah = L.polyline(initialPath, {
+color: 'red',
+weight: 2, // Increase the weight for better visibility
+interactive: false, // Make it non-interactive to ensure it renders smoothly
+pane: 'overlayPane' // Ensure it's rendered on top of other layers
+}).addTo(map);
+
+const lineBetweenPins = L.polyline([[2.8126, 101.5018], [3.1390, 101.6869]], {
+color: 'yellow',
+weight: 2, // Increase the weight for better visibility
+interactive: false, // Make it non-interactive to ensure it renders smoothly
+pane: 'overlayPane' // Ensure it's rendered on top of other layers
+}).addTo(map);
+
+// Function to update the button's position based on the pin's position
 const updateButtonPosition = () => {
-  const firstPinLatLng = firstPin.getLatLng();
-  const point = map.latLngToLayerPoint(firstPinLatLng);
-  roundButton.style.left = `${point.x + 20}px`;
-  roundButton.style.top = `${point.y - 60}px`;
+const firstPinLatLng = firstPin.getLatLng();
+const point = map.latLngToLayerPoint(firstPinLatLng);
+roundButton.style.left = `${point.x + 20}px`;
+roundButton.style.top = `${point.y - 60}px`;
 };
 
 // Initialize the button and attach it to the map
@@ -1428,510 +1175,592 @@ document.querySelector('.leaflet-map-pane').appendChild(roundButton);
 
 // Event listener for dragging the firstPin
 firstPin.on('drag', () => {
-  updateButtonPosition(); // Update the button's position continuously during drag
+updateButtonPosition(); // Update the button's position continuously during drag
 });
 
 // Ensure the button is positioned correctly when dragging starts and ends
 firstPin.on('dragstart', () => {
-  updateButtonPosition();
+updateButtonPosition();
 });
 
 firstPin.on('dragend', () => {
-  updateButtonPosition();
+updateButtonPosition();
 });
 
 // Event listener for the button click to navigate to install-banner-container
 roundButton.addEventListener('click', (event) => {
-  event.stopPropagation(); // Prevent map click events from interfering
-  const bannerContainer = document.getElementById('install-banner-container');
-  if (bannerContainer) {
-    bannerContainer.scrollIntoView({ behavior: 'smooth' });
-  }
+event.stopPropagation(); // Prevent map click events from interfering
+const bannerContainer = document.getElementById('install-banner-container');
+if (bannerContainer) {
+bannerContainer.scrollIntoView({
+behavior: 'smooth'
+});
+}
 });
 
 // Initial positioning of the button
 updateButtonPosition();
 
-  const handlePinDrag = (pin, line, callback) => {
-    pin.on('dragstart', () => line.setStyle({ opacity: 0 }));
-    pin.on('dragend', () => {
-      callback();
-      line.setStyle({ opacity: 1 });
-    });
-  };
+const handlePinDrag = (pin,
+line,
+callback) => {
+pin.on('dragstart',
+() => line.setStyle({
+opacity: 0
+}));
+pin.on('dragend',
+() => {
+callback();
+line.setStyle({
+opacity: 1
+});
+});
+};
 
-  handlePinDrag(firstPin, lineToKaabah, () => {
-    updateBearingAndLines('firstPin');
-    updateButtonPosition();
-  });
+handlePinDrag(firstPin,
+lineToKaabah,
+() => {
+updateBearingAndLines('firstPin');
+updateButtonPosition();
+});
 
-  handlePinDrag(secondPin, lineBetweenPins, () => updateBearingAndLines('secondPin'));
+handlePinDrag(secondPin,
+lineBetweenPins,
+() => updateBearingAndLines('secondPin'));
 
-  map.on('click', e => {
-    secondPin.setLatLng(e.latlng);
-    updateBearingAndLines('secondPin');
-  });
+map.on('click',
+e => {
+secondPin.setLatLng(e.latlng);
+updateBearingAndLines('secondPin');
+});
 
-  map.on('contextmenu', e => {
-    firstPin.setLatLng(e.latlng);
-    updateBearingAndLines('firstPin');
-    updateButtonPosition();
-  });
+map.on('contextmenu',
+e => {
+firstPin.setLatLng(e.latlng);
+updateBearingAndLines('firstPin');
+updateButtonPosition();
+});
 
-  const updateLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const { latitude: userLat, longitude: userLng } = position.coords;
-          const zoomLevel = 19;
-          firstPin.setLatLng([userLat, userLng]);
-          map.setView([userLat, userLng], zoomLevel);
-          updateBearingAndLines('firstPin');
-          updateButtonPosition();
-        },
-        () => {
-          alert('Unable to retrieve your location. Please enable location services.');
-          firstPin.setLatLng(defaultLocation);
-          map.setView(defaultLocation, 19);
-          updateBearingAndLines('firstPin');
-          updateButtonPosition();
-        },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-      );
-    } else {
-      alert('Geolocation is not supported by this browser.');
-      firstPin.setLatLng(defaultLocation);
-      map.setView(defaultLocation, 19);
-      updateBearingAndLines('firstPin');
-      updateButtonPosition();
-    }
-  }
+const updateLocation = () => {
+if (navigator.geolocation) {
+navigator.geolocation.getCurrentPosition(
+position => {
+const {
+latitude: userLat, longitude: userLng
+} = position.coords;
+const zoomLevel = 19;
+firstPin.setLatLng([userLat, userLng]);
+map.setView([userLat, userLng], zoomLevel);
+updateBearingAndLines('firstPin');
+updateButtonPosition();
+},
+() => {
+alert('Unable to retrieve your location. Please enable location services.');
+firstPin.setLatLng(defaultLocation);
+map.setView(defaultLocation, 19);
+updateBearingAndLines('firstPin');
+updateButtonPosition();
+},
+{
+enableHighAccuracy: true, timeout: 5000, maximumAge: 0
+}
+);
+} else {
+alert('Geolocation is not supported by this browser.');
+firstPin.setLatLng(defaultLocation);
+map.setView(defaultLocation, 19);
+updateBearingAndLines('firstPin');
+updateButtonPosition();
+}
+}
 
-  const addClickEventToButton = (buttonId, handler) => {
-    document.getElementById(buttonId).addEventListener('click', handler);
-  };
+const addClickEventToButton = (buttonId, handler) => {
+document.getElementById(buttonId).addEventListener('click', handler);
+};
 
-  addClickEventToButton('updateLocationButton', updateLocation);
-  addClickEventToButton('centerDotButton', updateLocation);
+addClickEventToButton('updateLocationButton', updateLocation);
+addClickEventToButton('centerDotButton', updateLocation);
 
-  const markerTooltipText1Element = document.getElementById('markerTooltipText1');
-  const markerTooltipText2Element = document.getElementById('markerTooltipText2');
+const markerTooltipText1Element = document.getElementById('markerTooltipText1');
+const markerTooltipText2Element = document.getElementById('markerTooltipText2');
 
-  const toDMS = (degrees, isLatitude) => {
-    const degreeAbs = Math.abs(degrees);
-    const degree = Math.floor(degreeAbs);
-    const minuteDecimal = (degreeAbs - degree) * 60;
-    const minute = Math.floor(minuteDecimal);
-    const second = ((minuteDecimal - minute) * 60).toFixed(2);
-    const direction = isLatitude ? (degrees >= 0 ? 'N' : 'S') : (degrees >= 0 ? 'E' : 'W');
-    return `${degree}° ${minute}' ${second}" ${direction}`;
-  }
+const toDMS = (degrees, isLatitude) => {
+const degreeAbs = Math.abs(degrees);
+const degree = Math.floor(degreeAbs);
+const minuteDecimal = (degreeAbs - degree) * 60;
+const minute = Math.floor(minuteDecimal);
+const second = ((minuteDecimal - minute) * 60).toFixed(2);
+const direction = isLatitude ? (degrees >= 0 ? 'N': 'S'): (degrees >= 0 ? 'E': 'W');
+return `${degree}° ${minute}' ${second}" ${direction}`;
+}
 
-  const updateBearingAndLines = (changedPin) => {
-  if (firstPin && secondPin) {
-    const firstLatLng = firstPin.getLatLng();
+const updateBearingAndLines = (changedPin) => {
+if (firstPin && secondPin) {
+const firstLatLng = firstPin.getLatLng();
 
-    // Control the visibility of secondPin based on kaedahQiblat value
-    if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-      secondPin.addTo(map); // Add secondPin to the map
-    } else {
-      map.removeLayer(secondPin); // Remove secondPin from the map
-    }
+// Control the visibility of secondPin based on kaedahQiblat value
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+secondPin.addTo(map); // Add secondPin to the map
+} else {
+map.removeLayer(secondPin); // Remove secondPin from the map
+}
 
-    const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
-    lineToKaabah.setLatLngs(pathToKaabah);
+const pathToKaabah = interpolateGreatCircle(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1], 100);
+lineToKaabah.setLatLngs(pathToKaabah);
 
-    // Determine whether to show or hide the lineBetweenPins based on kaedahQiblat value
-    if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-      const secondLatLng = secondPin.getLatLng();
-      lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
-      lineBetweenPins.setStyle({ opacity: 1 }); // Make lineBetweenPins visible
-    } else {
-      lineBetweenPins.setLatLngs([[0, 0], [0, 0]]);
-      lineBetweenPins.setStyle({ opacity: 0 }); // Make lineBetweenPins invisible
-    }
+// Determine whether to show or hide the lineBetweenPins based on kaedahQiblat value
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+const secondLatLng = secondPin.getLatLng();
+lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
+lineBetweenPins.setStyle({
+opacity: 1
+}); // Make lineBetweenPins visible
+} else {
+lineBetweenPins.setLatLngs([[0, 0], [0, 0]]);
+lineBetweenPins.setStyle({
+opacity: 0
+}); // Make lineBetweenPins invisible
+}
 
-    const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
-    const sunAzimuth = updateSunAzimuth(firstLatLng);
+const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
+const sunAzimuth = updateSunAzimuth(firstLatLng);
 
-    // Determine whether to show or hide the shadowLine based on kaedahQiblat value
-    if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-      updateShadowLine(firstLatLng, sunAzimuth);
-    } else {
-      shadowLine.setLatLngs([[0, 0], [0, 0]]);
-      shadowLine.setStyle({ opacity: 0 }); // Make shadowLine invisible
-    }
+// Determine whether to show or hide the shadowLine based on kaedahQiblat value
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+updateShadowLine(firstLatLng, sunAzimuth);
+} else {
+shadowLine.setLatLngs([[0, 0], [0, 0]]);
+shadowLine.setStyle({
+opacity: 0
+}); // Make shadowLine invisible
+}
 
-    const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
 
-    const markerTooltipText1Element = document.getElementById('markerTooltipText1');
-    const markerTooltipText2Element = document.getElementById('markerTooltipText2');
+const markerTooltipText1Element = document.getElementById('markerTooltipText1');
+const markerTooltipText2Element = document.getElementById('markerTooltipText2');
 
-    if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-      markerTooltipText1Element.innerHTML = `Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>`;
-      markerTooltipText2Element.innerHTML = ''; // Clear the second tooltip
-    } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-      const secondLatLng = secondPin.getLatLng();
-      const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
-      markerTooltipText2Element.innerHTML = `Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>Yellow Pin - Bearing bangunan: ${bearingToSecondPin.toFixed(2)}°`;
-      markerTooltipText1Element.innerHTML = ''; // Clear the first tooltip
-    }
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+markerTooltipText1Element.innerHTML = `Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>`;
+markerTooltipText2Element.innerHTML = ''; // Clear the second tooltip
+} else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+const secondLatLng = secondPin.getLatLng();
+const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
+markerTooltipText2Element.innerHTML = `Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>Yellow Pin - Bearing bangunan: ${bearingToSecondPin.toFixed(2)}°`;
+markerTooltipText1Element.innerHTML = ''; // Clear the first tooltip
+}
 
-    const firstPinDataElement = document.getElementById('firstPinData');
-    firstPinDataElement.innerHTML = `Date: ${currentDate.toLocaleDateString()}<br/>Time: ${currentDate.toLocaleTimeString()}<br/>Latitude: ${firstLatLng.lat.toFixed(6)} (${toDMS(firstLatLng.lat)})<br/>Longitude: ${firstLatLng.lng.toFixed(6)} (${toDMS(firstLatLng.lng)})<br/>`;
+const firstPinDataElement = document.getElementById('firstPinData');
+firstPinDataElement.innerHTML = `Date: ${currentDate.toLocaleDateString()}<br/>Time: ${currentDate.toLocaleTimeString()}<br/>Latitude: ${firstLatLng.lat.toFixed(6)} (${toDMS(firstLatLng.lat)})<br/>Longitude: ${firstLatLng.lng.toFixed(6)} (${toDMS(firstLatLng.lng)})<br/>`;
 
-    if (!ELEMENTS.dateTimeInput.value) {
-      ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
-    }
+if (!ELEMENTS.dateTimeInput.value) {
+ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
+}
 
-    if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-      ELEMENTS.degreeInput.value = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondPin.getLatLng().lat, secondPin.getLatLng().lng).toFixed(2);
-    } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-      ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
-    }
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+ELEMENTS.degreeInput.value = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondPin.getLatLng().lat, secondPin.getLatLng().lng).toFixed(2);
+} else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
+}
 
-    updateArrow(ELEMENTS.blackArrowLine, sunAzimuth);
-    updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
+updateArrow(ELEMENTS.blackArrowLine, sunAzimuth);
+updateArrow(ELEMENTS.blackArrowHead, sunAzimuth);
 
-    updateCompassDisplay();
-    updateAngles();
-  }
+updateCompassDisplay();
+updateAngles();
+}
 };
 
 // Update the map click event to only modify secondPin if it's visible
 map.on('click', e => {
-  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
-    secondPin.setLatLng(e.latlng);
-    updateBearingAndLines('secondPin');
-  }
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
+secondPin.setLatLng(e.latlng);
+updateBearingAndLines('secondPin');
+}
 });
 
-  const updateSunAzimuth = (position) => {
-    const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
-    const sunPosition = SunCalc.getPosition(selectedDate, position.lat, position.lng);
-    return sunPosition.azimuth * 180 / Math.PI + 180;
-  }
+const updateSunAzimuth = (position) => {
+const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
+const sunPosition = SunCalc.getPosition(selectedDate,
+position.lat,
+position.lng);
+return sunPosition.azimuth * 180 / Math.PI + 180;
+}
 
-  const updateShadowLine = (latLng, objectHeight) => {
-  const isNight = isSunDown(new Date(ELEMENTS.dateTimeInput.value || Date.now()), latLng.lat, latLng.lng);
+const updateShadowLine = (latLng,
+objectHeight) => {
+const isNight = isSunDown(new Date(ELEMENTS.dateTimeInput.value || Date.now()),
+latLng.lat,
+latLng.lng);
 
-  if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
-    const shadowEndpoint = calculateShadowEndpoint(latLng, objectHeight);
-    shadowLine.setLatLngs([[latLng.lat, latLng.lng], [shadowEndpoint.lat, shadowEndpoint.lng]]);
-    shadowLine.setStyle({ color: 'green', weight: 3, opacity: isNight ? 0.3 : 1, dashArray: '1, 1', lineCap: 'round', lineJoin: 'round' });
-  } else {
-    shadowLine.setLatLngs([[0, 0], [0, 0]]);
-    shadowLine.setStyle({ opacity: 0 });
-  }
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
+const shadowEndpoint = calculateShadowEndpoint(latLng, objectHeight);
+shadowLine.setLatLngs([[latLng.lat, latLng.lng], [shadowEndpoint.lat, shadowEndpoint.lng]]);
+shadowLine.setStyle({
+color: 'green', weight: 3, opacity: isNight ? 0.3: 1, dashArray: '1, 1', lineCap: 'round', lineJoin: 'round'
+});
+} else {
+shadowLine.setLatLngs([[0, 0], [0, 0]]);
+shadowLine.setStyle({
+opacity: 0
+});
+}
 };
 
-  const calculateShadowEndpoint = (startLatLng, objectHeight) => {
-    const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
-    const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
+const calculateShadowEndpoint = (startLatLng, objectHeight) => {
+const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
+const position = SunCalc.getPosition(selectedDate, startLatLng.lat, startLatLng.lng);
 
-    const azimuth = position.azimuth;
-    const altitude = position.altitude;
+const azimuth = position.azimuth;
+const altitude = position.altitude;
 
-    const shadowLength = objectHeight / Math.tan(altitude);
+const shadowLength = objectHeight / Math.tan(altitude);
 
-    const earthRadius = 6371000;
+const earthRadius = 6371000;
 
-    const angularDistance = shadowLength / earthRadius;
-    const bearing = azimuth;
+const angularDistance = shadowLength / earthRadius;
+const bearing = azimuth;
 
-    const lat1 = toRadians(startLatLng.lat);
-    const lon1 = toRadians(startLatLng.lng);
+const lat1 = toRadians(startLatLng.lat);
+const lon1 = toRadians(startLatLng.lng);
 
-    const lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularDistance) + Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing));
-    const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1), Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2));
+const lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularDistance) + Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing));
+const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1), Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2));
 
-    return L.latLng(toDegrees(lat2), toDegrees(lon2));
-  }
+return L.latLng(toDegrees(lat2), toDegrees(lon2));
+}
 
-  ELEMENTS.dateTimeInput.addEventListener('change', () => {
-    if (typeof updateBearingAndLines === 'function') {
-      updateBearingAndLines('firstPin');
-      updateShadowLine(firstPin.getLatLng(), parseFloat(ELEMENTS.degreeInput.value) || 0);
-    }
-  });
+ELEMENTS.dateTimeInput.addEventListener('change', () => {
+if (typeof updateBearingAndLines === 'function') {
+updateBearingAndLines('firstPin');
+updateShadowLine(firstPin.getLatLng(), parseFloat(ELEMENTS.degreeInput.value) || 0);
+}
+});
 
-  ELEMENTS.kaedahQiblat.addEventListener('change', () => {
-    updateBearingAndLines('firstPin');
-    ELEMENTS.degreeInput.placeholder = ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN ? "Bearing" : "Azimuth Matahari";
-    ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
-    updateCompassDisplay();
-  });
+ELEMENTS.kaedahQiblat.addEventListener('change',
+() => {
+updateBearingAndLines('firstPin');
+ELEMENTS.degreeInput.placeholder = ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN ? "Bearing": "Azimuth Matahari";
+ELEMENTS.qiblatInput.placeholder = "True North Qiblat";
+updateCompassDisplay();
+});
 }
 
 document.getElementById('searchButton').addEventListener('click', () => {
-  const query = document.getElementById('locationSearch').value;
-  if (query) {
-    searchLocation(query);
-  }
+const query = document.getElementById('locationSearch').value;
+if (query) {
+searchLocation(query);
+}
 });
 
 document.getElementById('clearSearchButton').addEventListener('click', () => {
-  const searchResults = document.getElementById('searchResults');
-  searchResults.innerHTML = ''; // Clear the list
-  searchResults.style.display = 'none'; // Hide the list
-  document.getElementById('locationSearch').value = ''; // Clear the search input
+const searchResults = document.getElementById('searchResults');
+searchResults.innerHTML = ''; // Clear the list
+searchResults.style.display = 'none'; // Hide the list
+document.getElementById('locationSearch').value = ''; // Clear the search input
 });
 
 const searchLocation = (query) => {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const searchResults = document.getElementById('searchResults');
-      searchResults.innerHTML = ''; // Clear previous results
+const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
+fetch(url)
+.then(response => response.json())
+.then(data => {
+const searchResults = document.getElementById('searchResults');
+searchResults.innerHTML = ''; // Clear previous results
 
-      if (data && data.length > 0) {
-        data.forEach(location => {
-          const listItem = document.createElement('li');
-          listItem.textContent = `${location.display_name} (${location.lat}, ${location.lon})`;
+if (data && data.length > 0) {
+data.forEach(location => {
+const listItem = document.createElement('li');
+listItem.textContent = `${location.display_name} (${location.lat}, ${location.lon})`;
 
-          listItem.addEventListener('click', () => {
-            const lat = parseFloat(location.lat);
-            const lon = parseFloat(location.lon);
-            if (firstPin) {
-              firstPin.setLatLng([lat, lon]);
-              map.setView([lat, lon], 19); // Adjust the zoom level as needed
-              updateBearingAndLines('firstPin');
-              if (typeof updateButtonPosition === 'function') {
-                updateButtonPosition(); // Ensure button position is updated
-              }
-            }
-            searchResults.innerHTML = ''; // Clear the list
-            searchResults.style.display = 'none'; // Hide the list
-          });
+listItem.addEventListener('click', () => {
+const lat = parseFloat(location.lat);
+const lon = parseFloat(location.lon);
+if (firstPin) {
+firstPin.setLatLng([lat, lon]);
+map.setView([lat, lon], 19); // Adjust the zoom level as needed
+updateBearingAndLines('firstPin');
+if (typeof updateButtonPosition === 'function') {
+updateButtonPosition(); // Ensure button position is updated
+}
+}
+searchResults.innerHTML = ''; // Clear the list
+searchResults.style.display = 'none'; // Hide the list
+});
 
-          searchResults.appendChild(listItem);
-        });
-        searchResults.style.display = 'block'; // Show results when available
-      } else {
-        alert('Location not found. Please try a different search.');
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching location:', error);
-      alert('An error occurred while searching for the location.');
-    });
+searchResults.appendChild(listItem);
+});
+searchResults.style.display = 'block'; // Show results when available
+} else {
+alert('Location not found. Please try a different search.');
+}
+})
+.catch(error => {
+console.error('Error fetching location:', error);
+alert('An error occurred while searching for the location.');
+});
 }
 
 const calculateAndLabelAngles = (angleA, angleB) => {
-  angleA = (angleA + 360) % 360;
-  angleB = (angleB + 360) % 360;
+angleA = (angleA + 360) % 360;
+angleB = (angleB + 360) % 360;
 
-  const oppositeAngleB = (angleB + 180) % 360;
-  const sector1 = (angleB - angleA + 360) % 360 <= 180 ? (angleB - angleA + 360) % 360 : (oppositeAngleB - angleA + 360) % 360;
-  const sector2 = 180 - sector1;
-  const sector3 = sector1;
-  const sector4 = sector2;
+const oppositeAngleB = (angleB + 180) % 360;
+const sector1 = (angleB - angleA + 360) % 360 <= 180 ? (angleB - angleA + 360) % 360: (oppositeAngleB - angleA + 360) % 360;
+const sector2 = 180 - sector1;
+const sector3 = sector1;
+const sector4 = sector2;
 
-  const radius = 60;
-  drawSectorArc(100, 100, radius, 0, sector1, document.getElementById('sector1'), document.getElementById('label1'), sector1.toFixed(2));
-  drawSectorArc(100, 100, radius, sector1, sector1 + sector2, document.getElementById('sector2'), document.getElementById('label2'), sector2.toFixed(2));
-  drawSectorArc(100, 100, radius, sector1 + sector2, sector1 + sector2 + sector3, document.getElementById('sector3'), document.getElementById('label3'), sector3.toFixed(2));
-  drawSectorArc(100, 100, radius, sector1 + sector2 + sector3, 360, document.getElementById('sector4'), document.getElementById('label4'), sector4.toFixed(2));
+const radius = 60;
+drawSectorArc(100,
+100,
+radius,
+0,
+sector1,
+document.getElementById('sector1'),
+document.getElementById('label1'),
+sector1.toFixed(2));
+drawSectorArc(100,
+100,
+radius,
+sector1,
+sector1 + sector2,
+document.getElementById('sector2'),
+document.getElementById('label2'),
+sector2.toFixed(2));
+drawSectorArc(100,
+100,
+radius,
+sector1 + sector2,
+sector1 + sector2 + sector3,
+document.getElementById('sector3'),
+document.getElementById('label3'),
+sector3.toFixed(2));
+drawSectorArc(100,
+100,
+radius,
+sector1 + sector2 + sector3,
+360,
+document.getElementById('sector4'),
+document.getElementById('label4'),
+sector4.toFixed(2));
 }
 
 const drawSectorArc = (cx, cy, radius, startAngle, endAngle, pathElement, labelElement, label) => {
-  const start = polarToCartesian(cx, cy, radius, endAngle);
-  const end = polarToCartesian(cx, cy, radius, startAngle);
-  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+const start = polarToCartesian(cx,
+cy,
+radius,
+endAngle);
+const end = polarToCartesian(cx,
+cy,
+radius,
+startAngle);
+const largeArcFlag = endAngle - startAngle <= 180 ? "0": "1";
 
-  const d = [
-    "M", cx, cy,
-    "L", start.x, start.y,
-    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
-    "Z"
-  ].join(" ");
+const d = [
+"M", cx, cy,
+"L", start.x, start.y,
+"A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+"Z"
+].join(" ");
 
-  pathElement.setAttribute("d", d);
+pathElement.setAttribute("d",
+d);
 
-  const midAngle = startAngle + (endAngle - startAngle) / 2;
-  const labelPos = polarToCartesian(cx, cy, radius / 1.5, midAngle);
-  labelElement.setAttribute("x", labelPos.x);
-  labelElement.setAttribute("y", labelPos.y);
-  labelElement.textContent = `${label}°`;
+const midAngle = startAngle + (endAngle - startAngle) / 2;
+const labelPos = polarToCartesian(cx,
+cy,
+radius / 1.5,
+midAngle);
+labelElement.setAttribute("x",
+labelPos.x);
+labelElement.setAttribute("y",
+labelPos.y);
+labelElement.textContent = `${label}°`;
 }
 
 const polarToCartesian = (cx, cy, radius, angleInDegrees) => {
-  const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-  return {
-    x: cx + (radius * Math.cos(angleInRadians)),
-    y: cy + (radius * Math.sin(angleInRadians))
-  };
+const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+return {
+x: cx + (radius * Math.cos(angleInRadians)),
+y: cy + (radius * Math.sin(angleInRadians))
+};
 }
 
 const updateAngles = () => {
-  const angleA = parseFloat(ELEMENTS.degreeInput.value) || 0;
-  const angleB = parseFloat(ELEMENTS.qiblatInput.value) || 0;
+const angleA = parseFloat(ELEMENTS.degreeInput.value) || 0;
+const angleB = parseFloat(ELEMENTS.qiblatInput.value) || 0;
 
-  calculateAndLabelAngles(angleA, angleB);
+calculateAndLabelAngles(angleA,
+angleB);
 }
 
 const initializeDynamicAngleUpdates = () => {
-  ELEMENTS.degreeInput.addEventListener('input', updateAngles);
-  ELEMENTS.qiblatInput.addEventListener('input', updateAngles);
+ELEMENTS.degreeInput.addEventListener('input',
+updateAngles);
+ELEMENTS.qiblatInput.addEventListener('input',
+updateAngles);
 
-  if (firstPin && secondPin) {
-    firstPin.on('drag', () => updateBearingAndLines('firstPin'));
-    secondPin.on('drag', () => updateBearingAndLines('secondPin'));
-  }
+if (firstPin && secondPin) {
+firstPin.on('drag', () => updateBearingAndLines('firstPin'));
+secondPin.on('drag', () => updateBearingAndLines('secondPin'));
+}
 }
 
 const setupInputWithDebounce = (inputElement) => {
-  inputElement.addEventListener('input', () => {
-    clearTimeout(inputDebounceTimeout);
-    inputDebounceTimeout = setTimeout(() => {
-      finalizeInput(inputElement);
-    }, 1000); // 1 second delay
-  });
+inputElement.addEventListener('input', () => {
+clearTimeout(inputDebounceTimeout);
+inputDebounceTimeout = setTimeout(() => {
+finalizeInput(inputElement);
+}, 1000); // 1 second delay
+});
 
-  inputElement.addEventListener('focus', () => {
-    clearTimeout(inputDebounceTimeout); // Clear timeout on focus
-  });
+inputElement.addEventListener('focus', () => {
+clearTimeout(inputDebounceTimeout); // Clear timeout on focus
+});
 
-  inputElement.addEventListener('blur', () => {
-    finalizeInput(inputElement); // Finalize immediately on blur
-  });
+inputElement.addEventListener('blur', () => {
+finalizeInput(inputElement); // Finalize immediately on blur
+});
 }
 
 const finalizeInput = (inputElement) => {
-  inputElement.blur();  // Remove focus to stop editing
-  updateCompassDisplay(); // Ensure the display is updated with the final value
+inputElement.blur(); // Remove focus to stop editing
+updateCompassDisplay(); // Ensure the display is updated with the final value
 }
 
 const ELEMENTS = {
-  circle: document.getElementById('circle'),
-  centerLine: document.getElementById('centerLine'),
-  arrowLine: document.getElementById('arrowLine'),
-  arrowHead: document.getElementById('arrowHead'),
-  blackArrowLine: document.getElementById('blackArrowLine'),
-  blackArrowHead: document.getElementById('blackArrowHead'),
-  kaedahQiblat: document.getElementById('kaedahQiblat'),
-  degreeInput: document.getElementById('degreeInput'),
-  latInput: document.getElementById('latInput'),  // Added for latitude input
-  longInput: document.getElementById('longInput'), // Added for longitude input
-  degreeTooltip: document.getElementById('degreeTooltip'),
-  qiblatInput: document.getElementById('qiblatInput'),
-  qiblatTooltip: document.getElementById('qiblatTooltip'),
-  distanceToKaabah: document.getElementById('distanceToKaabah'),
-  dateTimeInput: document.getElementById('dateTimeInput'),
-  status: document.getElementById('status')
+circle: document.getElementById('circle'),
+centerLine: document.getElementById('centerLine'),
+arrowLine: document.getElementById('arrowLine'),
+arrowHead: document.getElementById('arrowHead'),
+blackArrowLine: document.getElementById('blackArrowLine'),
+blackArrowHead: document.getElementById('blackArrowHead'),
+kaedahQiblat: document.getElementById('kaedahQiblat'),
+degreeInput: document.getElementById('degreeInput'),
+latInput: document.getElementById('latInput'),
+// Added for latitude input
+longInput: document.getElementById('longInput'),
+// Added for longitude input
+degreeTooltip: document.getElementById('degreeTooltip'),
+qiblatInput: document.getElementById('qiblatInput'),
+qiblatTooltip: document.getElementById('qiblatTooltip'),
+distanceToKaabah: document.getElementById('distanceToKaabah'),
+dateTimeInput: document.getElementById('dateTimeInput'),
+status: document.getElementById('status')
 };
 
 const DISPLAY = {
-  BLOCK: 'block',
-  NONE: 'none'
+BLOCK: 'block',
+NONE: 'none'
 };
 
 const QIBLAT_METHODS = {
-  BANGUNAN: 'bangunan',
-  BAYANG: 'bayang',
-  OFFLINELATLONG: 'offlineLatLong'
+BANGUNAN: 'bangunan',
+BAYANG: 'bayang',
+OFFLINELATLONG: 'offlineLatLong'
 };
 
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 
 const calculateBearing = (lat1, lon1, lat2, lon2) => {
-  const lat1Rad = toRadians(lat1);
-  const lat2Rad = toRadians(lat2);
-  const deltaLonRad = toRadians(lon2 - lon1);
+const lat1Rad = toRadians(lat1);
+const lat2Rad = toRadians(lat2);
+const deltaLonRad = toRadians(lon2 - lon1);
 
-  const y = Math.sin(deltaLonRad) * Math.cos(lat2Rad);
-  const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLonRad);
+const y = Math.sin(deltaLonRad) * Math.cos(lat2Rad);
+const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLonRad);
 
-  const bearing = Math.atan2(y, x);
-  return (toDegrees(bearing) + 360) % 360;
+const bearing = Math.atan2(y, x);
+return (toDegrees(bearing) + 360) % 360;
 }
 
 const interpolateGreatCircle = (lat1, lon1, lat2, lon2, steps) => {
-  const points = [];
-  const startLat = toRadians(lat1);
-  const startLon = toRadians(lon1);
-  const endLat = toRadians(lat2);
-  const endLon = toRadians(lon2);
+const points = [];
+const startLat = toRadians(lat1);
+const startLon = toRadians(lon1);
+const endLat = toRadians(lat2);
+const endLon = toRadians(lon2);
 
-  const d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((endLat - startLat) / 2), 2) +
-    Math.cos(startLat) * Math.cos(endLat) * Math.pow(Math.sin((endLon - startLon) / 2), 2)));
+const d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((endLat - startLat) / 2), 2) +
+Math.cos(startLat) * Math.cos(endLat) * Math.pow(Math.sin((endLon - startLon) / 2), 2)));
 
-  for (let i = 0; i <= steps; i++) {
-    const f = i / steps;
-    const A = Math.sin((1 - f) * d) / Math.sin(d);
-    const B = Math.sin(f * d) / Math.sin(d);
+for (let i = 0; i <= steps; i++) {
+const f = i / steps;
+const A = Math.sin((1 - f) * d) / Math.sin(d);
+const B = Math.sin(f * d) / Math.sin(d);
 
-    const x = A * Math.cos(startLat) * Math.cos(startLon) + B * Math.cos(endLat) * Math.cos(endLon);
-    const y = A * Math.cos(startLat) * Math.sin(startLon) + B * Math.cos(endLat) * Math.sin(endLon);
-    const z = A * Math.sin(startLat) + B * Math.sin(endLat);
+const x = A * Math.cos(startLat) * Math.cos(startLon) + B * Math.cos(endLat) * Math.cos(endLon);
+const y = A * Math.cos(startLat) * Math.sin(startLon) + B * Math.cos(endLat) * Math.sin(endLon);
+const z = A * Math.sin(startLat) + B * Math.sin(endLat);
 
-    const newLat = Math.atan2(z, Math.sqrt(x * x + y * y));
-    const newLon = Math.atan2(y, x);
+const newLat = Math.atan2(z, Math.sqrt(x * x + y * y));
+const newLon = Math.atan2(y, x);
 
-    points.push([toDegrees(newLat), toDegrees(newLon)]);
-  }
+points.push([toDegrees(newLat), toDegrees(newLon)]);
+}
 
-  return points;
+return points;
 }
 
 const showTooltip = (tooltipElement) => {
-  tooltipElement.style.visibility = 'visible';
-  tooltipElement.style.opacity = '1';
+tooltipElement.style.visibility = 'visible';
+tooltipElement.style.opacity = '1';
 };
 
 const hideTooltip = (tooltipElement) => {
-  tooltipElement.style.visibility = 'hidden';
-  tooltipElement.style.opacity = '0';
+tooltipElement.style.visibility = 'hidden';
+tooltipElement.style.opacity = '0';
 };
 
 const updateArrow = (element, degree) => {
-  element.style.transform = `translateY(-50%) rotate(${degree}deg)`;
+element.style.transform = `translateY(-50%) rotate(${degree}deg)`;
 };
 
 const updateCompassDisplay = () => {
-	let lat, lng;
+let lat,
+lng;
 
-	// Check if latitude and longitude inputs have valid values
-	const inputLat = parseFloat(ELEMENTS.latInput.value);
-	const inputLng = parseFloat(ELEMENTS.longInput.value);
+// Check if latitude and longitude inputs have valid values
+const inputLat = parseFloat(ELEMENTS.latInput.value);
+const inputLng = parseFloat(ELEMENTS.longInput.value);
 
-	if (!isNaN(inputLat) && !isNaN(inputLng)) {
-		lat = inputLat;
-		lng = inputLng;
-	} else if (firstPin) {
-		// Use the pin position if inputs are not valid
-		const firstPinLatLng = firstPin.getLatLng();
-		lat = firstPinLatLng.lat;
-		lng = firstPinLatLng.lng;
-	} else {
-		// Fallback to default values if neither is available
-		lat = 0;
-		lng = 0;
-	}
+if (!isNaN(inputLat) && !isNaN(inputLng)) {
+lat = inputLat;
+lng = inputLng;
+} else if (firstPin) {
+// Use the pin position if inputs are not valid
+const firstPinLatLng = firstPin.getLatLng();
+lat = firstPinLatLng.lat;
+lng = firstPinLatLng.lng;
+} else {
+// Fallback to default values if neither is available
+lat = 0;
+lng = 0;
+}
 
-	const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
-	const isNight = isSunDown(selectedDate, lat, lng);
+const selectedDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
+const isNight = isSunDown(selectedDate, lat, lng);
 
-	const degree = parseFloat(ELEMENTS.degreeInput.value) || 0;
-	const inputQiblaDegree = parseFloat(ELEMENTS.qiblatInput.value) || 0;
-	const finalQiblatDegree = inputQiblaDegree;
+const degree = parseFloat(ELEMENTS.degreeInput.value) || 0;
+const inputQiblaDegree = parseFloat(ELEMENTS.qiblatInput.value) || 0;
+const finalQiblatDegree = inputQiblaDegree;
 
-	if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN ||
-		(ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG && isNight) ||
-		(ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.OFFLINELATLONG && isNight)) {
-		ELEMENTS.circle.style.transform = `rotate(${-90 - degree}deg)`;
-	} else {
-		ELEMENTS.circle.style.transform = `rotate(${90 - degree}deg)`;
-	}
+if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN ||
+(ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG && isNight) ||
+(ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.OFFLINELATLONG && isNight)) {
+ELEMENTS.circle.style.transform = `rotate(${-90 - degree}deg)`;
+} else {
+ELEMENTS.circle.style.transform = `rotate(${90 - degree}deg)`;
+}
 
-	ELEMENTS.centerLine.style.transform = `translateY(-50%) rotate(${degree}deg)`;
+ELEMENTS.centerLine.style.transform = `translateY(-50%) rotate(${degree}deg)`;
 
-	updateArrow(ELEMENTS.blackArrowLine, degree);
-	updateArrow(ELEMENTS.blackArrowHead, degree);
-	updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
-	updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
+updateArrow(ELEMENTS.blackArrowLine, degree);
+updateArrow(ELEMENTS.blackArrowHead, degree);
+updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
+updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
 };
 
 // Attach event listeners to update the display when inputs change
@@ -1943,56 +1772,54 @@ ELEMENTS.qiblatInput.addEventListener('input', updateCompassDisplay);
 
 // Update when the pin is moved
 if (firstPin) {
-	firstPin.on('drag', updateCompassDisplay);
+firstPin.on('drag', updateCompassDisplay);
 }
 
-
-
 ELEMENTS.qiblatInput.addEventListener('input', () => {
-  updateCompassDisplay();
-  resetActivityTimer();
+updateCompassDisplay();
+resetActivityTimer();
 });
 
 ELEMENTS.degreeInput.addEventListener('input', () => {
-  updateCompassDisplay();
-  resetActivityTimer();
+updateCompassDisplay();
+resetActivityTimer();
 });
 
 // Reset the activity timer and make the circle non-sticky
 const resetActivityTimer = () => {
-  clearTimeout(activityTimeout);
-  const circleWrapper = document.querySelector('.sticky-wrapper');
-  circleWrapper.classList.add('non-sticky');
-  activityTimeout = setTimeout(() => {
-    circleWrapper.classList.remove('non-sticky');
-  }, 1000);
+clearTimeout(activityTimeout);
+const circleWrapper = document.querySelector('.sticky-wrapper');
+circleWrapper.classList.add('non-sticky');
+activityTimeout = setTimeout(() => {
+circleWrapper.classList.remove('non-sticky');
+}, 1000);
 }
 
 // Function to populate degree numbers and add event listeners
 const populateDegreeNumbers = () => {
-  const radius = ELEMENTS.circle.offsetWidth / 2;
-  const offset = 20;
-  for (let i = 0; i < 360; i += 10) {
-    const degreeNumber = document.createElement('div');
-    degreeNumber.className = 'degree-number';
-    degreeNumber.textContent = i;
+const radius = ELEMENTS.circle.offsetWidth / 2;
+const offset = 20;
+for (let i = 0; i < 360; i += 10) {
+const degreeNumber = document.createElement('div');
+degreeNumber.className = 'degree-number';
+degreeNumber.textContent = i;
 
-    const angle = i * (Math.PI / 180);
-    const x = radius + (radius + offset) * Math.cos(angle);
-    const y = radius + (radius + offset) * Math.sin(angle);
+const angle = i * (Math.PI / 180);
+const x = radius + (radius + offset) * Math.cos(angle);
+const y = radius + (radius + offset) * Math.sin(angle);
 
-    degreeNumber.style.left = `${x}px`;
-    degreeNumber.style.top = `${y}px`;
-    degreeNumber.style.transform = `translate(-50%, -50%) rotate(${i}deg)`;
+degreeNumber.style.left = `${x}px`;
+degreeNumber.style.top = `${y}px`;
+degreeNumber.style.transform = `translate(-50%, -50%) rotate(${i}deg)`;
 
-    degreeNumber.addEventListener('click', () => {
-      if (i === 100 || i === 200 || i === 230) {
-        showModal(i);
-      }
-    });
+degreeNumber.addEventListener('click', () => {
+if (i === 100 || i === 200 || i === 230) {
+showModal(i);
+}
+});
 
-    ELEMENTS.circle.appendChild(degreeNumber);
-  }
+ELEMENTS.circle.appendChild(degreeNumber);
+}
 };
 
 // Call the populateDegreeNumbers function to initialize the degree numbers
@@ -2000,151 +1827,155 @@ populateDegreeNumbers();
 
 // Function to toggle sticky class on the circle
 const toggleStickyOnFocus = (inputElement, circleWrapper) => {
-  inputElement.addEventListener('focus', () => {
-    circleWrapper.classList.add('non-sticky');
-    setTimeout(() => {
-      inputElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300);
-  });
+inputElement.addEventListener('focus',
+() => {
+circleWrapper.classList.add('non-sticky');
+setTimeout(() => {
+inputElement.scrollIntoView({
+behavior: 'smooth', block: 'center'
+});
+}, 300);
+});
 
-  inputElement.addEventListener('blur', () => {
-    circleWrapper.classList.remove('non-sticky');
-    resetActivityTimer(); // Ensure the timer is reset on blur
-  });
+inputElement.addEventListener('blur',
+() => {
+circleWrapper.classList.remove('non-sticky');
+resetActivityTimer(); // Ensure the timer is reset on blur
+});
 }
 
 // Function to toggle the map's circle class
 const toggleMapCircle = () => {
-  const mapElement = document.getElementById('map');
-  const circleContainer = document.querySelector('.circle-container');
+const mapElement = document.getElementById('map');
+const circleContainer = document.querySelector('.circle-container');
 
-  if (circleContainer.contains(mapElement)) {
-    // Move the map outside the circle and restore original styles
-    document.querySelector('.map-fieldset').appendChild(mapElement);
-    mapElement.style.borderRadius = '0'; // Remove circular shape
-    mapElement.style.height = '50vh'; // Original height
-    mapElement.style.width = '100%'; // Original width
-    mapElement.style.position = 'relative'; // Reset position
-    mapElement.style.top = ''; // Reset top
-    mapElement.style.left = ''; // Reset left
-  } else {
-    // Move the map inside the circle and make it circular
-    circleContainer.appendChild(mapElement);
-    mapElement.classList.add('circle-map'); // Add the class for circular shape
-    alignMapWithCircle(); // Align map size with circle
-    mapElement.style.borderRadius = '50%'; // Make it circular
-    mapElement.style.position = 'absolute'; // Position absolutely
-    mapElement.style.top = '0'; // Align at top
-    mapElement.style.left = '0'; // Align at left
-  }
+if (circleContainer.contains(mapElement)) {
+// Move the map outside the circle and restore original styles
+document.querySelector('.map-fieldset').appendChild(mapElement);
+mapElement.style.borderRadius = '0'; // Remove circular shape
+mapElement.style.height = '50vh'; // Original height
+mapElement.style.width = '100%'; // Original width
+mapElement.style.position = 'relative'; // Reset position
+mapElement.style.top = ''; // Reset top
+mapElement.style.left = ''; // Reset left
+} else {
+// Move the map inside the circle and make it circular
+circleContainer.appendChild(mapElement);
+mapElement.classList.add('circle-map'); // Add the class for circular shape
+alignMapWithCircle(); // Align map size with circle
+mapElement.style.borderRadius = '50%'; // Make it circular
+mapElement.style.position = 'absolute'; // Position absolutely
+mapElement.style.top = '0'; // Align at top
+mapElement.style.left = '0'; // Align at left
+}
 }
 
 const alignMapWithCircle = () => {
-  const mapElement = document.getElementById('map');
-  const circleContainer = document.querySelector('.circle');
+const mapElement = document.getElementById('map');
+const circleContainer = document.querySelector('.circle');
 
-  mapElement.style.width = `${circleContainer.offsetWidth}px`;
-  mapElement.style.height = `${circleContainer.offsetHeight}px`;
+mapElement.style.width = `${circleContainer.offsetWidth}px`;
+mapElement.style.height = `${circleContainer.offsetHeight}px`;
 }
 
 if (!isOnline()) {
-  updateBearingAndLines = () => {
-    console.warn("Offline mode: updateBearingAndLines cannot be executed.");
-  };
+updateBearingAndLines = () => {
+console.warn("Offline mode: updateBearingAndLines cannot be executed.");
+};
 }
 
 // Function to initialize the degree adjustment buttons
 const initializeDegreeButtons = () => {
-  const increaseButton = document.getElementById('increaseButton');
-  const decreaseButton = document.getElementById('decreaseButton');
-  const rotationValue = document.getElementById('rotationValue');
-  const mapElement = document.getElementById('map');
+const increaseButton = document.getElementById('increaseButton');
+const decreaseButton = document.getElementById('decreaseButton');
+const rotationValue = document.getElementById('rotationValue');
+const mapElement = document.getElementById('map');
 
-  const updateRotation = () => {
-    rotationValue.textContent = `${degree}°`;
-    mapElement.style.transform = `rotate(${degree}deg)`;
-  }
+const updateRotation = () => {
+rotationValue.textContent = `${degree}°`;
+mapElement.style.transform = `rotate(${degree}deg)`;
+}
 
-  const increaseDegree = () => {
-    degree = (degree + 0.5) % 360;
-    updateRotation();
-  }
+const increaseDegree = () => {
+degree = (degree + 0.5) % 360;
+updateRotation();
+}
 
-  const decreaseDegree = () => {
-    degree = (degree - 0.5 + 360) % 360; // Ensure the value stays positive
-    updateRotation();
-  }
+const decreaseDegree = () => {
+degree = (degree - 0.5 + 360) % 360; // Ensure the value stays positive
+updateRotation();
+}
 
-  const handleButtonHold = (callback) => {
-    callback();
-    holdInterval = setInterval(() => {
-      callback();
-      speed = Math.max(30, speed - 10000000); // Decrease interval time to speed up
-      clearInterval(holdInterval); // Clear previous interval
-      holdInterval = setInterval(callback, speed); // Set new faster interval
-    }, speed);
-  }
+const handleButtonHold = (callback) => {
+callback();
+holdInterval = setInterval(() => {
+callback();
+speed = Math.max(30, speed - 10000000); // Decrease interval time to speed up
+clearInterval(holdInterval); // Clear previous interval
+holdInterval = setInterval(callback, speed); // Set new faster interval
+}, speed);
+}
 
-  increaseButton.addEventListener('mousedown', () => {
-    speed = 1000; // Reset speed
-    handleButtonHold(increaseDegree);
-  });
+increaseButton.addEventListener('mousedown', () => {
+speed = 1000; // Reset speed
+handleButtonHold(increaseDegree);
+});
 
-  decreaseButton.addEventListener('mousedown', () => {
-    speed = 1000; // Reset speed
-    handleButtonHold(decreaseDegree);
-  });
+decreaseButton.addEventListener('mousedown', () => {
+speed = 1000; // Reset speed
+handleButtonHold(decreaseDegree);
+});
 
-  document.addEventListener('mouseup', () => {
-    clearInterval(holdInterval);
-  });
+document.addEventListener('mouseup', () => {
+clearInterval(holdInterval);
+});
 
-  // For touch devices
-  increaseButton.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    speed = 1000; // Reset speed
-    handleButtonHold(increaseDegree);
-  });
+// For touch devices
+increaseButton.addEventListener('touchstart', (e) => {
+e.preventDefault();
+speed = 1000; // Reset speed
+handleButtonHold(increaseDegree);
+});
 
-  decreaseButton.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    speed = 1000; // Reset speed
-    handleButtonHold(decreaseDegree);
-  });
+decreaseButton.addEventListener('touchstart', (e) => {
+e.preventDefault();
+speed = 1000; // Reset speed
+handleButtonHold(decreaseDegree);
+});
 
-  document.addEventListener('touchend', () => {
-    clearInterval(holdInterval);
-  });
+document.addEventListener('touchend', () => {
+clearInterval(holdInterval);
+});
 }
 
 const isSunDown = (date, latitude, longitude) => {
-  const sunTimes = SunCalc.getTimes(date, latitude, longitude);
-  const currentTime = date.getTime();
-  return currentTime < sunTimes.sunrise.getTime() || currentTime > sunTimes.sunset.getTime();
+const sunTimes = SunCalc.getTimes(date, latitude, longitude);
+const currentTime = date.getTime();
+return currentTime < sunTimes.sunrise.getTime() || currentTime > sunTimes.sunset.getTime();
 }
 
 // Function to update compass display, bearings, and other elements
 const updateDisplayForOfflineLatLong = () => {
-  const lat = parseFloat(ELEMENTS.latInput.value);
-  const long = parseFloat(ELEMENTS.longInput.value);
-  const dateTime = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+const lat = parseFloat(ELEMENTS.latInput.value);
+const long = parseFloat(ELEMENTS.longInput.value);
+const dateTime = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
 
-  if (!isNaN(lat) && !isNaN(long)) {
-    const bearingToKaabah = calculateBearing(lat, long, 21.4225, 39.8262);
-    const sunAzimuth = SunCalc.getPosition(dateTime, lat, long).azimuth * 180 / Math.PI + 180;
+if (!isNaN(lat) && !isNaN(long)) {
+const bearingToKaabah = calculateBearing(lat, long, 21.4225, 39.8262);
+const sunAzimuth = SunCalc.getPosition(dateTime, lat, long).azimuth * 180 / Math.PI + 180;
 
-    // Update the compass display
-    updateArrow(ELEMENTS.arrowLine, bearingToKaabah);
-    updateArrow(ELEMENTS.arrowHead, bearingToKaabah);
+// Update the compass display
+updateArrow(ELEMENTS.arrowLine, bearingToKaabah);
+updateArrow(ELEMENTS.arrowHead, bearingToKaabah);
 
-    // Update other UI elements based on your requirements
-    ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
-    ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
+// Update other UI elements based on your requirements
+ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
+ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
 
-    // Call functions to update any lines or visual elements
-    updateCompassDisplay();
-    updateAngles();
-  }
+// Call functions to update any lines or visual elements
+updateCompassDisplay();
+updateAngles();
+}
 };
 
 // Attach event listeners to the inputs
@@ -2153,36 +1984,36 @@ ELEMENTS.longInput.addEventListener('input', updateDisplayForOfflineLatLong);
 ELEMENTS.dateTimeInput.addEventListener('change', updateDisplayForOfflineLatLong);
 
 const updateFirstPinData = () => {
-  const lat = parseFloat(ELEMENTS.latInput.value) || 0;
-  const long = parseFloat(ELEMENTS.longInput.value) || 0;
-  const dateTime = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value) : new Date();
+const lat = parseFloat(ELEMENTS.latInput.value) || 0;
+const long = parseFloat(ELEMENTS.longInput.value) || 0;
+const dateTime = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
 
-  const toDMS = (degrees, isLatitude) => {
-    const degreeAbs = Math.abs(degrees);
-    const degree = Math.floor(degreeAbs);
-    const minuteDecimal = (degreeAbs - degree) * 60;
-    const minute = Math.floor(minuteDecimal);
-    const second = ((minuteDecimal - minute) * 60).toFixed(2);
-    const direction = isLatitude ? (degrees >= 0 ? 'N' : 'S') : (degrees >= 0 ? 'E' : 'W');
-    return `${degree}° ${minute}' ${second}" ${direction}`;
-  };
+const toDMS = (degrees, isLatitude) => {
+const degreeAbs = Math.abs(degrees);
+const degree = Math.floor(degreeAbs);
+const minuteDecimal = (degreeAbs - degree) * 60;
+const minute = Math.floor(minuteDecimal);
+const second = ((minuteDecimal - minute) * 60).toFixed(2);
+const direction = isLatitude ? (degrees >= 0 ? 'N': 'S'): (degrees >= 0 ? 'E': 'W');
+return `${degree}° ${minute}' ${second}" ${direction}`;
+};
 
-  // Calculate the sun's position using SunCalc
-  const sunPosition = SunCalc.getPosition(dateTime, lat, long);
-  const sunAzimuth = (sunPosition.azimuth * 180 / Math.PI + 180).toFixed(2); // Convert to degrees and adjust
+// Calculate the sun's position using SunCalc
+const sunPosition = SunCalc.getPosition(dateTime, lat, long);
+const sunAzimuth = (sunPosition.azimuth * 180 / Math.PI + 180).toFixed(2); // Convert to degrees and adjust
 
-  // Use your calculateBearing function to find the Qiblat direction
-  const kaabahLat = 21.4225; // Latitude of the Kaabah in Mecca
-  const kaabahLong = 39.8262; // Longitude of the Kaabah in Mecca
-  const qiblatDegree = calculateBearing(lat, long, kaabahLat, kaabahLong);
+// Use your calculateBearing function to find the Qiblat direction
+const kaabahLat = 21.4225; // Latitude of the Kaabah in Mecca
+const kaabahLong = 39.8262; // Longitude of the Kaabah in Mecca
+const qiblatDegree = calculateBearing(lat, long, kaabahLat, kaabahLong);
 
-  const firstPinDataElement = document.getElementById('firstPinData');
-  firstPinDataElement.innerHTML = `Date: ${dateTime.toLocaleDateString()}<br/>
-                                   Time: ${dateTime.toLocaleTimeString()}<br/>
-                                   Latitude: ${lat.toFixed(6)} (${toDMS(lat, true)})<br/>
-                                   Longitude: ${long.toFixed(6)} (${toDMS(long, false)})<br/>
-                                   Sun Azimuth: ${sunAzimuth}°<br/>
-                                   Qiblat Degree: ${qiblatDegree.toFixed(2)}°<br/>`;
+const firstPinDataElement = document.getElementById('firstPinData');
+firstPinDataElement.innerHTML = `Date: ${dateTime.toLocaleDateString()}<br/>
+Time: ${dateTime.toLocaleTimeString()}<br/>
+Latitude: ${lat.toFixed(6)} (${toDMS(lat, true)})<br/>
+Longitude: ${long.toFixed(6)} (${toDMS(long, false)})<br/>
+Sun Azimuth: ${sunAzimuth}°<br/>
+Qiblat Degree: ${qiblatDegree.toFixed(2)}°<br/>`;
 };
 
 // Ensure to call updateFirstPinData when needed, e.g., on input changes
@@ -2190,7 +2021,7 @@ ELEMENTS.latInput.addEventListener('input', updateFirstPinData);
 ELEMENTS.longInput.addEventListener('input', updateFirstPinData);
 ELEMENTS.dateTimeInput.addEventListener('change', updateFirstPinData);
 
-    </script>
+</script>
 
 </body>
 </html>
