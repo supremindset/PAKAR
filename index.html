@@ -397,34 +397,6 @@
             border-radius: 5px;
         }
 
-        .degree-button-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px auto;
-        }
-
-        .degree-button {
-            width: 40px;
-            height: 40px;
-            font-size: 18px;
-            margin: 0 10px;
-            background-color: #2980b9;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .degree-button:hover {
-            background-color: #3498db;
-        }
-
-        .degree-button:active {
-            background-color: #1e6a8d;
-        }
-
         .svg {
             position: absolute;
             top: 1px;
@@ -566,7 +538,7 @@
     <div id="install-banner-container">
         <div class="marquee-button">
             <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner" id="marqueeText">
-                KEM FALAK (Sempena Hujan Meteor Quadrantids) | 4-5 Januari 2025 (Sabtu-Ahad) | Baitul Hilal Bukit Jugra Kuala Langat Banting
+                PAKAR
             </marquee>
         </div>
     </div>
@@ -597,7 +569,6 @@
             <input class="custom-select" type="number" id="degreeInput" placeholder="Sun Azimuth / Bearing Bangunan" min="0" max="360" step="0.1">
             <input class="custom-select" type="number" id="qiblatInput" placeholder="Qiblat" min="0" max="360" step="0.1">
             <input class="custom-select" type="datetime-local" id="dateTimeInput" placeholder="Select Date and Time">
-            <button id="toggleMapCircle" class="location-btn">Fit Map to Circle</button>
         </div>
     </fieldset>
     <br>
@@ -646,12 +617,6 @@
             </div>
         </div>
 
-        <div class="degree-button-container">
-            <button class="degree-button" id="decreaseButton">–</button>
-            <span id="rotationValue">0°</span>
-            <button class="degree-button" id="increaseButton">+</button>
-        </div>
-
         <div id="install-banner-container"></div>
 
         <fieldset class="map-fieldset">
@@ -680,6 +645,7 @@
 !function(){"use strict";!function(){var n=Math.PI,t=Math.sin,e=Math.cos,r=Math.tan,a=Math.asin,u=Math.atan2,o=Math.acos,i=n/180,c=864e5,d=2440588,s=2451545;function f(n){return new Date((n+.5-d)*c)}function l(n){return function(n){return n.valueOf()/c-.5+d}(n)-s}var h=23.4397*i;function M(n,a){return u(t(n)*e(h)-r(a)*t(h),e(n))}function v(n,r){return a(t(r)*e(h)+e(r)*t(h)*t(n))}function g(n,a,o){return u(t(n),e(n)*t(a)-r(o)*e(a))}function w(n,r,u){return a(t(r)*t(u)+e(r)*e(u)*e(n))}function m(n,t){return i*(280.16+360.9856235*n)-t}function p(n){return i*(357.5291+.98560028*n)}function D(e){return e+i*(1.9148*t(e)+.02*t(2*e)+3e-4*t(3*e))+102.9372*i+n}function P(n){var t=D(p(n));return{dec:v(t,0),ra:M(t,0)}}var y={getPosition:function(n,t,e){var r=i*-e,a=i*t,u=l(n),o=P(u),c=m(u,r)-o.ra;return{azimuth:g(c,a,o.dec),altitude:w(c,a,o.dec)}}},b=y.times=[[-.833,"sunrise","sunset"],[-.3,"sunriseEnd","sunsetStart"],[-6,"dawn","dusk"],[-12,"nauticalDawn","nauticalDusk"],[-18,"nightEnd","night"],[6,"goldenHourEnd","goldenHour"]];y.addTime=function(n,t,e){b.push([n,t,e])};var H=9e-4;function T(t,e,r){return H+(t+e)/(2*n)+r}function E(n,e,r){return s+n+.0053*t(e)-.0069*t(2*r)}function I(n,r,a,u,i,c,d){var s=function(n,r,a){return o((t(n)-t(r)*t(a))/(e(r)*e(a)))}(n,a,u);return E(T(s,r,i),c,d)}function k(n){var r=i*(134.963+13.064993*n),a=i*(93.272+13.22935*n),u=i*(218.316+13.176396*n)+6.289*i*t(r),o=5.128*i*t(a),c=385001-20905*e(r);return{ra:M(u,o),dec:v(u,o),dist:c}}function q(n,t){return new Date(n.valueOf()+t*c/24)}y.getTimes=function(t,e,r,a){var u,o,c,d,s,h=i*-r,M=i*e,g=function(n){return-2.076*Math.sqrt(n)/60}(a=a||0),w=function(t,e){return Math.round(t-H-e/(2*n))}(l(t),h),m=T(0,h,w),P=p(m),y=D(P),k=v(y,0),q=E(m,P,y),x={solarNoon:f(q),nadir:f(q-.5)};for(u=0,o=b.length;u<o;u+=1)s=q-((d=I(((c=b[u])[0]+g)*i,h,M,k,w,P,y))-q),x[c[1]]=f(s),x[c[2]]=f(d);return x},y.getMoonPosition=function(n,a,o){var c=i*-o,d=i*a,s=l(n),f=k(s),h=m(s,c)-f.ra,M=w(h,d,f.dec),v=u(t(h),r(d)*e(f.dec)-t(f.dec)*e(h));return M+=function(n){return n<0&&(n=0),2967e-7/Math.tan(n+.00312536/(n+.08901179))}(M),{azimuth:g(h,d,f.dec),altitude:M,distance:f.dist,parallacticAngle:v}},y.getMoonIllumination=function(n){var r=l(n||new Date),a=P(r),i=k(r),c=149598e3,d=o(t(a.dec)*t(i.dec)+e(a.dec)*e(i.dec)*e(a.ra-i.ra)),s=u(c*t(d),i.dist-c*e(d)),f=u(e(a.dec)*t(a.ra-i.ra),t(a.dec)*e(i.dec)-e(a.dec)*t(i.dec)*e(a.ra-i.ra));return{fraction:(1+e(s))/2,phase:.5+.5*s*(f<0?-1:1)/Math.PI,angle:f}},y.getMoonTimes=function(n,t,e,r){var a=new Date(n);r?a.setUTCHours(0,0,0,0):a.setHours(0,0,0,0);for(var u,o,c,d,s,f,l,h,M,v,g,w,m,p=.133*i,D=y.getMoonPosition(a,t,e).altitude-p,P=1;P<=24&&(u=y.getMoonPosition(q(a,P),t,e).altitude-p,h=((s=(D+(o=y.getMoonPosition(q(a,P+1),t,e).altitude-p))/2-u)*(l=-(f=(o-D)/2)/(2*s))+f)*l+u,v=0,(M=f*f-4*s*u)>=0&&(g=l-(m=Math.sqrt(M)/(2*Math.abs(s))),w=l+m,Math.abs(g)<=1&&v++,Math.abs(w)<=1&&v++,g<-1&&(g=w)),1===v?D<0?c=P+g:d=P+g:2===v&&(c=P+(h<0?w:g),d=P+(h<0?g:w)),!c||!d);P+=2)D=o;var b={};return c&&(b.rise=q(a,c)),d&&(b.set=q(a,d)),c||d||(b[h>0?"alwaysUp":"alwaysDown"]=!0),b},"object"==typeof exports&&"undefined"!=typeof module?module.exports=y:"function"==typeof define&&define.amd?define(y):window.SunCalc=y}()}();
 </script>
 <script>
+// 1
 async function checkServerReachability() {
 const statusElement = document.getElementById('status');
 const controller = new AbortController();
@@ -716,8 +682,6 @@ statusElement.style.color = 'red';
 onDisconnect(); // Call your function when disconnected
 }
 }
-
-// Function to call when the server is reachable
 function onConnect() {
 console.log('Execute logic for successful connection');
 const selectElement = document.getElementById('kaedahQiblat');
@@ -736,8 +700,6 @@ options[i].style.display = 'block'; // Make the option visible again
     
 // Add your custom logic for a successful connection here
 }
-
-// Function to call when the server is unreachable
 function onDisconnect() {
 console.log('Execute logic for unsuccessful connection');
 const selectElement = document.getElementById('kaedahQiblat');
@@ -755,182 +717,67 @@ options[i].style.display = 'none'; // Hide the options
 
     // Add your custom logic for when the server is unreachable here
 }
-
-// Check server reachability every 2 seconds
 setInterval(checkServerReachability, 2000);
 
+// event listener kaedahQiblat when change
 document.getElementById('kaedahQiblat').addEventListener('change', function() {
-const selectedValue = this.value;
-const degreeInput = document.getElementById('degreeInput');
-const qiblatInput = document.getElementById('qiblatInput');
-const dateTimeInput = document.getElementById('dateTimeInput');
-const latInput = document.getElementById('latInput');
-const longInput = document.getElementById('longInput');
+    const selectedValue = this.value;
+    const degreeInput = document.getElementById('degreeInput');
+    const qiblatInput = document.getElementById('qiblatInput');
+    const dateTimeInput = document.getElementById('dateTimeInput');
+    const latInput = document.getElementById('latInput');
+    const longInput = document.getElementById('longInput');
+    const blackArrowLine = document.getElementById('blackArrowLine');
+    const blackArrowHead = document.getElementById('blackArrowHead');
 
-// Hide all inputs initially
-degreeInput.style.display = 'none';
-qiblatInput.style.display = 'none';
-dateTimeInput.style.display = 'none';
-latInput.style.display = 'none';
-longInput.style.display = 'none';
+    // Hide all inputs initially
+    degreeInput.style.display = 'none';
+    qiblatInput.style.display = 'none';
+    dateTimeInput.style.display = 'none';
+    latInput.style.display = 'none';
+    longInput.style.display = 'none';
 
-// Show inputs and reset values based on selected value
-if (selectedValue === 'bayang') {
-degreeInput.style.display = 'block';
-qiblatInput.style.display = 'block';
-dateTimeInput.style.display = 'block';
-} else if (selectedValue === 'bangunan') {
-degreeInput.style.display = 'block';
-qiblatInput.style.display = 'block';
-} else if (selectedValue === 'offlineLatLong') {
-latInput.style.display = 'block';
-longInput.style.display = 'block';
-dateTimeInput.style.display = 'block';
-
-
-}
+    // Show inputs and reset values based on selected value and change color
+    if (selectedValue === 'bayang') {
+        degreeInput.style.display = 'block';
+        qiblatInput.style.display = 'block';
+        dateTimeInput.style.display = 'block';
+        blackArrowLine.style.backgroundColor = 'black';
+        blackArrowHead.style.backgroundColor = 'black';
+    } else if (selectedValue === 'bangunan') {
+        degreeInput.style.display = 'block';
+        qiblatInput.style.display = 'block';
+        blackArrowLine.style.backgroundColor = 'rgba(255, 223, 70, 1)';
+        blackArrowHead.style.backgroundColor = 'rgba(255, 223, 70, 1)';
+    } else if (selectedValue === 'offlineLatLong') {
+        latInput.style.display = 'block';
+        longInput.style.display = 'block';
+        dateTimeInput.style.display = 'block';
+        blackArrowLine.style.backgroundColor = 'black';
+        blackArrowHead.style.backgroundColor = 'black';
+    }
+    checkServerReachability();
 });
-
-// Trigger the change event on page load to set initial visibility
 document.getElementById('kaedahQiblat').dispatchEvent(new Event('change'));
 // End OnlineOffline
 
-const modalData = [{
-image: "image1-url.jpg",
-text: [
-"Date: 4-5 Januari 2025",
-"Location: Baitul Hilal Bukit Jugra Kuala Langat Banting",
-"Event: KEM FALAK (Sempena Hujan Meteor Quadrantids)"
-],
-important: 3 // Show this modal 3 times consecutively
-},
-/*
-  // temp hide
-  {
-    image: "https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/IMG_20240215_102404.jpg",
-    text: [
-      "Date: 6-7 Februari 2025",
-      "Location: Place Two",
-      "Event: Another Event"
-    ],
-    important: "latest" // Show this modal every 2 clicks
-  },
-  {
-    image: "image1-url.jpg",
-    text: [
-      "Date",
-      "Location",
-      "Event"
-    ],
-    important: 3 // Show this modal 3 times consecutively
-  },
-  // Add more modal objects here
-  */
-];
 
-// Function to create and display the modal
-const showModal = (degree) => {
-const modal = document.createElement('div');
-modal.className = 'modal';
-modal.style.display = 'block';
-
-let content = '';
-
-// Customize the content based on the degree
-if (degree === 100) {
-content = `<p>You are lucky!</p>`;
-} else if (degree === 200) {
-content = `<p>You are kind!</p>`;
-} else if (degree === 230) {
-content = `
-<p>You found me. Saya developer app ini. Banyak orang yang suka menerima, tetapi masih ada orang yang suka memberi. Semoga kamu diberkati dunia akhirat. ❤️</p>
-<img src="https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/IMG_20240215_102404.jpg" alt="Sample Image" class="modal-image">
-`;
+// helper function
+const toDMS = (degrees, isLatitude) => {
+const degreeAbs = Math.abs(degrees);
+const degree = Math.floor(degreeAbs);
+const minuteDecimal = (degreeAbs - degree) * 60;
+const minute = Math.floor(minuteDecimal);
+const second = ((minuteDecimal - minute) * 60).toFixed(2);
+const direction = isLatitude ? (degrees >= 0 ? 'N': 'S'): (degrees >= 0 ? 'E': 'W');
+return `${degree}° ${minute}' ${second}" ${direction}`;
 }
-
-modal.innerHTML = `
-<div class="modal-content">
-<span class="close">&times;</span>
-${content}
-</div>
-`;
-
-document.body.appendChild(modal);
-
-// Close the modal when the close button is clicked
-modal.querySelector('.close').onclick = () => {
-modal.style.display = 'none';
-document.body.removeChild(modal);
-};
-
-// Close the modal when clicking outside of the modal
-window.onclick = (event) => {
-if (event.target === modal) {
-modal.style.display = 'none';
-document.body.removeChild(modal);
-}
-};
-};
-
-let currentModalIndex = null;
-let repeatCount = 0;
-let clickCount = 0;
-
-// Function to update modal content
-const updateModalContent = () => {
-const modalImage = document.getElementById("modalImage");
-const modalList = document.getElementById("modalList");
-
-clickCount++;
-
-// Check for modals with 'latest' importance
-const latestModal = modalData.find(({
-important
-}) => important === "latest");
-
-if (clickCount % 2 === 0 && latestModal) {
-currentModalIndex = modalData.indexOf(latestModal);
-repeatCount = 1; // Show 'latest' modal on every second click
-} else if (currentModalIndex === null || repeatCount <= 0) {
-// Select a random index for other modals
-do {
-currentModalIndex = Math.floor(Math.random() * modalData.length);
-} while (modalData[currentModalIndex].important === "latest");
-
-repeatCount = modalData[currentModalIndex].important || 1;
-}
-
-const currentData = modalData[currentModalIndex];
-
-modalImage.src = currentData.image;
-modalList.innerHTML = currentData.text.map(item => `<li>${item}</li>`).join('');
-
-// Decrease the repeat count
-repeatCount--;
-}
-
-// JavaScript to handle modal display
-const modal = document.getElementById("myModal");
-const span = document.getElementsByClassName("close")[0];
-const marqueeButton = document.querySelector(".marquee-button");
-
-marqueeButton.onclick = () => {
-updateModalContent(); // Update content before showing
-modal.style.display = "block";
-}
-
-span.onclick = () => {
-modal.style.display = "none";
-}
-
-window.onclick = event => {
-if (event.target === modal) {
-modal.style.display = "none";
-}
-}
+const KAABAH_LAT = 21.4225;
+const KAABAH_LONG = 39.8262;
 
 const isOnline = () => navigator.onLine;
 
+// load external javascript
 const loadScript = (url, callback) => {
 const script = document.createElement('script');
 script.src = url;
@@ -939,37 +786,7 @@ script.onload = callback;
 document.body.appendChild(script);
 }
 
-// Array of birthdays
-const birthdays = [{
-name: "Abi",
-birthdate: "01-01"
-}, // December 21st
-{
-name: "Bob",
-birthdate: "01-15"
-}, // January 15th
-// Add more birthdays here
-];
-
-// Function to check for birthdays and update marquee
-const checkBirthdays = () => {
-const today = new Date();
-const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-const day = String(today.getDate()).padStart(2, '0');
-const currentDate = `${month}-${day}`;
-
-const birthdayPerson = birthdays.find(person => person.birthdate === currentDate);
-
-const marqueeText = document.getElementById("marqueeText");
-
-if (birthdayPerson) {
-marqueeText.innerHTML = `🎉 Happy Birthday, ${birthdayPerson.name}! 🎂`;
-}
-};
-
-// Call the function to check for birthdays
-checkBirthdays();
-
+// variables are declared with `let` because their values will change during the execution of the script
 let updateBearingAndLines;
 let mapInitialized = false;
 let activityTimeout;
@@ -978,8 +795,8 @@ let degree = 0;
 let holdInterval = null;
 let speed = 1000;
 let firstPin, secondPin;
-let map; // Declare map here to make it accessible globally
-let updateButtonPosition; // Declare the function variable here
+let map;
+let updateButtonPosition;
 
 window.onload = () => {
 // Initialize the firstPin and secondPin only if the map is loaded
@@ -994,17 +811,9 @@ icon: yellowIcon, draggable: true
 }).addTo(map);
 }
 
-const circleWrapper = document.querySelector('.sticky-wrapper');
-toggleStickyOnFocus(ELEMENTS.degreeInput, circleWrapper);
-toggleStickyOnFocus(ELEMENTS.qiblatInput, circleWrapper);
-
 setupInputWithDebounce(ELEMENTS.degreeInput);
 setupInputWithDebounce(ELEMENTS.qiblatInput);
 
-const toggleMapCircleButton = document.getElementById('toggleMapCircle');
-toggleMapCircleButton.addEventListener('click', toggleMapCircle);
-
-initializeDegreeButtons();
 populateDegreeNumbers();
 initializeDynamicAngleUpdates();
 
@@ -1021,7 +830,7 @@ const kaedahQiblatSelect = document.getElementById('kaedahQiblat');
 kaedahQiblatSelect.addEventListener('change',
 updateSectorColors);
 
-updateSectorColors(); // Call once on load to set initial colors
+updateSectorColors();
 };
 
 const updateSectorColors = () => {
@@ -1049,15 +858,37 @@ sectors.sector4.setAttribute('fill', lighterColor);
 }
 }
 
+let alertShown = false; // Flag to track if the alert has been shown
 const initializeMapIfOnline = () => {
-if (!mapInitialized) {
-loadLeafletResources(() => {
-initializeMap();
-mapInitialized = true;
-});
-}
-}
-
+    if (!mapInitialized) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    loadLeafletResources(() => {
+                        initializeMap(position.coords.latitude, position.coords.longitude);
+                        mapInitialized = true;
+                    });
+                },
+                () => {
+                    if (!alertShown) {
+                        alert('Please enable GPS to view the map.');
+                        alertShown = true; // Set the flag to true after showing the alert
+                    }
+                    // Do not initialize the map if GPS is not available
+                },
+                {
+                    enableHighAccuracy: true, timeout: 5000, maximumAge: 0
+                }
+            );
+        } else {
+            if (!alertShown) {
+                alert('Geolocation is not supported by this browser.');
+                alertShown = true; // Set the flag to true after showing the alert
+            }
+            // Do not initialize the map if geolocation is not supported
+        }
+    }
+};
 const loadLeafletResources = (callback) => {
 const leafletCSS = document.createElement('link');
 leafletCSS.rel = 'stylesheet';
@@ -1066,8 +897,7 @@ document.head.appendChild(leafletCSS);
 
 loadScript('https://unpkg.com/leaflet/dist/leaflet.js', callback);
 }
-
-const initializeMap = () => {
+const initializeMap = (latitude, longitude) => {
 const iconSettings = {
 iconSize: [100,
 100],
@@ -1078,21 +908,17 @@ popupAnchor: [1,
 tooltipAnchor: [16,
 -28]
 };
-
 const redIcon = L.icon({
 ...iconSettings,
 iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/redPin.svg'
 });
-
 const yellowIcon = L.icon({
 ...iconSettings,
 iconUrl: 'https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/yellowPin.svg'
 });
-
 const defaultLocation = [2.8126,
 101.5018];
 map = L.map('map').setView(defaultLocation, 19);
-
 const addLayer = (url, attribution, maxZoom) =>
 L.tileLayer(url, {
 attribution, maxZoom
@@ -1104,21 +930,15 @@ const baseMaps = {
 "HERE Normal Day": addLayer('https://{s}.base.maps.ls.hereapi.com/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?apiKey=ZrGsYcNXW4T_cGxQWLiIZ0DdraWLJ2XaCfI8axrRCkw&lg=eng', 'Map data © 2024 HERE', 20),
 "OpenStreetMap": addLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 'Map data © OpenStreetMap contributors', 19)
 };
-
-// Add the Esri World Imagery layer initially
 baseMaps["Esri World Imagery"].addTo(map);
-
 L.control.layers(baseMaps).addTo(map);
-
-const kaabahLatLng = [21.4225,
-39.8262];
+const kaabahLatLng = [KAABAH_LAT, KAABAH_LONG];
 firstPin = L.marker(defaultLocation, {
 icon: redIcon, draggable: true
 }).addTo(map);
 secondPin = L.marker([3.1390, 101.6869], {
 icon: yellowIcon, draggable: true
 }).addTo(map);
-
 const shadowLine = L.polyline([[0, 0], [0, 0]], {
 color: 'green',
 weight: 10,
@@ -1127,157 +947,118 @@ dashArray: '5, 5',
 lineCap: 'round',
 lineJoin: 'round'
 }).addTo(map);
-
 const initialPath = interpolateGreatCircle(2.8126, 101.5018, kaabahLatLng[0], kaabahLatLng[1], 100);
 const lineToKaabah = L.polyline(initialPath, {
 color: 'red',
-weight: 2, // Increase the weight for better visibility
-interactive: false, // Make it non-interactive to ensure it renders smoothly
-pane: 'overlayPane' // Ensure it's rendered on top of other layers
+weight: 2,
+interactive: false,
+pane: 'overlayPane'
 }).addTo(map);
-
 const lineBetweenPins = L.polyline([[2.8126, 101.5018], [3.1390, 101.6869]], {
 color: 'yellow',
-weight: 2, // Increase the weight for better visibility
-interactive: false, // Make it non-interactive to ensure it renders smoothly
-pane: 'overlayPane' // Ensure it's rendered on top of other layers
+weight: 2,
+interactive: false,
+pane: 'overlayPane'
 }).addTo(map);
 
-// Function to update the button's position based on the pin's position
-const updateButtonPosition = () => {
-const firstPinLatLng = firstPin.getLatLng();
-const point = map.latLngToLayerPoint(firstPinLatLng);
-roundButton.style.left = `${point.x + 20}px`;
-roundButton.style.top = `${point.y - 60}px`;
+// Center Button Related Code //
+// Function to show an alert for successful location change
+const showAlertForLocationChange = () => {
+    alert("Location successfully changed.");
 };
-
-// Initialize the button and attach it to the map
+const updateButtonPosition = () => {
+    const firstPinLatLng = firstPin.getLatLng();
+    const point = map.latLngToLayerPoint(firstPinLatLng);
+    roundButton.style.left = `${point.x + 20}px`;
+    roundButton.style.top = `${point.y - 60}px`;
+};
 const roundButton = document.createElement('button');
 roundButton.className = 'round-button';
 roundButton.id = 'newRoundButton';
 roundButton.innerText = 'OK';
 document.querySelector('.leaflet-map-pane').appendChild(roundButton);
-
-// Event listener for dragging the firstPin
 firstPin.on('drag', () => {
-updateButtonPosition(); // Update the button's position continuously during drag
+    updateButtonPosition();
 });
-
-// Ensure the button is positioned correctly when dragging starts and ends
 firstPin.on('dragstart', () => {
-updateButtonPosition();
+    updateButtonPosition();
 });
-
 firstPin.on('dragend', () => {
-updateButtonPosition();
+    updateButtonPosition();
+    showAlertForLocationChange(); // Alert on drag end
 });
-
-// Event listener for the button click to navigate to install-banner-container
 roundButton.addEventListener('click', (event) => {
-event.stopPropagation(); // Prevent map click events from interfering
-const bannerContainer = document.getElementById('install-banner-container');
-if (bannerContainer) {
-bannerContainer.scrollIntoView({
-behavior: 'smooth'
+    event.stopPropagation();
+    const bannerContainer = document.getElementById('install-banner-container');
+    if (bannerContainer) {
+        bannerContainer.scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
 });
-}
-});
-
-// Initial positioning of the button
 updateButtonPosition();
-
-const handlePinDrag = (pin,
-line,
-callback) => {
-pin.on('dragstart',
-() => line.setStyle({
-opacity: 0
-}));
-pin.on('dragend',
-() => {
-callback();
-line.setStyle({
-opacity: 1
-});
-});
+const handlePinDrag = (pin, line, callback) => {
+    pin.on('dragstart', () => line.setStyle({ opacity: 0 }));
+    pin.on('dragend', () => {
+        callback();
+        line.setStyle({ opacity: 1 });
+    });
 };
-
-handlePinDrag(firstPin,
-lineToKaabah,
-() => {
-updateBearingAndLines('firstPin');
-updateButtonPosition();
+handlePinDrag(firstPin, lineToKaabah, () => {
+    updateBearingAndLines('firstPin');
+    updateButtonPosition();
 });
-
-handlePinDrag(secondPin,
-lineBetweenPins,
-() => updateBearingAndLines('secondPin'));
-
-map.on('click',
-e => {
-secondPin.setLatLng(e.latlng);
-updateBearingAndLines('secondPin');
+handlePinDrag(secondPin, lineBetweenPins, () => updateBearingAndLines('secondPin'));
+map.on('click', e => {
+    secondPin.setLatLng(e.latlng);
+    updateBearingAndLines('secondPin');
 });
-
-map.on('contextmenu',
-e => {
-firstPin.setLatLng(e.latlng);
-updateBearingAndLines('firstPin');
-updateButtonPosition();
+map.on('contextmenu', e => {
+    firstPin.setLatLng(e.latlng);
+    updateBearingAndLines('firstPin');
+    updateButtonPosition();
+    showAlertForLocationChange(); // Alert on context menu action
 });
-
 const updateLocation = () => {
-if (navigator.geolocation) {
-navigator.geolocation.getCurrentPosition(
-position => {
-const {
-latitude: userLat, longitude: userLng
-} = position.coords;
-const zoomLevel = 19;
-firstPin.setLatLng([userLat, userLng]);
-map.setView([userLat, userLng], zoomLevel);
-updateBearingAndLines('firstPin');
-updateButtonPosition();
-},
-() => {
-alert('Unable to retrieve your location. Please enable location services.');
-firstPin.setLatLng(defaultLocation);
-map.setView(defaultLocation, 19);
-updateBearingAndLines('firstPin');
-updateButtonPosition();
-},
-{
-enableHighAccuracy: true, timeout: 5000, maximumAge: 0
-}
-);
-} else {
-alert('Geolocation is not supported by this browser.');
-firstPin.setLatLng(defaultLocation);
-map.setView(defaultLocation, 19);
-updateBearingAndLines('firstPin');
-updateButtonPosition();
-}
-}
-
-const addClickEventToButton = (buttonId, handler) => {
-document.getElementById(buttonId).addEventListener('click', handler);
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const { latitude: userLat, longitude: userLng } = position.coords;
+                const zoomLevel = 19;
+                firstPin.setLatLng([userLat, userLng]);
+                map.setView([userLat, userLng], zoomLevel);
+                updateBearingAndLines('firstPin');
+                updateButtonPosition();
+                showAlertForLocationChange(); // Alert after updating location
+            },
+            () => {
+                alert('Please enable GPS.');
+                firstPin.setLatLng(defaultLocation);
+                map.setView(defaultLocation, 19);
+                updateBearingAndLines('firstPin');
+                updateButtonPosition();
+            },
+            {
+                enableHighAccuracy: true, timeout: 5000, maximumAge: 0
+            }
+        );
+    } else {
+        alert('Geolocation is not supported by this browser.');
+        firstPin.setLatLng(defaultLocation);
+        map.setView(defaultLocation, 19);
+        updateBearingAndLines('firstPin');
+        updateButtonPosition();
+    }
 };
-
+const addClickEventToButton = (buttonId, handler) => {
+    document.getElementById(buttonId).addEventListener('click', handler);
+};
 addClickEventToButton('updateLocationButton', updateLocation);
 addClickEventToButton('centerDotButton', updateLocation);
 
+
 const markerTooltipText1Element = document.getElementById('markerTooltipText1');
 const markerTooltipText2Element = document.getElementById('markerTooltipText2');
-
-const toDMS = (degrees, isLatitude) => {
-const degreeAbs = Math.abs(degrees);
-const degree = Math.floor(degreeAbs);
-const minuteDecimal = (degreeAbs - degree) * 60;
-const minute = Math.floor(minuteDecimal);
-const second = ((minuteDecimal - minute) * 60).toFixed(2);
-const direction = isLatitude ? (degrees >= 0 ? 'N': 'S'): (degrees >= 0 ? 'E': 'W');
-return `${degree}° ${minute}' ${second}" ${direction}`;
-}
 
 const updateBearingAndLines = (changedPin) => {
 if (firstPin && secondPin) {
@@ -1299,12 +1080,12 @@ const secondLatLng = secondPin.getLatLng();
 lineBetweenPins.setLatLngs([firstLatLng, secondLatLng]);
 lineBetweenPins.setStyle({
 opacity: 1
-}); // Make lineBetweenPins visible
+});
 } else {
 lineBetweenPins.setLatLngs([[0, 0], [0, 0]]);
 lineBetweenPins.setStyle({
 opacity: 0
-}); // Make lineBetweenPins invisible
+});
 }
 
 const bearingToKaabah = calculateBearing(firstLatLng.lat, firstLatLng.lng, kaabahLatLng[0], kaabahLatLng[1]);
@@ -1317,7 +1098,7 @@ updateShadowLine(firstLatLng, sunAzimuth);
 shadowLine.setLatLngs([[0, 0], [0, 0]]);
 shadowLine.setStyle({
 opacity: 0
-}); // Make shadowLine invisible
+});
 }
 
 const currentDate = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
@@ -1327,16 +1108,21 @@ const markerTooltipText2Element = document.getElementById('markerTooltipText2');
 
 if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BAYANG) {
 markerTooltipText1Element.innerHTML = `Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>Red Pin - Sun Azimuth: ${sunAzimuth.toFixed(2)}°<br/>`;
-markerTooltipText2Element.innerHTML = ''; // Clear the second tooltip
+markerTooltipText2Element.innerHTML = '';
 } else if (ELEMENTS.kaedahQiblat.value === QIBLAT_METHODS.BANGUNAN) {
 const secondLatLng = secondPin.getLatLng();
 const bearingToSecondPin = calculateBearing(firstLatLng.lat, firstLatLng.lng, secondLatLng.lat, secondLatLng.lng);
 markerTooltipText2Element.innerHTML = `Qiblat: ${bearingToKaabah.toFixed(2)}°<br/>Yellow Pin - Bearing bangunan: ${bearingToSecondPin.toFixed(2)}°`;
-markerTooltipText1Element.innerHTML = ''; // Clear the first tooltip
+markerTooltipText1Element.innerHTML = '';
 }
 
 const firstPinDataElement = document.getElementById('firstPinData');
-firstPinDataElement.innerHTML = `Date: ${currentDate.toLocaleDateString()}<br/>Time: ${currentDate.toLocaleTimeString()}<br/>Latitude: ${firstLatLng.lat.toFixed(6)} (${toDMS(firstLatLng.lat)})<br/>Longitude: ${firstLatLng.lng.toFixed(6)} (${toDMS(firstLatLng.lng)})<br/>`;
+firstPinDataElement.innerHTML = `
+    Date: ${currentDate.toLocaleDateString()}<br/>
+    Time: ${currentDate.toLocaleTimeString()}<br/>
+    Latitude: ${firstLatLng.lat.toFixed(6)} (${toDMS(firstLatLng.lat, true)})<br/>
+    Longitude: ${firstLatLng.lng.toFixed(6)} (${toDMS(firstLatLng.lng, false)})<br/>
+`;
 
 if (!ELEMENTS.dateTimeInput.value) {
 ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
@@ -1431,27 +1217,26 @@ updateCompassDisplay();
 });
 }
 
+// 2
 document.getElementById('searchButton').addEventListener('click', () => {
 const query = document.getElementById('locationSearch').value;
 if (query) {
 searchLocation(query);
 }
 });
-
 document.getElementById('clearSearchButton').addEventListener('click', () => {
 const searchResults = document.getElementById('searchResults');
-searchResults.innerHTML = ''; // Clear the list
-searchResults.style.display = 'none'; // Hide the list
-document.getElementById('locationSearch').value = ''; // Clear the search input
+searchResults.innerHTML = '';
+searchResults.style.display = 'none';
+document.getElementById('locationSearch').value = '';
 });
-
 const searchLocation = (query) => {
 const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
 fetch(url)
 .then(response => response.json())
 .then(data => {
 const searchResults = document.getElementById('searchResults');
-searchResults.innerHTML = ''; // Clear previous results
+searchResults.innerHTML = '';
 
 if (data && data.length > 0) {
 data.forEach(location => {
@@ -1463,19 +1248,19 @@ const lat = parseFloat(location.lat);
 const lon = parseFloat(location.lon);
 if (firstPin) {
 firstPin.setLatLng([lat, lon]);
-map.setView([lat, lon], 19); // Adjust the zoom level as needed
+map.setView([lat, lon], 19);
 updateBearingAndLines('firstPin');
 if (typeof updateButtonPosition === 'function') {
-updateButtonPosition(); // Ensure button position is updated
+updateButtonPosition();
 }
 }
-searchResults.innerHTML = ''; // Clear the list
-searchResults.style.display = 'none'; // Hide the list
+searchResults.innerHTML = '';
+searchResults.style.display = 'none';
 });
 
 searchResults.appendChild(listItem);
 });
-searchResults.style.display = 'block'; // Show results when available
+searchResults.style.display = 'block';
 } else {
 alert('Location not found. Please try a different search.');
 }
@@ -1486,6 +1271,7 @@ alert('An error occurred while searching for the location.');
 });
 }
 
+// 3
 const calculateAndLabelAngles = (angleA, angleB) => {
 angleA = (angleA + 360) % 360;
 angleB = (angleB + 360) % 360;
@@ -1530,7 +1316,6 @@ document.getElementById('sector4'),
 document.getElementById('label4'),
 sector4.toFixed(2));
 }
-
 const drawSectorArc = (cx, cy, radius, startAngle, endAngle, pathElement, labelElement, label) => {
 const start = polarToCartesian(cx,
 cy,
@@ -1563,7 +1348,6 @@ labelElement.setAttribute("y",
 labelPos.y);
 labelElement.textContent = `${label}°`;
 }
-
 const polarToCartesian = (cx, cy, radius, angleInDegrees) => {
 const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
 return {
@@ -1571,7 +1355,6 @@ x: cx + (radius * Math.cos(angleInRadians)),
 y: cy + (radius * Math.sin(angleInRadians))
 };
 }
-
 const updateAngles = () => {
 const angleA = parseFloat(ELEMENTS.degreeInput.value) || 0;
 const angleB = parseFloat(ELEMENTS.qiblatInput.value) || 0;
@@ -1579,7 +1362,6 @@ const angleB = parseFloat(ELEMENTS.qiblatInput.value) || 0;
 calculateAndLabelAngles(angleA,
 angleB);
 }
-
 const initializeDynamicAngleUpdates = () => {
 ELEMENTS.degreeInput.addEventListener('input',
 updateAngles);
@@ -1592,28 +1374,29 @@ secondPin.on('drag', () => updateBearingAndLines('secondPin'));
 }
 }
 
+// 4
 const setupInputWithDebounce = (inputElement) => {
 inputElement.addEventListener('input', () => {
 clearTimeout(inputDebounceTimeout);
 inputDebounceTimeout = setTimeout(() => {
 finalizeInput(inputElement);
-}, 1000); // 1 second delay
+}, 1000);
 });
 
 inputElement.addEventListener('focus', () => {
-clearTimeout(inputDebounceTimeout); // Clear timeout on focus
+clearTimeout(inputDebounceTimeout);
 });
 
 inputElement.addEventListener('blur', () => {
-finalizeInput(inputElement); // Finalize immediately on blur
+finalizeInput(inputElement);
 });
 }
-
 const finalizeInput = (inputElement) => {
-inputElement.blur(); // Remove focus to stop editing
-updateCompassDisplay(); // Ensure the display is updated with the final value
+inputElement.blur();
+updateCompassDisplay();
 }
 
+// 5
 const ELEMENTS = {
 circle: document.getElementById('circle'),
 centerLine: document.getElementById('centerLine'),
@@ -1624,9 +1407,7 @@ blackArrowHead: document.getElementById('blackArrowHead'),
 kaedahQiblat: document.getElementById('kaedahQiblat'),
 degreeInput: document.getElementById('degreeInput'),
 latInput: document.getElementById('latInput'),
-// Added for latitude input
 longInput: document.getElementById('longInput'),
-// Added for longitude input
 degreeTooltip: document.getElementById('degreeTooltip'),
 qiblatInput: document.getElementById('qiblatInput'),
 qiblatTooltip: document.getElementById('qiblatTooltip'),
@@ -1634,21 +1415,17 @@ distanceToKaabah: document.getElementById('distanceToKaabah'),
 dateTimeInput: document.getElementById('dateTimeInput'),
 status: document.getElementById('status')
 };
-
 const DISPLAY = {
 BLOCK: 'block',
 NONE: 'none'
 };
-
 const QIBLAT_METHODS = {
 BANGUNAN: 'bangunan',
 BAYANG: 'bayang',
 OFFLINELATLONG: 'offlineLatLong'
 };
-
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
-
 const calculateBearing = (lat1, lon1, lat2, lon2) => {
 const lat1Rad = toRadians(lat1);
 const lat2Rad = toRadians(lat2);
@@ -1660,7 +1437,6 @@ const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(l
 const bearing = Math.atan2(y, x);
 return (toDegrees(bearing) + 360) % 360;
 }
-
 const interpolateGreatCircle = (lat1, lon1, lat2, lon2, steps) => {
 const points = [];
 const startLat = toRadians(lat1);
@@ -1689,25 +1465,26 @@ points.push([toDegrees(newLat), toDegrees(newLon)]);
 return points;
 }
 
+// 6
 const showTooltip = (tooltipElement) => {
 tooltipElement.style.visibility = 'visible';
 tooltipElement.style.opacity = '1';
 };
-
 const hideTooltip = (tooltipElement) => {
 tooltipElement.style.visibility = 'hidden';
 tooltipElement.style.opacity = '0';
 };
 
+// 6 update the rotation of an HTML element to visually indicate a specific direction or bearing.
 const updateArrow = (element, degree) => {
 element.style.transform = `translateY(-50%) rotate(${degree}deg)`;
 };
 
+// 7
 const updateCompassDisplay = () => {
 let lat,
 lng;
 
-// Check if latitude and longitude inputs have valid values
 const inputLat = parseFloat(ELEMENTS.latInput.value);
 const inputLng = parseFloat(ELEMENTS.longInput.value);
 
@@ -1715,12 +1492,10 @@ if (!isNaN(inputLat) && !isNaN(inputLng)) {
 lat = inputLat;
 lng = inputLng;
 } else if (firstPin) {
-// Use the pin position if inputs are not valid
 const firstPinLatLng = firstPin.getLatLng();
 lat = firstPinLatLng.lat;
 lng = firstPinLatLng.lng;
 } else {
-// Fallback to default values if neither is available
 lat = 0;
 lng = 0;
 }
@@ -1747,24 +1522,18 @@ updateArrow(ELEMENTS.blackArrowHead, degree);
 updateArrow(ELEMENTS.arrowLine, finalQiblatDegree || 0);
 updateArrow(ELEMENTS.arrowHead, finalQiblatDegree || 0);
 };
-
-// Attach event listeners to update the display when inputs change
 ELEMENTS.latInput.addEventListener('input', updateCompassDisplay);
 ELEMENTS.longInput.addEventListener('input', updateCompassDisplay);
 ELEMENTS.dateTimeInput.addEventListener('change', updateCompassDisplay);
 ELEMENTS.degreeInput.addEventListener('input', updateCompassDisplay);
 ELEMENTS.qiblatInput.addEventListener('input', updateCompassDisplay);
-
-// Update when the pin is moved
 if (firstPin) {
 firstPin.on('drag', updateCompassDisplay);
 }
-
 ELEMENTS.qiblatInput.addEventListener('input', () => {
 updateCompassDisplay();
 resetActivityTimer();
 });
-
 ELEMENTS.degreeInput.addEventListener('input', () => {
 updateCompassDisplay();
 resetActivityTimer();
@@ -1798,7 +1567,7 @@ degreeNumber.style.top = `${y}px`;
 degreeNumber.style.transform = `translate(-50%, -50%) rotate(${i}deg)`;
 
 degreeNumber.addEventListener('click', () => {
-if (i === 100 || i === 200 || i === 230) {
+if (i === 100 || i === 200 || i === 0) {
 showModal(i);
 }
 });
@@ -1806,131 +1575,12 @@ showModal(i);
 ELEMENTS.circle.appendChild(degreeNumber);
 }
 };
-
-// Call the populateDegreeNumbers function to initialize the degree numbers
 populateDegreeNumbers();
-
-// Function to toggle sticky class on the circle
-const toggleStickyOnFocus = (inputElement, circleWrapper) => {
-inputElement.addEventListener('focus',
-() => {
-circleWrapper.classList.add('non-sticky');
-setTimeout(() => {
-inputElement.scrollIntoView({
-behavior: 'smooth', block: 'center'
-});
-}, 300);
-});
-
-inputElement.addEventListener('blur',
-() => {
-circleWrapper.classList.remove('non-sticky');
-resetActivityTimer(); // Ensure the timer is reset on blur
-});
-}
-
-// Function to toggle the map's circle class
-const toggleMapCircle = () => {
-const mapElement = document.getElementById('map');
-const circleContainer = document.querySelector('.circle-container');
-
-if (circleContainer.contains(mapElement)) {
-// Move the map outside the circle and restore original styles
-document.querySelector('.map-fieldset').appendChild(mapElement);
-mapElement.style.borderRadius = '0'; // Remove circular shape
-mapElement.style.height = '50vh'; // Original height
-mapElement.style.width = '100%'; // Original width
-mapElement.style.position = 'relative'; // Reset position
-mapElement.style.top = ''; // Reset top
-mapElement.style.left = ''; // Reset left
-} else {
-// Move the map inside the circle and make it circular
-circleContainer.appendChild(mapElement);
-mapElement.classList.add('circle-map'); // Add the class for circular shape
-alignMapWithCircle(); // Align map size with circle
-mapElement.style.borderRadius = '50%'; // Make it circular
-mapElement.style.position = 'absolute'; // Position absolutely
-mapElement.style.top = '0'; // Align at top
-mapElement.style.left = '0'; // Align at left
-}
-}
-
-const alignMapWithCircle = () => {
-const mapElement = document.getElementById('map');
-const circleContainer = document.querySelector('.circle');
-
-mapElement.style.width = `${circleContainer.offsetWidth}px`;
-mapElement.style.height = `${circleContainer.offsetHeight}px`;
-}
 
 if (!isOnline()) {
 updateBearingAndLines = () => {
 console.warn("Offline mode: updateBearingAndLines cannot be executed.");
 };
-}
-
-// Function to initialize the degree adjustment buttons
-const initializeDegreeButtons = () => {
-const increaseButton = document.getElementById('increaseButton');
-const decreaseButton = document.getElementById('decreaseButton');
-const rotationValue = document.getElementById('rotationValue');
-const mapElement = document.getElementById('map');
-
-const updateRotation = () => {
-rotationValue.textContent = `${degree}°`;
-mapElement.style.transform = `rotate(${degree}deg)`;
-}
-
-const increaseDegree = () => {
-degree = (degree + 0.5) % 360;
-updateRotation();
-}
-
-const decreaseDegree = () => {
-degree = (degree - 0.5 + 360) % 360; // Ensure the value stays positive
-updateRotation();
-}
-
-const handleButtonHold = (callback) => {
-callback();
-holdInterval = setInterval(() => {
-callback();
-speed = Math.max(30, speed - 10000000); // Decrease interval time to speed up
-clearInterval(holdInterval); // Clear previous interval
-holdInterval = setInterval(callback, speed); // Set new faster interval
-}, speed);
-}
-
-increaseButton.addEventListener('mousedown', () => {
-speed = 1000; // Reset speed
-handleButtonHold(increaseDegree);
-});
-
-decreaseButton.addEventListener('mousedown', () => {
-speed = 1000; // Reset speed
-handleButtonHold(decreaseDegree);
-});
-
-document.addEventListener('mouseup', () => {
-clearInterval(holdInterval);
-});
-
-// For touch devices
-increaseButton.addEventListener('touchstart', (e) => {
-e.preventDefault();
-speed = 1000; // Reset speed
-handleButtonHold(increaseDegree);
-});
-
-decreaseButton.addEventListener('touchstart', (e) => {
-e.preventDefault();
-speed = 1000; // Reset speed
-handleButtonHold(decreaseDegree);
-});
-
-document.addEventListener('touchend', () => {
-clearInterval(holdInterval);
-});
 }
 
 const isSunDown = (date, latitude, longitude) => {
@@ -1946,24 +1596,17 @@ const long = parseFloat(ELEMENTS.longInput.value);
 const dateTime = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
 
 if (!isNaN(lat) && !isNaN(long)) {
-const bearingToKaabah = calculateBearing(lat, long, 21.4225, 39.8262);
+const bearingToKaabah = calculateBearing(lat, long, KAABAH_LAT, KAABAH_LONG);
 const sunAzimuth = SunCalc.getPosition(dateTime, lat, long).azimuth * 180 / Math.PI + 180;
 
-// Update the compass display
 updateArrow(ELEMENTS.arrowLine, bearingToKaabah);
 updateArrow(ELEMENTS.arrowHead, bearingToKaabah);
-
-// Update other UI elements based on your requirements
 ELEMENTS.qiblatInput.value = bearingToKaabah.toFixed(2);
 ELEMENTS.degreeInput.value = sunAzimuth.toFixed(2);
-
-// Call functions to update any lines or visual elements
 updateCompassDisplay();
 updateAngles();
 }
 };
-
-// Attach event listeners to the inputs
 ELEMENTS.latInput.addEventListener('input', updateDisplayForOfflineLatLong);
 ELEMENTS.longInput.addEventListener('input', updateDisplayForOfflineLatLong);
 ELEMENTS.dateTimeInput.addEventListener('change', updateDisplayForOfflineLatLong);
@@ -1973,24 +1616,12 @@ const lat = parseFloat(ELEMENTS.latInput.value) || 0;
 const long = parseFloat(ELEMENTS.longInput.value) || 0;
 const dateTime = ELEMENTS.dateTimeInput.value ? new Date(ELEMENTS.dateTimeInput.value): new Date();
 
-const toDMS = (degrees, isLatitude) => {
-const degreeAbs = Math.abs(degrees);
-const degree = Math.floor(degreeAbs);
-const minuteDecimal = (degreeAbs - degree) * 60;
-const minute = Math.floor(minuteDecimal);
-const second = ((minuteDecimal - minute) * 60).toFixed(2);
-const direction = isLatitude ? (degrees >= 0 ? 'N': 'S'): (degrees >= 0 ? 'E': 'W');
-return `${degree}° ${minute}' ${second}" ${direction}`;
-};
 
 // Calculate the sun's position using SunCalc
 const sunPosition = SunCalc.getPosition(dateTime, lat, long);
-const sunAzimuth = (sunPosition.azimuth * 180 / Math.PI + 180).toFixed(2); // Convert to degrees and adjust
+const sunAzimuth = (sunPosition.azimuth * 180 / Math.PI + 180).toFixed(2);
 
-// Use your calculateBearing function to find the Qiblat direction
-const kaabahLat = 21.4225; // Latitude of the Kaabah in Mecca
-const kaabahLong = 39.8262; // Longitude of the Kaabah in Mecca
-const qiblatDegree = calculateBearing(lat, long, kaabahLat, kaabahLong);
+const qiblatDegree = calculateBearing(lat, long, KAABAH_LAT, KAABAH_LONG);
 
 const firstPinDataElement = document.getElementById('firstPinData');
 firstPinDataElement.innerHTML = `Date: ${dateTime.toLocaleDateString()}<br/>
@@ -2000,12 +1631,153 @@ Longitude: ${long.toFixed(6)} (${toDMS(long, false)})<br/>
 Sun Azimuth: ${sunAzimuth}°<br/>
 Qiblat Degree: ${qiblatDegree.toFixed(2)}°<br/>`;
 };
-
-// Ensure to call updateFirstPinData when needed, e.g., on input changes
 ELEMENTS.latInput.addEventListener('input', updateFirstPinData);
 ELEMENTS.longInput.addEventListener('input', updateFirstPinData);
 ELEMENTS.dateTimeInput.addEventListener('change', updateFirstPinData);
 
+// side features
+// marquee
+const modalData = [{
+image: "image1-url.jpg",
+text: [
+"Date: 4-5 Januari 2025",
+"Location: Baitul Hilal Bukit Jugra Kuala Langat Banting",
+"Event: KEM FALAK (Sempena Hujan Meteor Quadrantids)"
+],
+important: 3 // Show this modal 3 times consecutively
+},
+/*
+  // temp hide
+  {
+    image: "https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/IMG_20240215_102404.jpg",
+    text: [
+      "Date: 6-7 Februari 2025",
+      "Location: Place Two",
+      "Event: Another Event"
+    ],
+    important: "latest" // Show this modal every 2 clicks
+  },
+  {
+    image: "image1-url.jpg",
+    text: [
+      "Date",
+      "Location",
+      "Event"
+    ],
+    important: 3 // Show this modal 3 times consecutively
+  },
+  // Add more modal objects here
+  */
+];
+const showModal = (degree) => {
+const modal = document.createElement('div');
+modal.className = 'modal';
+modal.style.display = 'block';
+let content = '';
+
+// Customize the content based on the degree. search: if (i === 100
+if (degree === 100) {
+content = `<p>You are lucky!</p>`;
+} else if (degree === 200) {
+content = `<p>You are kind!</p>`;
+} else if (degree === 0) {
+content = `
+<p>You found me. Saya developer app ini. Banyak orang yang suka menerima, tetapi masih ada orang yang suka memberi. Semoga kamu diberkati dunia akhirat. ❤️</p>
+<img src="https://raw.githubusercontent.com/supremindset/PAKAR/refs/heads/main/IMG_20240215_102404.jpg" alt="Sample Image" class="modal-image">
+`;
+}
+
+modal.innerHTML = `
+<div class="modal-content">
+<span class="close">&times;</span>
+${content}
+</div>
+`;
+document.body.appendChild(modal);
+modal.querySelector('.close').onclick = () => {
+modal.style.display = 'none';
+document.body.removeChild(modal);
+};
+window.onclick = (event) => {
+if (event.target === modal) {
+modal.style.display = 'none';
+document.body.removeChild(modal);
+}
+};
+};
+let currentModalIndex = null;
+let repeatCount = 0;
+let clickCount = 0;
+const updateModalContent = () => {
+const modalImage = document.getElementById("modalImage");
+const modalList = document.getElementById("modalList");
+
+clickCount++;
+
+// Check for modals with 'latest' importance
+const latestModal = modalData.find(({
+important
+}) => important === "latest");
+
+if (clickCount % 2 === 0 && latestModal) {
+currentModalIndex = modalData.indexOf(latestModal);
+repeatCount = 1; // Show 'latest' modal on every second click
+} else if (currentModalIndex === null || repeatCount <= 0) {
+// Select a random index for other modals
+do {
+currentModalIndex = Math.floor(Math.random() * modalData.length);
+} while (modalData[currentModalIndex].important === "latest");
+
+repeatCount = modalData[currentModalIndex].important || 1;
+}
+
+const currentData = modalData[currentModalIndex];
+
+modalImage.src = currentData.image;
+modalList.innerHTML = currentData.text.map(item => `<li>${item}</li>`).join('');
+
+// Decrease the repeat count
+repeatCount--;
+}
+const modal = document.getElementById("myModal");
+const span = document.getElementsByClassName("close")[0];
+const marqueeButton = document.querySelector(".marquee-button");
+marqueeButton.onclick = () => {
+updateModalContent(); // Update content before showing
+modal.style.display = "block";
+}
+span.onclick = () => {
+modal.style.display = "none";
+}
+window.onclick = event => {
+if (event.target === modal) {
+modal.style.display = "none";
+}
+}
+
+// birthdays
+const birthdays = [{
+name: "Abi",
+birthdate: "01-01"
+}, // December 21st
+{
+name: "Bob",
+birthdate: "10-15"
+}, // October 15th
+// Add more birthdays here
+];
+const checkBirthdays = () => {
+const today = new Date();
+const month = String(today.getMonth() + 1).padStart(2, '0');
+const day = String(today.getDate()).padStart(2, '0');
+const currentDate = `${month}-${day}`;
+const birthdayPerson = birthdays.find(person => person.birthdate === currentDate);
+const marqueeText = document.getElementById("marqueeText");
+if (birthdayPerson) {
+marqueeText.innerHTML = `🎉 Happy Birthday, ${birthdayPerson.name}! 🎂`;
+}
+};
+checkBirthdays();
 </script>
 
 </body>
