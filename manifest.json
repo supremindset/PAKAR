@@ -55,5 +55,9 @@
   ],
   "dir": "ltr",
   "lang": "en",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ]
 }
