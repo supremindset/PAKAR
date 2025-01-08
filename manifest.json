@@ -57,7 +57,6 @@
   "lang": "en",
   "orientation": "portrait",
   "display_override": [
-    "standalone",
-    "window-controls-overlay"
+    "standalone"
   ]
 }
