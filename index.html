@@ -143,20 +143,6 @@
             /* Ensure lines are behind the center-dot */
         }
 
-        .arrow-line {
-            position: absolute;
-            width: 100%;
-            height: 4px;
-            background-color: red;
-            top: 50%;
-            left: 0;
-            transform-origin: center;
-            transform: translateY(-50%) rotate(0deg);
-            transition: transform 0.5s ease;
-            z-index: 2;
-            /* Ensure lines are behind the center-dot */
-        }
-
         .short-horizontal-line {
             position: absolute;
             width: 250px;
@@ -219,6 +205,20 @@
         .label-west {
             margin-top: -20px;
         }
+        
+        .arrow-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background-color: rgba(255, 0, 0);
+            top: 50%;
+            left: 0;
+            transform-origin: center;
+            transform: translateY(-50%) rotate(0deg);
+            transition: transform 0.5s ease;
+            z-index: 2;
+            /* Ensure lines are behind the center-dot */
+        }
 
         .arrow-head {
             position: absolute;
@@ -237,8 +237,7 @@
         .black-arrow-line {
             position: absolute;
             width: 100%;
-            height: 2px;
-            background-color: #333;
+            height: 4px;
             top: 50%;
             left: 0;
             transform-origin: center;
@@ -538,7 +537,7 @@
     <div id="install-banner-container">
         <div class="marquee-button">
             <marquee behavior="scroll" direction="left" scrollamount="5" class="install-banner" id="marqueeText">
-                PAKAR
+                Mencerap Awal Bulan Syaaban, 1-2 Februari 2025 (Sabtu-Ahad)
             </marquee>
         </div>
     </div>
@@ -742,19 +741,19 @@ document.getElementById('kaedahQiblat').addEventListener('change', function() {
         degreeInput.style.display = 'block';
         qiblatInput.style.display = 'block';
         dateTimeInput.style.display = 'block';
-        blackArrowLine.style.backgroundColor = 'black';
-        blackArrowHead.style.backgroundColor = 'black';
+        blackArrowLine.style.backgroundColor = 'rgba(34, 139, 34)';
+        blackArrowHead.style.backgroundColor = 'rgba(34, 139, 34)';
     } else if (selectedValue === 'bangunan') {
         degreeInput.style.display = 'block';
         qiblatInput.style.display = 'block';
-        blackArrowLine.style.backgroundColor = 'rgba(255, 223, 70, 1)';
-        blackArrowHead.style.backgroundColor = 'rgba(255, 223, 70, 1)';
+        blackArrowLine.style.backgroundColor = 'rgba(255, 223, 70)';
+        blackArrowHead.style.backgroundColor = 'rgba(255, 223, 70)';
     } else if (selectedValue === 'offlineLatLong') {
         latInput.style.display = 'block';
         longInput.style.display = 'block';
         dateTimeInput.style.display = 'block';
-        blackArrowLine.style.backgroundColor = 'black';
-        blackArrowHead.style.backgroundColor = 'black';
+        blackArrowLine.style.backgroundColor = 'rgba(41, 128, 185)';
+        blackArrowHead.style.backgroundColor = 'rgba(41, 128, 185)';
     }
     checkServerReachability();
 });
@@ -962,9 +961,21 @@ pane: 'overlayPane'
 }).addTo(map);
 
 // Center Button Related Code //
-// Function to show an alert for successful location change
-const showAlertForLocationChange = () => {
-    alert("Location successfully changed.");
+// Function to make the centerDotButton blink green
+const blinkCenterDotButton = () => {
+    const centerDotButton = document.getElementById('centerDotButton');
+    let blinkCount = 0;
+    const originalColor = centerDotButton.style.backgroundColor || '#2980b9'; // Default color if not set
+
+    const blinkInterval = setInterval(() => {
+        centerDotButton.style.backgroundColor = (blinkCount % 2 === 0) ? 'white' : originalColor;
+        blinkCount++;
+
+        if (blinkCount >= 6) { // Blink 3 times (since it toggles color twice per blink)
+            clearInterval(blinkInterval);
+            centerDotButton.style.backgroundColor = originalColor; // Ensure it ends on the original color
+        }
+    }, 500); // Change color every 500 ms
 };
 const updateButtonPosition = () => {
     const firstPinLatLng = firstPin.getLatLng();
@@ -985,7 +996,7 @@ firstPin.on('dragstart', () => {
 });
 firstPin.on('dragend', () => {
     updateButtonPosition();
-    showAlertForLocationChange(); // Alert on drag end
+    blinkCenterDotButton();
 });
 roundButton.addEventListener('click', (event) => {
     event.stopPropagation();
@@ -1017,7 +1028,7 @@ map.on('contextmenu', e => {
     firstPin.setLatLng(e.latlng);
     updateBearingAndLines('firstPin');
     updateButtonPosition();
-    showAlertForLocationChange(); // Alert on context menu action
+    blinkCenterDotButton();
 });
 const updateLocation = () => {
     if (navigator.geolocation) {
@@ -1029,7 +1040,7 @@ const updateLocation = () => {
                 map.setView([userLat, userLng], zoomLevel);
                 updateBearingAndLines('firstPin');
                 updateButtonPosition();
-                showAlertForLocationChange(); // Alert after updating location
+                blinkCenterDotButton();
             },
             () => {
                 alert('Please enable GPS.');
@@ -1640,9 +1651,9 @@ ELEMENTS.dateTimeInput.addEventListener('change', updateFirstPinData);
 const modalData = [{
 image: "image1-url.jpg",
 text: [
-"Date: 4-5 Januari 2025",
+"Date: 1-2 Februari 2025",
 "Location: Baitul Hilal Bukit Jugra Kuala Langat Banting",
-"Event: KEM FALAK (Sempena Hujan Meteor Quadrantids)"
+"Event: KEM FALAK (Mencerap Awal Bulan Syaaban)"
 ],
 important: 3 // Show this modal 3 times consecutively
 },
